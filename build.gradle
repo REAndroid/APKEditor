@@ -1,0 +1,44 @@
+
+apply plugin: 'java'
+
+group 'com.reandroid.apkeditor'
+version '1.0.0'
+
+java {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.compileJava {
+            //options.addStringOption('-Xlint:unchecked', '-quiet')
+        }
+    }
+}
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
+    compile(files("$rootProject.projectDir/libs/Commons.jar"))
+}
+
+processResources {
+    filesMatching('tool.properties') {
+        expand('version': version)
+    }
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes(
+                'Main-Class': 'com.reandroid.apkeditor.Main'
+        )
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
