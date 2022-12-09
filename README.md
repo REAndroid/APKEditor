@@ -1,2 +1,2 @@
-A# APKEditor
+# APKEditor
 ## Android apk editor
