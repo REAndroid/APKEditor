@@ -41,7 +41,7 @@ public class Main {
         StringBuilder builder=new StringBuilder();
         builder.append(getWelcome());
         builder.append("\nUsage: \n");
-        builder.append(" java -jar ").append(getName()).append(".jar");
+        builder.append(" java -jar ").append(APKEditor.getJarName());
         builder.append(" <command> <args>");
         builder.append("\n commands: ");
         builder.append("\n  1)  ").append(Decompiler.ARG_SHORT).append(" | ").append(Decompiler.ARG_LONG);
@@ -53,23 +53,12 @@ public class Main {
     }
     private static String getWelcome(){
         StringBuilder builder=new StringBuilder();
-        builder.append(getName());
-        builder.append(" - ").append(getVersion());
-        builder.append("\n").append(getRepo());
-        builder.append("\n").append(getDescription());
+        builder.append(APKEditor.getName());
+        builder.append(" - ").append(APKEditor.getVersion());
+        builder.append("\nUsing: ").append(APKEditor.getARSCLibInfo());
+        builder.append("\n").append(APKEditor.getRepo());
+        builder.append("\n").append(APKEditor.getDescription());
         return builder.toString();
-    }
-    private static String getDescription(){
-        return "Standalone android binary apk, arsc, xml edit tool";
-    }
-    private static String getRepo(){
-        return "https://github.com/REAndroid/APKEditor";
-    }
-    private static String getName(){
-        return "APKEditor";
-    }
-    private static String getVersion(){
-        return "1.0.0";
     }
     private static String getCommand(String[] args){
         String cmd=args[0];

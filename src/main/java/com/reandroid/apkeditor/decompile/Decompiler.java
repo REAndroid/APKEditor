@@ -2,10 +2,12 @@ package com.reandroid.apkeditor.decompile;
 
 import com.reandroid.apkeditor.Util;
 import com.reandroid.commons.command.ARGException;
+import com.reandroid.commons.utils.FileUtil;
 import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.lib.apk.ApkJsonDecoder;
 import com.reandroid.lib.apk.ApkModule;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Decompiler {
@@ -17,8 +19,8 @@ public class Decompiler {
         log("Loading ...");
         ApkModule apkModule=ApkModule.loadApkFile(options.inputFile);
         log("Decompiling to json ...");
-        ApkJsonDecoder serializer=new ApkJsonDecoder(apkModule, options.splitJson);
-        serializer.writeToDirectory(options.outputFile);
+        ApkJsonDecoder decoder=new ApkJsonDecoder(apkModule, options.splitJson);
+        decoder.writeToDirectory(options.outputFile);
         log("Done");
     }
     public static void execute(String[] args) throws ARGException, IOException {
@@ -28,14 +30,17 @@ public class Decompiler {
         DecompileOptions option=new DecompileOptions();
         option.parse(args);
         log("Decompiling ...\n"+option);
+        File outDir=option.outputFile;
+        Util.deleteEmptyDirectories(outDir);
+        if(outDir.exists()){
+            if(!option.force){
+                throw new ARGException("Path already exists: "+outDir);
+            }
+            log("Deleting: "+outDir);
+            Util.deleteDir(outDir);
+        }
         Decompiler decompiler=new Decompiler(option);
         decompiler.run();
-    }
-    private static String getError(String err){
-        return "Error: " + err+"\n Run with -h for help";
-    }
-    private static String getName(){
-        return "Decompiler";
     }
     private static void log(String msg){
         Logger.i(getLogTag()+msg);
@@ -52,5 +57,5 @@ public class Decompiler {
     }
     public static final String ARG_SHORT="d";
     public static final String ARG_LONG="decode";
-    public static final String DESCRIPTION="Decodes android binary to readable json string";
+    public static final String DESCRIPTION="Decodes android resources binary to readable json";
 }
