@@ -1,6 +1,6 @@
 # APKEditor
 ## Android apk editor (suitable for resource obfuscated apks)
-
+## Using [ARSCLib](https://github.com/REAndroid/ARSCLib)
 * ## Decompile
 
 ```console
