@@ -12,20 +12,25 @@ public class BuildOptions extends Options {
     }
     public String toString(){
         StringBuilder builder=new StringBuilder();
-        builder.append(" Input: "+inputFile);
-        builder.append("\nOutput: "+outputFile);
-        builder.append("\n Force: "+force);
+        builder.append("   Input: ").append(inputFile);
+        builder.append("\n Output: ").append(outputFile);
+        if(resDirName!=null){
+            builder.append("\nres dir: ").append(resDirName);
+        }
+        if(validateResDir){
+            builder.append("\n Validate res dir name: true");
+        }
+        if(force){
+            builder.append("\n Force: true");
+        }
         builder.append("\n ---------------------------- ");
         return builder.toString();
     }
+    @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
         parseOutput(args);
-        parseForce(args);
-        checkUnknownOptions(args);
-    }
-    private void parseForce(String[] args) throws ARGException {
-        force=containsArg(ARG_force, true, args);
+        super.parse(args);
     }
     private void parseOutput(String[] args) throws ARGException {
         this.outputFile=null;
@@ -62,11 +67,17 @@ public class BuildOptions extends Options {
         String[][] table=new String[][]{
                 new String[]{ARG_input, ARG_DESC_input},
                 new String[]{ARG_output, ARG_DESC_output},
-                new String[]{ARG_force, ARG_DESC_force}
+                new String[]{ARG_resDir, ARG_DESC_resDir}
+        };
+        StringHelper.printTwoColumns(builder, "   ", 75, table);
+        builder.append("\nFlags:\n");
+        table=new String[][]{
+                new String[]{ARG_force, ARG_DESC_force},
+                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();
-        builder.append("\nExample-1:");
+        builder.append("\n\nExample-1:");
         builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
                 .append(ARG_input).append(" path/to/input_dir");
         builder.append(" ").append(ARG_output).append(" path/to/out.apk");
@@ -75,10 +86,4 @@ public class BuildOptions extends Options {
                 .append(ARG_input).append(" path/to/input_dir");
         return builder.toString();
     }
-    private static final String ARG_output="-o";
-    private static final String ARG_DESC_output="output file";
-    private static final String ARG_input="-i";
-    private static final String ARG_DESC_input="input directory";
-    private static final String ARG_force="-f";
-    private static final String ARG_DESC_force="force delete output path";
 }

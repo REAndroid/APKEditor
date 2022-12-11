@@ -3,12 +3,30 @@ package com.reandroid.apkeditor;
 import com.reandroid.commons.command.ARGException;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class Options {
     public File inputFile;
     public File outputFile;
     public boolean force;
+    public boolean validateResDir;
+    public String resDirName;
 
+    public void parse(String[] args) throws ARGException {
+        parseResDirName(args);
+        parseForce(args);
+        parseValidateResDir(args);
+        checkUnknownOptions(args);
+    }
+    private void parseValidateResDir(String[] args) throws ARGException {
+        validateResDir=containsArg(ARG_validate_res_dir, true, args);
+    }
+    private void parseResDirName(String[] args) throws ARGException {
+        this.resDirName=parseArgValue(ARG_resDir, true, args);
+    }
+    private void parseForce(String[] args) throws ARGException {
+        force=containsArg(ARG_force, true, args);
+    }
     protected void checkUnknownOptions(String[] args) throws ARGException {
         args=Util.trimNull(args);
         if(Util.isEmpty(args)){
@@ -95,4 +113,14 @@ public class Options {
         return false;
     }
 
+    protected static final String ARG_output="-o";
+    protected static final String ARG_DESC_output="output path";
+    protected static final String ARG_input="-i";
+    protected static final String ARG_DESC_input="input path";
+    protected static final String ARG_resDir="-res-dir";
+    protected static final String ARG_DESC_resDir="sets resource files root dir name\n(eg. for obfuscation to move files from 'res/*' to 'r/*' or vice versa)";
+    protected static final String ARG_validate_res_dir="-vrd";
+    protected static final String ARG_DESC_validate_res_dir="validate resources dir name\n(eg. if a drawable resource file path is 'res/abc.png' then it\nmoves to 'res/drawable/abc.png')";
+    protected static final String ARG_force="-f";
+    protected static final String ARG_DESC_force="force delete output path";
 }

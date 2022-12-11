@@ -5,6 +5,7 @@ import com.reandroid.apkeditor.decompile.DecompileOptions;
 import com.reandroid.archive.WriteProgress;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
+import com.reandroid.lib.apk.APKLogger;
 import com.reandroid.lib.apk.ApkJsonEncoder;
 import com.reandroid.lib.apk.ApkModule;
 import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
@@ -15,6 +16,7 @@ import java.util.zip.ZipEntry;
 
 public class Builder implements WriteProgress {
     private final BuildOptions options;
+    private APKLogger mApkLogger;
     public Builder(BuildOptions options){
         this.options=options;
     }
@@ -22,15 +24,41 @@ public class Builder implements WriteProgress {
         log("Scanning directory ...");
         ApkJsonEncoder encoder=new ApkJsonEncoder();
         ApkModule loadedModule=encoder.scanDirectory(options.inputFile);
+        loadedModule.setAPKLogger(getAPKLogger());
+        if(options.resDirName!=null){
+            log("Renaming resources root dir: "+options.resDirName);
+            loadedModule.setResourcesRootDir(options.resDirName);
+        }
+        if(options.validateResDir){
+            log("Validating resources dir ...");
+            loadedModule.validateResourcesDir();
+        }
         log("Writing apk...");
         loadedModule.writeApk(options.outputFile, this);
         log("Done");
     }
+    private APKLogger getAPKLogger(){
+        if(mApkLogger!=null){
+            return mApkLogger;
+        }
+        mApkLogger = new APKLogger() {
+            @Override
+            public void logMessage(String msg) {
+                Logger.i(getLogTag()+msg);
+            }
+            @Override
+            public void logError(String msg, Throwable tr) {
+                Logger.e(getLogTag()+msg, tr);
+            }
+            @Override
+            public void logVerbose(String msg) {
+                Logger.sameLine(getLogTag()+msg);
+            }
+        };
+        return mApkLogger;
+    }
     @Override
     public void onCompressFile(String path, int method, long length) {
-        if("resources.arsc".equals(path)){
-            path.trim();
-        }
         StringBuilder builder=new StringBuilder();
         builder.append("Writing:");
         if(method == ZipEntry.STORED){
