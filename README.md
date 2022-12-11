@@ -4,7 +4,7 @@
 * ## Decompile
 
 ```console
-java -jar APKEditor-1.0.1.jar d -split -f -i test.apk -o test_json
+java -jar APKEditor.jar d -split -f -i test.apk -o test_json
 00.000 I: [DECOMPILE] Decompiling ...
  Input: test.apk
 Output: test_json
@@ -18,7 +18,7 @@ Output: test_json
 * ## Build
 
 ```console
-java -jar APKEditor-1.0.1.jar b -f -i test_json -o test_edited.apk
+java -jar APKEditor.jar b -f -i test_json -o test_edited.apk
 
 00.000 I: [BUILD] Building ...
  Input: test_json/base
