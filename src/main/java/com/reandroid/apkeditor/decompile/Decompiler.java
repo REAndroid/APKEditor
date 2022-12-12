@@ -25,6 +25,10 @@ public class Decompiler {
             log("Renaming resources root dir: "+options.resDirName);
             apkModule.setResourcesRootDir(options.resDirName);
         }
+        if(options.validateResDir){
+            log("Validating resources dir ...");
+            apkModule.validateResourcesDir();
+        }
         log("Decompiling to json ...");
         ApkJsonDecoder decoder=new ApkJsonDecoder(apkModule, options.splitJson);
         decoder.writeToDirectory(options.outputFile);
