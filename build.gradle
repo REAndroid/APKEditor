@@ -2,7 +2,7 @@
 apply plugin: 'java'
 
 group 'com.reandroid.apkeditor'
-version '1.0.3'
+version '1.0.4'
 
 java {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -22,6 +22,9 @@ repositories {
 }
 
 dependencies {
+    // TODO
+    // lets manually copy jar files to libs directory,
+    // until we get decent repository like maven
     compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
     compile(files("$rootProject.projectDir/libs/Commons.jar"))
 }
