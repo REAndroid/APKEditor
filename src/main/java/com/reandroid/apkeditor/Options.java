@@ -3,7 +3,6 @@ package com.reandroid.apkeditor;
 import com.reandroid.commons.command.ARGException;
 
 import java.io.File;
-import java.util.Arrays;
 
 public class Options {
     public File inputFile;

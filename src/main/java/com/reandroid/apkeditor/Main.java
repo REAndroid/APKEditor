@@ -2,6 +2,7 @@ package com.reandroid.apkeditor;
 
 import com.reandroid.apkeditor.compile.Builder;
 import com.reandroid.apkeditor.decompile.Decompiler;
+import com.reandroid.apkeditor.merge.Merger;
 import com.reandroid.commons.command.ARGException;
 
 import java.io.IOException;
@@ -35,6 +36,10 @@ public class Main {
             Builder.execute(args);
             return;
         }
+        if(Merger.isCommand(command)){
+            Merger.execute(args);
+            return;
+        }
         throw new ARGException("Unknown command: "+command);
     }
     private static String getHelp(){
@@ -45,9 +50,11 @@ public class Main {
         builder.append(" <command> <args>");
         builder.append("\n commands: ");
         builder.append("\n  1)  ").append(Decompiler.ARG_SHORT).append(" | ").append(Decompiler.ARG_LONG);
-        builder.append("    -  ").append(Decompiler.DESCRIPTION);
+        builder.append("   -   ").append(Decompiler.DESCRIPTION);
         builder.append("\n  2)  ").append(Builder.ARG_SHORT).append(" | ").append(Builder.ARG_LONG);
-        builder.append("    -  ").append(Builder.DESCRIPTION);
+        builder.append("    -   ").append(Builder.DESCRIPTION);
+        builder.append("\n  3)  ").append(Merger.ARG_SHORT).append(" | ").append(Merger.ARG_LONG);
+        builder.append("    -   ").append(Merger.DESCRIPTION);
         builder.append("\n run with <command> -h to get detailed help about each command");
         return builder.toString();
     }

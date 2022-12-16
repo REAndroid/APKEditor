@@ -12,6 +12,7 @@ public class DecompileOptions extends Options {
     public boolean splitJson;
     public DecompileOptions(){
     }
+    @Override
     public String toString(){
         StringBuilder builder=new StringBuilder();
         builder.append("   Input: ").append(inputFile);
