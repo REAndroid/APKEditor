@@ -102,6 +102,6 @@ public class DecompileOptions extends Options {
                 .append(ARG_input).append(" path/to/input.apk").append(" ").append(ARG_split_resources);
         return builder.toString();
     }
-    private static final String ARG_split_resources="-split";
+    private static final String ARG_split_resources="-split-json";
     private static final String ARG_DESC_split_resources="splits resources.arsc into multiple parts as per type entries (use this for large files)";
 }

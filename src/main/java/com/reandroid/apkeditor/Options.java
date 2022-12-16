@@ -17,13 +17,13 @@ public class Options {
         parseValidateResDir(args);
         checkUnknownOptions(args);
     }
-    private void parseValidateResDir(String[] args) throws ARGException {
+    protected void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
     }
-    private void parseResDirName(String[] args) throws ARGException {
+    protected void parseResDirName(String[] args) throws ARGException {
         this.resDirName=parseArgValue(ARG_resDir, true, args);
     }
-    private void parseForce(String[] args) throws ARGException {
+    protected void parseForce(String[] args) throws ARGException {
         force=containsArg(ARG_force, true, args);
     }
     protected void checkUnknownOptions(String[] args) throws ARGException {
@@ -119,7 +119,7 @@ public class Options {
     protected static final String ARG_resDir="-res-dir";
     protected static final String ARG_DESC_resDir="sets resource files root dir name\n(eg. for obfuscation to move files from 'res/*' to 'r/*' or vice versa)";
     protected static final String ARG_validate_res_dir="-vrd";
-    protected static final String ARG_DESC_validate_res_dir="validate resources dir name\n(eg. if a drawable resource file path is 'res/abc.png' then it\nmoves to 'res/drawable/abc.png')";
+    protected static final String ARG_DESC_validate_res_dir="validate resources dir name\n(eg. if a drawable resource file path is 'res/abc.png' then\nit will be moved to 'res/drawable/abc.png')";
     protected static final String ARG_force="-f";
     protected static final String ARG_DESC_force="force delete output path";
 }
