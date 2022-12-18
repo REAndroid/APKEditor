@@ -74,3 +74,8 @@ gradlew.bat fatJar
 ```
 ## Downloads
 * ### [Latest release](https://github.com/REAndroid/APKEditor/releases/latest)
+## Contribute
+* Please share your ideas / thoughts
+* Please create issue you faced while using this tool along with your apk
+## Contact
+* [Telegram](https://t.me/kikfox)
