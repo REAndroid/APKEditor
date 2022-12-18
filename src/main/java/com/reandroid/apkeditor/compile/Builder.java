@@ -3,6 +3,7 @@ package com.reandroid.apkeditor.compile;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.decompile.DecompileOptions;
 import com.reandroid.archive.WriteProgress;
+import com.reandroid.archive.ZipAlign;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.lib.apk.APKLogger;
@@ -21,7 +22,7 @@ public class Builder implements WriteProgress {
         this.options=options;
     }
     public void run() throws IOException {
-        log("Scanning directory ...");
+        log("Scanning direc tory ...");
         ApkJsonEncoder encoder=new ApkJsonEncoder();
         ApkModule loadedModule=encoder.scanDirectory(options.inputFile);
         loadedModule.setAPKLogger(getAPKLogger());
@@ -35,6 +36,8 @@ public class Builder implements WriteProgress {
         }
         log("Writing apk...");
         loadedModule.writeApk(options.outputFile, this);
+        log("Zip align ...");
+        ZipAlign.align4(options.outputFile);
         log("Done");
     }
     private APKLogger getAPKLogger(){

@@ -5,6 +5,7 @@ import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
 import com.reandroid.archive.APKArchive;
 import com.reandroid.archive.WriteProgress;
+import com.reandroid.archive.ZipAlign;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.lib.apk.APKLogger;
@@ -41,8 +42,10 @@ public class Merger extends BaseCommand implements WriteProgress {
         if(mergedModule.hasAndroidManifestBlock()){
             sanitizeManifest(mergedModule.getAndroidManifestBlock());
         }
-        log("Writing apk...");
+        log("Writing apk ...");
         mergedModule.writeApk(options.outputFile, this);
+        log("Zip align ...");
+        ZipAlign.align4(options.outputFile);
         log("Saved to: "+options.outputFile);
         log("Done");
     }
