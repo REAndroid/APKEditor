@@ -1,41 +1,71 @@
+<details><summary> 👈 <code><i> Click arrows to expand/collapse details on this page </i></code></summary></details>
+
 # APKEditor
 ### Powerful android apk resources editor
-### Using [ARSCLib](https://github.com/REAndroid/ARSCLib)
-* 100% java
-* Independent of AAPT/AAPT2
-* Can be used for obfuscation or de-obfuscation resources
-* Fast
+This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has three main features
+
+<details><summary><code>java -jar APKEditor.jar <b>-h</b></code></summary>
+
+```
+$ java -jar APKEditor.jar -h
+APKEditor - x.x.x
+Using: ARSCLib-x.x.x
+https://github.com/REAndroid/APKEditor
+Android binary resource files editor
+Usage: 
+ java -jar APKEditor.jar <command> <args>
+ commands: 
+  1)  d | decode   -   Decodes android resources binary to readable json
+  2)  b | build    -   Builds android binary from json
+  3)  m | merge    -   Merges split apk files from directory
+ run with <command> -h to get detailed help about each command
+ 
+```
+</details>
 
 #### 1- Decompile
+Decompiles resources of apk to human readable json string.
+<details> <summary><code>java -jar APKEditor.jar <b>d</b> -i path/to/your-file.apk</code></summary>
+
 ```
-java -jar APKEditor.jar d -split -f -i test.apk -o test_json
+$ java -jar APKEditor.jar d -i test.apk -o test_json
 00.000 I: [DECOMPILE] Decompiling ...
  Input: test.apk
 Output: test_json
- Force: true
- Split: true
  ---------------------------- 
 00.036 I: [DECOMPILE] Loading ...
 00.129 I: [DECOMPILE] Decompiling to json ...
 30.093 I: [DECOMPILE] Done
 ```
-### 2- Build
+
+</details>
+
+#### 2- Build
+Builds back to apk from decompiled json files
+<details> <summary><code>java -jar APKEditor.jar <b>b</b> -i path/to/decompiled-directory</code></summary>
+
 ```
-java -jar APKEditor.jar b -f -i test_json -o test_edited.apk
+$ java -jar APKEditor.jar b -i test_json -o test_edited.apk
 
 00.000 I: [BUILD] Building ...
  Input: test_json/base
 Output: test_edited.apk
- Force: true
  ---------------------------- 
 00.048 I: [BUILD] Scanning directory ...
 00.247 I: [BUILD] Writing apk...
-22.032 [BUILD] Writing: method=STORED total=284921526 bytes : resources.arsc              
-56.217 I: [BUILD] Done
+22.032 [BUILD] Writing: method=STORED total=284921526 bytes : resources.arsc  
+25.009 I: [BUILD] Zip align ...
+27.101 I: [BUILD] Saved to: test_edited.apk
+30.217 I: [BUILD] Done
 ```
-### 3- Merge
+</details>
+
+#### 3- Merge
+Merges multiple splitted apk (app bundles) to standalone apk
+<details> <summary><code>java -jar APKEditor.jar <b>m</b> -i path/to/directory-of-apk-files</code></summary>
+
 ```
-java -jar APKEditor-1.0.5.jar m -i "apk_files"
+$ java -jar APKEditor.jar m -i apk_files
 00.049 I: [MERGE] Merging ...
    Input: apk_files
  Output: apk_files_merged.apk
@@ -58,24 +88,28 @@ java -jar APKEditor-1.0.5.jar m -i "apk_files"
 
 01.480 I: [MERGE] Writing apk...
 03.686 [MERGE] Writing: total=47693672 bytes : resources.arsc
-         
-03.768 I: [MERGE] Saved to: apk_files_merged.apk
-03.768 I: [MERGE] Done
-```
-* ### Building Jar
-```console
-git clone https://github.com/REAndroid/APKEditor.git
-cd APKEditor
-# Linux / Mac
-./gradlew fatJar
-# Windows
-gradlew.bat fatJar
-# Executable jar will be built under build/libs/APKEditor-{version}.jar
-```
-## Downloads
-* ### [Latest release](https://github.com/REAndroid/APKEditor/releases/latest)
-## Contribute
-* Please share your ideas / thoughts
+03.729 I: [MERGE] Zip align ... 
+04.611 I: [MERGE] Saved to: apk_files_merged.apk
+04.700 I: [MERGE] Done
+
+``` 
+</details>
+
+*NB: merge is introduced from version V1.0.5*
+
+***Downloads***
+* [Latest release with pre-built executable jar](https://github.com/REAndroid/APKEditor/releases/latest)
+
+***Contribute***
+* Everyone is so welcome in this project, if you have some code improvements please make a pull request
+* Please share your ideas / thoughts in discussions
 * Please create issue you faced while using this tool along with your apk
-## Contact
-* [Telegram](https://t.me/kikfox)
+
+
+
+<details> <summary><b>Contact</b></summary> 
+
+* [Telegram: @kikfox](https://t.me/kikfox)
+* [Email: thekikfox@gmail.com](mailto:thekikfox@gmail.com)
+
+</details>
