@@ -102,7 +102,7 @@ $ java -jar APKEditor.jar m -i apk_files
 
 ***Contribute***
 * Everyone is so welcome in this project, if you have some code improvements please make a pull request
-* Please share your ideas / thoughts in discussions
+* Please share your ideas / thoughts in [discussions](https://github.com/REAndroid/APKEditor/discussions)
 * Please create issue you faced while using this tool along with your apk
 
 
