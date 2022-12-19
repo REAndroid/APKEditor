@@ -107,7 +107,7 @@ $ java -jar APKEditor.jar m -i apk_files
 
 
 
-<details> <summary><b>Contact</b></summary> 
+<details> <summary><i><b>Contact</b></i></summary> 
 
 * [Telegram: @kikfox](https://t.me/kikfox)
 * [Email: thekikfox@gmail.com](mailto:thekikfox@gmail.com)
