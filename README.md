@@ -93,7 +93,7 @@ $ java -jar APKEditor.jar m -i apk_files
 04.700 I: [MERGE] Done
 
 ```  
-[![apkmerger](/.github/apkmerger.png)](#)
+ ![apkmerger](/.github/apkmerger.png)
 
 </details>
 
