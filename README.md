@@ -64,7 +64,7 @@ Output: test_edited.apk
 Merges multiple splitted apk (app bundles) to standalone apk
 <details> <summary><code>java -jar APKEditor.jar <b>m</b> -i path/to/directory-of-apk-files</code></summary>
 
-```
+ ``` 
 $ java -jar APKEditor.jar m -i apk_files
 00.049 I: [MERGE] Merging ...
    Input: apk_files
@@ -92,7 +92,9 @@ $ java -jar APKEditor.jar m -i apk_files
 04.611 I: [MERGE] Saved to: apk_files_merged.apk
 04.700 I: [MERGE] Done
 
-``` 
+```  
+[![apkmerger](/.github/apkmerger.png)](#)
+
 </details>
 
 *NB: merge is introduced from version V1.0.5*
