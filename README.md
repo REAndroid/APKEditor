@@ -2,7 +2,7 @@
 
 # APKEditor
 ### Powerful android apk resources editor
-This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has three main features
+This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has four main features
 
 <details><summary><code>java -jar APKEditor.jar <b>-h</b></code></summary>
 
@@ -15,9 +15,10 @@ Android binary resource files editor
 Usage: 
  java -jar APKEditor.jar <command> <args>
  commands: 
-  1)  d | decode   -   Decodes android resources binary to readable json
-  2)  b | build    -   Builds android binary from json
-  3)  m | merge    -   Merges split apk files from directory
+  1)  d | decode     -   Decodes android resources binary to readable json
+  2)  b | build      -   Builds android binary from json
+  3)  m | merge      -   Merges split apk files from directory
+  4)  x | refactor   -   Refactors obfuscated resource names
  run with <command> -h to get detailed help about each command
  
 ```
@@ -97,7 +98,28 @@ $ java -jar APKEditor.jar m -i apk_files
 
 </details>
 
-*NB: merge is introduced from version V1.0.5*
+#### 4- Refactor
+Refactors obfuscated resource entry names
+<details> <summary><code>java -jar APKEditor.jar <b>x</b> -i path/to/input.apk</code></summary>
+
+ ``` 
+$ java -jar APKEditor.jar x -i input.apk
+00.000 I: [REFACTOR] Refactoring ...
+   Input: input.apk
+ Output: input_refactored.apk
+ ---------------------------- 
+00.017 I: [REFACTOR] Loading apk: input.apk
+00.952 I: [REFACTOR] Renamed entries: 5888
+00.954 I: [REFACTOR] Writing apk ...
+03.268 [REFACTOR] Writing: total=47589184 bytes : resources.arsc              
+03.350 I: [REFACTOR] Zip align ...
+03.504 I: [REFACTOR] Saved to: input_refactored.apk
+03.504 I: [REFACTOR] Done
+
+```  
+
+</details>
+
 
 ***Downloads***
 * [Latest release with pre-built executable jar](https://github.com/REAndroid/APKEditor/releases/latest)

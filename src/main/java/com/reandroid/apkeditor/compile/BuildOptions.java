@@ -23,7 +23,23 @@ import com.reandroid.commons.command.ARGException;
 import java.io.File;
 
 public class BuildOptions extends Options {
+    public boolean validateResDir;
+    public String resDirName;
     public BuildOptions(){
+    }
+    @Override
+    public void parse(String[] args) throws ARGException {
+        parseInput(args);
+        parseOutput(args);
+        parseResDirName(args);
+        parseValidateResDir(args);
+        super.parse(args);
+    }
+    private void parseValidateResDir(String[] args) throws ARGException {
+        validateResDir=containsArg(ARG_validate_res_dir, true, args);
+    }
+    private void parseResDirName(String[] args) throws ARGException {
+        this.resDirName=parseArgValue(ARG_resDir, true, args);
     }
     @Override
     public String toString(){
@@ -41,12 +57,6 @@ public class BuildOptions extends Options {
         }
         builder.append("\n ---------------------------- ");
         return builder.toString();
-    }
-    @Override
-    public void parse(String[] args) throws ARGException {
-        parseInput(args);
-        parseOutput(args);
-        super.parse(args);
     }
     private void parseOutput(String[] args) throws ARGException {
         this.outputFile=null;

@@ -24,11 +24,24 @@ import com.reandroid.commons.command.ARGException;
 import java.io.File;
 
 public class MergerOptions extends Options {
+    public boolean validateResDir;
+    public String resDirName;
+    public MergerOptions(){
+        super();
+    }
     @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
         parseOutput(args);
+        parseResDirName(args);
+        parseValidateResDir(args);
         super.parse(args);
+    }
+    private void parseValidateResDir(String[] args) throws ARGException {
+        validateResDir=containsArg(ARG_validate_res_dir, true, args);
+    }
+    private void parseResDirName(String[] args) throws ARGException {
+        this.resDirName=parseArgValue(ARG_resDir, true, args);
     }
     private void parseOutput(String[] args) throws ARGException {
         this.outputFile=null;

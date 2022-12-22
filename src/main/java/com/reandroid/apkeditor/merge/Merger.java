@@ -15,24 +15,24 @@
   */
 package com.reandroid.apkeditor.merge;
 
-import com.reandroid.apkeditor.BaseCommand;
-import com.reandroid.apkeditor.Util;
-import com.reandroid.apkeditor.common.AndroidManifestHelper;
-import com.reandroid.archive.APKArchive;
-import com.reandroid.archive.WriteProgress;
-import com.reandroid.archive.ZipAlign;
-import com.reandroid.commons.command.ARGException;
-import com.reandroid.commons.utils.log.Logger;
-import com.reandroid.lib.apk.APKLogger;
-import com.reandroid.lib.apk.ApkBundle;
-import com.reandroid.lib.apk.ApkModule;
-import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
+ import com.reandroid.apkeditor.BaseCommand;
+ import com.reandroid.apkeditor.Util;
+ import com.reandroid.apkeditor.common.AndroidManifestHelper;
+ import com.reandroid.archive.WriteProgress;
+ import com.reandroid.archive.ZipAlign;
+ import com.reandroid.commons.command.ARGException;
+ import com.reandroid.commons.utils.log.Logger;
+ import com.reandroid.lib.apk.APKLogger;
+ import com.reandroid.lib.apk.ApkBundle;
+ import com.reandroid.lib.apk.ApkModule;
+ import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.zip.ZipEntry;
+ import java.io.File;
+ import java.io.IOException;
+ import java.util.Objects;
+ import java.util.zip.ZipEntry;
 
-public class Merger extends BaseCommand implements WriteProgress {
+ public class Merger extends BaseCommand implements WriteProgress {
     private final MergerOptions options;
     private APKLogger mApkLogger;
     public Merger(MergerOptions options){
@@ -76,11 +76,6 @@ public class Merger extends BaseCommand implements WriteProgress {
         if(removed){
             log("Removed: "+AndroidManifestBlock.NAME_isSplitRequired);
         }
-    }
-    private void removeSignature(ApkModule module){
-        module.removeDir("META-INF");
-        APKArchive archive = module.getApkArchive();
-        archive.remove("stamp-cert-sha256");
     }
     @Override
     public void onCompressFile(String path, int method, long length) {
@@ -127,14 +122,17 @@ public class Merger extends BaseCommand implements WriteProgress {
         }
         MergerOptions option=new MergerOptions();
         option.parse(args);
-        File outDir=option.outputFile;
-        Util.deleteEmptyDirectories(outDir);
-        if(outDir.exists()){
+        File outFile=option.outputFile;
+        if(Objects.equals(outFile.getParentFile(), option.inputFile)){
+            throw new IOException("Output file can not be inside input directory!");
+        }
+        Util.deleteEmptyDirectories(outFile);
+        if(outFile.exists()){
             if(!option.force){
-                throw new ARGException("Path already exists: "+outDir);
+                throw new ARGException("Path already exists: "+outFile);
             }
-            log("Deleting: "+outDir);
-            Util.deleteDir(outDir);
+            log("Deleting: "+outFile);
+            Util.deleteDir(outFile);
         }
         log("Merging ...\n"+option);
         Merger merger=new Merger(option);

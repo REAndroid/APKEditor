@@ -23,22 +23,13 @@ public class Options {
     public File inputFile;
     public File outputFile;
     public boolean force;
-    public boolean validateResDir;
-    public String resDirName;
-
+    public Options(){
+    }
     public void parse(String[] args) throws ARGException {
-        parseResDirName(args);
         parseForce(args);
-        parseValidateResDir(args);
         checkUnknownOptions(args);
     }
-    protected void parseValidateResDir(String[] args) throws ARGException {
-        validateResDir=containsArg(ARG_validate_res_dir, true, args);
-    }
-    protected void parseResDirName(String[] args) throws ARGException {
-        this.resDirName=parseArgValue(ARG_resDir, true, args);
-    }
-    protected void parseForce(String[] args) throws ARGException {
+    private void parseForce(String[] args) throws ARGException {
         force=containsArg(ARG_force, true, args);
     }
     protected void checkUnknownOptions(String[] args) throws ARGException {

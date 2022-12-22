@@ -13,16 +13,17 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.reandroid.apkeditor;
+package com.reandroid.apkeditor.refactor;
 
-import com.reandroid.archive.APKArchive;
-import com.reandroid.lib.apk.ApkModule;
+import java.util.regex.Pattern;
 
- public class BaseCommand {
-
-     protected static void removeSignature(ApkModule module){
-         module.removeDir("META-INF");
-         APKArchive archive = module.getApkArchive();
-         archive.remove("stamp-cert-sha256");
-     }
+public class RefactorUtil {
+    public static boolean isGoodName(String name){
+        if(name==null){
+            return false;
+        }
+        return PATTERN_GOOD_NAME.matcher(name).matches();
+    }
+    public static final String RES_DIR="res";
+    private static final Pattern PATTERN_GOOD_NAME =Pattern.compile("^[A-Za-z]{2,15}(_[A-Za-z]{1,15})*[0-9]*$");
 }

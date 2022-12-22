@@ -25,32 +25,24 @@ import java.io.File;
 
 public class DecompileOptions extends Options {
     public boolean splitJson;
+    public boolean validateResDir;
+    public String resDirName;
     public DecompileOptions(){
-    }
-    @Override
-    public String toString(){
-        StringBuilder builder=new StringBuilder();
-        builder.append("   Input: ").append(inputFile);
-        builder.append("\n Output: ").append(outputFile);
-        if(resDirName!=null){
-            builder.append("\nres dir: ").append(resDirName);
-        }
-        if(validateResDir){
-            builder.append("\n Validate res dir name: true");
-        }
-        if(force){
-            builder.append("\n Force: true");
-        }
-        builder.append("\n Split: ").append(splitJson);
-        builder.append("\n ---------------------------- ");
-        return builder.toString();
     }
     @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
         parseOutput(args);
         parseSplitResources(args);
+        parseResDirName(args);
+        parseValidateResDir(args);
         super.parse(args);
+    }
+    private void parseValidateResDir(String[] args) throws ARGException {
+        validateResDir=containsArg(ARG_validate_res_dir, true, args);
+    }
+    private void parseResDirName(String[] args) throws ARGException {
+        this.resDirName=parseArgValue(ARG_resDir, true, args);
     }
     private void parseSplitResources(String[] args) throws ARGException {
         splitJson=containsArg(ARG_split_resources, true, args);
@@ -86,6 +78,25 @@ public class DecompileOptions extends Options {
             throw new ARGException("No such file: "+file);
         }
         this.inputFile=file;
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder builder=new StringBuilder();
+        builder.append("   Input: ").append(inputFile);
+        builder.append("\n Output: ").append(outputFile);
+        if(resDirName!=null){
+            builder.append("\nres dir: ").append(resDirName);
+        }
+        if(validateResDir){
+            builder.append("\n Validate res dir name: true");
+        }
+        if(force){
+            builder.append("\n Force: true");
+        }
+        builder.append("\n Split: ").append(splitJson);
+        builder.append("\n ---------------------------- ");
+        return builder.toString();
     }
     public static String getHelp(){
         StringBuilder builder=new StringBuilder();
