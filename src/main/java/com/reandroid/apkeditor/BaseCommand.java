@@ -18,11 +18,14 @@ package com.reandroid.apkeditor;
 import com.reandroid.archive.APKArchive;
 import com.reandroid.lib.apk.ApkModule;
 
+import java.util.regex.Pattern;
+
  public class BaseCommand {
 
      protected static void removeSignature(ApkModule module){
-         module.removeDir("META-INF");
          APKArchive archive = module.getApkArchive();
+         archive.removeAll(Pattern.compile("META-INF/(?!services/).*"));
          archive.remove("stamp-cert-sha256");
      }
 }
+
