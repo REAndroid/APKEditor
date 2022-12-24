@@ -16,7 +16,20 @@
 package com.reandroid.apkeditor.utils;
 
 
-public class StringHelper {
+ import java.util.Comparator;
+ import java.util.List;
+
+ public class StringHelper {
+     public static List<String> sortAscending(List<String> nameList){
+         Comparator<String> cmp=new Comparator<String>() {
+             @Override
+             public int compare(String s1, String s2) {
+                 return s1.compareTo(s2);
+             }
+         };
+         nameList.sort(cmp);
+         return nameList;
+     }
     public static void printTwoColumns(StringBuilder builder, String tab, int totalWidth, String[][] table){
         int leftWidth=0;
         for(String[] col:table){

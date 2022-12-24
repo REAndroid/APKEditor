@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
      protected static void removeSignature(ApkModule module){
          APKArchive archive = module.getApkArchive();
-         archive.removeAll(Pattern.compile("META-INF/(?!services/).*"));
+         archive.removeAll(Pattern.compile("^META-INF/(?!services/).*"));
          archive.remove("stamp-cert-sha256");
      }
 }

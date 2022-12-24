@@ -20,8 +20,39 @@ import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.lib.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.lib.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.lib.arsc.chunk.xml.ResXmlStartElement;
+import com.reandroid.lib.arsc.value.ValueType;
 
-public class AndroidManifestHelper {
+import java.util.ArrayList;
+import java.util.List;
+
+ public class AndroidManifestHelper {
+    public static List<ResXmlElement> listSplitRequired(ResXmlElement parentElement){
+        List<ResXmlElement> results=new ArrayList<>();
+        if(parentElement==null){
+            return results;
+        }
+        List<ResXmlElement> metaDataList = parentElement.listElements(AndroidManifestBlock.TAG_meta_data);
+        for(ResXmlElement metaData:metaDataList){
+            ResXmlAttribute nameAttribute = metaData.getStartElement()
+                    .getAttribute(AndroidManifestBlock.ID_name);
+            if(nameAttribute==null){
+                continue;
+            }
+            if(nameAttribute.getValueType() != ValueType.STRING){
+                /*
+                 * TODO: could be reference ,
+                 *  thus we need TableBlock/EntryStore to resolve string value.
+                 */
+                continue;
+            }
+            String value = nameAttribute.getValueAsString();
+            if(value.startsWith("com.android.vending.")
+                    ||value.startsWith("com.android.stamp.")){
+                results.add(metaData);
+            }
+        }
+        return results;
+    }
     public static boolean removeApplicationAttribute(AndroidManifestBlock manifest, int resId){
         ResXmlElement app = manifest.getApplicationElement();
         if(app==null){

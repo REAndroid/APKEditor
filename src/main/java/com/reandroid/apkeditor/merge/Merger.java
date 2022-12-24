@@ -26,9 +26,13 @@ package com.reandroid.apkeditor.merge;
  import com.reandroid.lib.apk.ApkBundle;
  import com.reandroid.lib.apk.ApkModule;
  import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
+ import com.reandroid.lib.arsc.chunk.xml.ResXmlElement;
+ import com.reandroid.lib.arsc.item.ResXmlString;
+ import com.reandroid.lib.arsc.pool.ResXmlStringPool;
 
  import java.io.File;
  import java.io.IOException;
+ import java.util.List;
  import java.util.Objects;
  import java.util.zip.ZipEntry;
 
@@ -75,6 +79,21 @@ package com.reandroid.apkeditor.merge;
                 AndroidManifestBlock.ID_isSplitRequired);
         if(removed){
             log("Removed: "+AndroidManifestBlock.NAME_isSplitRequired);
+        }
+        ResXmlElement application = manifest.getApplicationElement();
+        List<ResXmlElement> splitMetaDataElements=AndroidManifestHelper.listSplitRequired(application);
+        for(ResXmlElement meta:splitMetaDataElements){
+            /*
+             * TODO: for "com.android.vending.splits"
+             *  remove @xml/splits entry from  TableBlock.
+             */
+            log("Removed: "+meta.toString());
+            application.removeElement(meta);
+        }
+        ResXmlStringPool pool = manifest.getStringPool();
+        List<ResXmlString> unused = pool.listUnusedStrings();
+        for(ResXmlString xmlString:unused){
+            log(xmlString.get());
         }
     }
     @Override

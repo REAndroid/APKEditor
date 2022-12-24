@@ -50,6 +50,9 @@ public class AutoRefactor {
             pkg.name=obfPackage.name;
             for(ResourceIds.Table.Package.Type obfType:obfPackage.listTypes()){
                 EntryRefactor entryRefactor=new EntryRefactor(tableBlock, obfType);
+                if(!entryRefactor.isObfuscated()){
+                    continue;
+                }
                 pkg.add(entryRefactor.refactorAll());
             }
             table.add(pkg);
