@@ -25,10 +25,13 @@ package com.reandroid.apkeditor.merge;
  import com.reandroid.lib.apk.APKLogger;
  import com.reandroid.lib.apk.ApkBundle;
  import com.reandroid.lib.apk.ApkModule;
+ import com.reandroid.lib.arsc.chunk.TableBlock;
  import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
+ import com.reandroid.lib.arsc.chunk.xml.ResXmlAttribute;
  import com.reandroid.lib.arsc.chunk.xml.ResXmlElement;
- import com.reandroid.lib.arsc.item.ResXmlString;
- import com.reandroid.lib.arsc.pool.ResXmlStringPool;
+ import com.reandroid.lib.arsc.group.EntryGroup;
+ import com.reandroid.lib.arsc.value.EntryBlock;
+ import com.reandroid.lib.arsc.value.ValueType;
 
  import java.io.File;
  import java.io.IOException;
@@ -59,7 +62,8 @@ package com.reandroid.apkeditor.merge;
         }
         removeSignature(mergedModule);
         if(mergedModule.hasAndroidManifestBlock()){
-            sanitizeManifest(mergedModule.getAndroidManifestBlock());
+            sanitizeManifest(mergedModule.getAndroidManifestBlock()
+                    , mergedModule.getTableBlock());
         }
         log("Writing apk ...");
         mergedModule.writeApk(options.outputFile, this);
@@ -68,7 +72,7 @@ package com.reandroid.apkeditor.merge;
         log("Saved to: "+options.outputFile);
         log("Done");
     }
-    private void sanitizeManifest(AndroidManifestBlock manifest){
+    private void sanitizeManifest(AndroidManifestBlock manifest, TableBlock tableBlock){
         log("Sanitizing manifest ...");
         boolean removed = AndroidManifestHelper.removeApplicationAttribute(manifest,
                 AndroidManifestBlock.ID_extractNativeLibs);
@@ -82,19 +86,47 @@ package com.reandroid.apkeditor.merge;
         }
         ResXmlElement application = manifest.getApplicationElement();
         List<ResXmlElement> splitMetaDataElements=AndroidManifestHelper.listSplitRequired(application);
+        boolean splits_removed=false;
         for(ResXmlElement meta:splitMetaDataElements){
-            /*
-             * TODO: for "com.android.vending.splits"
-             *  remove @xml/splits entry from  TableBlock.
-             */
+            if(!splits_removed){
+                splits_removed=removeSplitsTableEntry(meta, tableBlock);
+            }
             log("Removed: "+meta.toString());
             application.removeElement(meta);
         }
-        ResXmlStringPool pool = manifest.getStringPool();
-        List<ResXmlString> unused = pool.listUnusedStrings();
-        for(ResXmlString xmlString:unused){
-            log(xmlString.get());
+        manifest.refresh();
+    }
+    private boolean removeSplitsTableEntry(ResXmlElement metaElement, TableBlock tableBlock){
+        ResXmlAttribute nameAttribute = metaElement.searchAttributeByResourceId(AndroidManifestBlock.ID_name);
+        if(nameAttribute.getValueType()!= ValueType.STRING){
+            return false;
         }
+        if(!"com.android.vending.splits".equals(nameAttribute.getValueAsString())){
+            return false;
+        }
+        // TODO: add on AndroidManifestBlock as ID_*
+        int idValue=0x01010024;
+        int idResource=0x01010025;
+
+        ResXmlAttribute valueAttribute=metaElement.searchAttributeByResourceId(idValue);
+        if(valueAttribute==null){
+            valueAttribute=metaElement.searchAttributeByResourceId(idResource);
+        }
+        if(valueAttribute==null || valueAttribute.getValueType()!=ValueType.REFERENCE){
+            return false;
+        }
+        EntryGroup entryGroup = tableBlock.search(valueAttribute.getRawValue());
+        if(entryGroup==null){
+            return false;
+        }
+        for(EntryBlock entryBlock:entryGroup.listItems()){
+            log("Removed from table: "+entryBlock);
+            // It's not safe to destroy entry, resource id might be used in dex code.
+            // Better replace it with boolean value
+            entryBlock.setValueAsBoolean(false);
+        }
+        tableBlock.refresh();
+        return true;
     }
     @Override
     public void onCompressFile(String path, int method, long length) {
