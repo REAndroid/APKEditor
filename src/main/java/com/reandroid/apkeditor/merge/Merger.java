@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.merge;
  import com.reandroid.apkeditor.BaseCommand;
  import com.reandroid.apkeditor.Util;
  import com.reandroid.apkeditor.common.AndroidManifestHelper;
+ import com.reandroid.archive.APKArchive;
  import com.reandroid.archive.WriteProgress;
  import com.reandroid.archive.ZipAlign;
  import com.reandroid.commons.command.ARGException;
@@ -62,8 +63,7 @@ package com.reandroid.apkeditor.merge;
         }
         removeSignature(mergedModule);
         if(mergedModule.hasAndroidManifestBlock()){
-            sanitizeManifest(mergedModule.getAndroidManifestBlock()
-                    , mergedModule.getTableBlock());
+            sanitizeManifest(mergedModule);
         }
         log("Writing apk ...");
         mergedModule.writeApk(options.outputFile, this);
@@ -72,7 +72,9 @@ package com.reandroid.apkeditor.merge;
         log("Saved to: "+options.outputFile);
         log("Done");
     }
-    private void sanitizeManifest(AndroidManifestBlock manifest, TableBlock tableBlock){
+    private void sanitizeManifest(ApkModule apkModule) throws IOException {
+        AndroidManifestBlock manifest=apkModule.getAndroidManifestBlock();
+
         log("Sanitizing manifest ...");
         boolean removed = AndroidManifestHelper.removeApplicationAttribute(manifest,
                 AndroidManifestBlock.ID_extractNativeLibs);
@@ -89,14 +91,14 @@ package com.reandroid.apkeditor.merge;
         boolean splits_removed=false;
         for(ResXmlElement meta:splitMetaDataElements){
             if(!splits_removed){
-                splits_removed=removeSplitsTableEntry(meta, tableBlock);
+                splits_removed=removeSplitsTableEntry(meta, apkModule);
             }
             log("Removed: "+meta.toString());
             application.removeElement(meta);
         }
         manifest.refresh();
     }
-    private boolean removeSplitsTableEntry(ResXmlElement metaElement, TableBlock tableBlock){
+    private boolean removeSplitsTableEntry(ResXmlElement metaElement, ApkModule apkModule) throws IOException {
         ResXmlAttribute nameAttribute = metaElement.searchAttributeByResourceId(AndroidManifestBlock.ID_name);
         if(nameAttribute.getValueType()!= ValueType.STRING){
             return false;
@@ -115,12 +117,17 @@ package com.reandroid.apkeditor.merge;
         if(valueAttribute==null || valueAttribute.getValueType()!=ValueType.REFERENCE){
             return false;
         }
+        TableBlock tableBlock=apkModule.getTableBlock();
         EntryGroup entryGroup = tableBlock.search(valueAttribute.getRawValue());
         if(entryGroup==null){
             return false;
         }
+        APKArchive apkArchive=apkModule.getApkArchive();
         for(EntryBlock entryBlock:entryGroup.listItems()){
-            log("Removed from table: "+entryBlock);
+            String path=entryBlock.getValueAsString();
+            log("Removed from table: "+path);
+            //Remove file entry
+            apkArchive.remove(path);
             // It's not safe to destroy entry, resource id might be used in dex code.
             // Better replace it with boolean value
             entryBlock.setValueAsBoolean(false);
