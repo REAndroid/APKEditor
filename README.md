@@ -2,11 +2,11 @@
 
 # APKEditor
 ### Powerful android apk resources editor
-This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has four main features
+This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has five main features
 
 <details><summary><code>java -jar APKEditor.jar <b>-h</b></code></summary>
 
-```
+```ShellSession
 $ java -jar APKEditor.jar -h
 APKEditor - x.x.x
 Using: ARSCLib-x.x.x
@@ -28,7 +28,7 @@ Usage:
 Decompiles resources of apk to human readable json string.
 <details> <summary><code>java -jar APKEditor.jar <b>d</b> -i path/to/your-file.apk</code></summary>
 
-```
+```ShellSession
 $ java -jar APKEditor.jar d -i test.apk -o test_json
 00.000 I: [DECOMPILE] Decompiling ...
  Input: test.apk
@@ -45,7 +45,7 @@ Output: test_json
 Builds back to apk from decompiled json files
 <details> <summary><code>java -jar APKEditor.jar <b>b</b> -i path/to/decompiled-directory</code></summary>
 
-```
+```ShellSession
 $ java -jar APKEditor.jar b -i test_json -o test_edited.apk
 
 00.000 I: [BUILD] Building ...
@@ -65,7 +65,7 @@ Output: test_edited.apk
 Merges multiple splitted apk (app bundles) to standalone apk
 <details> <summary><code>java -jar APKEditor.jar <b>m</b> -i path/to/directory-of-apk-files</code></summary>
 
- ``` 
+ ```ShellSession
 $ java -jar APKEditor.jar m -i apk_files
 00.049 I: [MERGE] Merging ...
    Input: apk_files
@@ -94,7 +94,7 @@ $ java -jar APKEditor.jar m -i apk_files
 04.700 I: [MERGE] Done
 
 ```  
- ![apkmerger](/.github/apkmerger.png)
+![apkmerger](/.github/apkmerger.png)
 
 </details>
 
@@ -102,7 +102,7 @@ $ java -jar APKEditor.jar m -i apk_files
 Refactors obfuscated resource entry names
 <details> <summary><code>java -jar APKEditor.jar <b>x</b> -i path/to/input.apk</code></summary>
 
- ``` 
+ ```ShellSession
 $ java -jar APKEditor.jar x -i input.apk
 00.000 I: [REFACTOR] Refactoring ...
    Input: input.apk
@@ -120,6 +120,31 @@ $ java -jar APKEditor.jar x -i input.apk
 
 </details>
 
+#### 5- Protect (Under development - coming soon)
+Now it's time to support app developers against decompilers to make the battle even.
+This protection promises to protect apk resources against almost all decompile tools (including this one).
+
+* Archive protection: Protect apk file from extraction (unzipping). It's custom/tradition to use "<b>res</b>" as resource directory name, and some obfuscators use "<b>r</b>". How about using "<b>AndroidManifest.xml</b>" or "<b>classes.dex</b>" as resource directory name 😱 ???
+* Confuse resource name: Most obfuscated resource names have fixed length sequential names like a1, a2, a3 ... but this function
+  generates variable length random names.
+* Confuse xml parsers: Keep in mind that android devices don't care about any names to execute apk thus it's valid to rename type ``` 'string' ``` to ``` '" </string>' ``` . Consider a normal entry ``` <string name="app_name">My App</string> ``` and if decompiler attempts to parse the output will be malformed xml  ``` <" </string> name="app_name">My App</" </string>> ```
+* Byte offset/size confusing: Most decompilers are not parsing properly as actual device, thus we will exploit their weakness
+
+---
+
+***Build executable jar***
+<details> <summary> <code> ./gradlew -fatJar </code> </summary>
+
+ ```ShellSession
+ 
+# NB: Due to my lazyness , the dependency ARSCLib.jar is pre-built and placed under APKEditor/libs/ARSCLib.jar or you can build yourself and replace it.
+git clone https://github.com/REAndroid/APKEditor
+cd APKEditor
+./gradlew -fatJar
+# Executable jar will be placed ./build/libs/APKEditor-x.x.x.jar
+
+ ```
+ </details>
 
 ***Downloads***
 * [Latest release with pre-built executable jar](https://github.com/REAndroid/APKEditor/releases/latest)
@@ -133,7 +158,7 @@ $ java -jar APKEditor.jar x -i input.apk
 
 <details> <summary><i><b>Contact</b></i></summary> 
 
-* [Telegram: @kikfox](https://t.me/kikfox)
-* [Email: thekikfox@gmail.com](mailto:thekikfox@gmail.com)
+* Telegram: [@kikfox](https://t.me/kikfox)
+* Email: [thekikfox@gmail.com](mailto:thekikfox@gmail.com)
 
 </details>
