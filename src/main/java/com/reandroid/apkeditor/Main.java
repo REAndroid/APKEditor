@@ -18,6 +18,7 @@ package com.reandroid.apkeditor;
 import com.reandroid.apkeditor.compile.Builder;
 import com.reandroid.apkeditor.decompile.Decompiler;
 import com.reandroid.apkeditor.merge.Merger;
+import com.reandroid.apkeditor.protect.Protector;
 import com.reandroid.apkeditor.refactor.Refactor;
 import com.reandroid.commons.command.ARGException;
 
@@ -60,6 +61,10 @@ public class Main {
             Refactor.execute(args);
             return;
         }
+        if(Protector.isCommand(command)){
+            Protector.execute(args);
+            return;
+        }
         throw new ARGException("Unknown command: "+command);
     }
     private static String getHelp(){
@@ -77,6 +82,8 @@ public class Main {
         builder.append("      -   ").append(Merger.DESCRIPTION);
         builder.append("\n  4)  ").append(Refactor.ARG_SHORT).append(" | ").append(Refactor.ARG_LONG);
         builder.append("   -   ").append(Refactor.DESCRIPTION);
+        builder.append("\n  5)  ").append(Protector.ARG_SHORT).append(" | ").append(Protector.ARG_LONG);
+        builder.append("    -   ").append(Protector.DESCRIPTION);
         builder.append("\n run with <command> -h to get detailed help about each command");
         return builder.toString();
     }

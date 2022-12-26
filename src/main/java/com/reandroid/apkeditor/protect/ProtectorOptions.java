@@ -13,7 +13,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   */
-package com.reandroid.apkeditor.merge;
+package com.reandroid.apkeditor.protect;
 
 import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.Options;
@@ -22,25 +22,12 @@ import com.reandroid.commons.command.ARGException;
 
 import java.io.File;
 
-public class MergerOptions extends Options {
-    public boolean validateResDir;
-    public String resDirName;
-    public MergerOptions(){
-        super();
-    }
+public class ProtectorOptions extends Options {
     @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
         parseOutput(args);
-        parseResDirName(args);
-        parseValidateResDir(args);
         super.parse(args);
-    }
-    private void parseValidateResDir(String[] args) throws ARGException {
-        validateResDir=containsArg(ARG_validate_res_dir, true, args);
-    }
-    private void parseResDirName(String[] args) throws ARGException {
-        this.resDirName=parseArgValue(ARG_resDir, true, args);
     }
     private void parseOutput(String[] args) throws ARGException {
         this.outputFile=null;
@@ -52,7 +39,11 @@ public class MergerOptions extends Options {
     }
     private File getOutputApkFromInput(File file){
         String name = file.getName();
-        name=name+"_merged.apk";
+        int i=name.lastIndexOf('.');
+        if(i>0){
+            name=name.substring(0, i);
+        }
+        name=name+"_protected.apk";
         File dir=file.getParentFile();
         if(dir==null){
             return new File(name);
@@ -63,10 +54,10 @@ public class MergerOptions extends Options {
         this.inputFile=null;
         File file=parseFile(ARG_input, args);
         if(file==null){
-            throw new ARGException("Missing input directory");
+            throw new ARGException("Missing input file");
         }
-        if(!file.isDirectory()){
-            throw new ARGException("No such directory: "+file);
+        if(!file.isFile()){
+            throw new ARGException("No such file: "+file);
         }
         this.inputFile=file;
     }
@@ -75,12 +66,6 @@ public class MergerOptions extends Options {
         StringBuilder builder=new StringBuilder();
         builder.append("   Input: ").append(inputFile);
         builder.append("\n Output: ").append(outputFile);
-        if(resDirName!=null){
-            builder.append("\nres dir: ").append(resDirName);
-        }
-        if(validateResDir){
-            builder.append("\n Validate res dir name: true");
-        }
         if(force){
             builder.append("\n Force: true");
         }
@@ -89,12 +74,11 @@ public class MergerOptions extends Options {
     }
     public static String getHelp(){
         StringBuilder builder=new StringBuilder();
-        builder.append(Merger.DESCRIPTION);
+        builder.append(Protector.DESCRIPTION);
         builder.append("\nOptions:\n");
         String[][] table=new String[][]{
                 new String[]{ARG_input, ARG_DESC_input},
-                new String[]{ARG_output, ARG_DESC_output},
-                new String[]{ARG_resDir, ARG_DESC_resDir}
+                new String[]{ARG_output, ARG_DESC_output}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         builder.append("\nFlags:\n");
@@ -104,8 +88,8 @@ public class MergerOptions extends Options {
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();
         builder.append("\n\nExample-1:");
-        builder.append("\n   java -jar ").append(jar).append(" ").append(Merger.ARG_SHORT).append(" ")
-                .append(ARG_input).append(" path/to/input_dir");
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Protector.ARG_SHORT).append(" ")
+                .append(ARG_input).append(" path/to/input.apk");
         builder.append(" ").append(ARG_output).append(" path/to/out.apk");
         return builder.toString();
     }
