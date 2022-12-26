@@ -106,13 +106,11 @@ package com.reandroid.apkeditor.merge;
         if(!"com.android.vending.splits".equals(nameAttribute.getValueAsString())){
             return false;
         }
-        // TODO: add on AndroidManifestBlock as ID_*
-        int idValue=0x01010024;
-        int idResource=0x01010025;
-
-        ResXmlAttribute valueAttribute=metaElement.searchAttributeByResourceId(idValue);
+        ResXmlAttribute valueAttribute=metaElement.searchAttributeByResourceId(
+                AndroidManifestBlock.ID_value);
         if(valueAttribute==null){
-            valueAttribute=metaElement.searchAttributeByResourceId(idResource);
+            valueAttribute=metaElement.searchAttributeByResourceId(
+                    AndroidManifestBlock.ID_resource);
         }
         if(valueAttribute==null || valueAttribute.getValueType()!=ValueType.REFERENCE){
             return false;
