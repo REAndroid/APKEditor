@@ -46,7 +46,7 @@ public class Protector extends BaseCommand implements WriteProgress {
         log("Protecting files ..");
         confuseResDir(module);
         log("Protecting resource table ..");
-        confuseTypeNames(module);
+        //confuseTypeNames(module);
         confuseByteOffset(module);
         module.getTableBlock().refresh();
         log("Writing apk ...");
