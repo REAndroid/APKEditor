@@ -19,6 +19,7 @@ Usage:
   2)  b | build      -   Builds android binary from json
   3)  m | merge      -   Merges split apk files from directory
   4)  x | refactor   -   Refactors obfuscated resource names
+  5)  p | protect    -   Protects/Obfuscates apk resource
  run with <command> -h to get detailed help about each command
  
 ```
@@ -120,16 +121,28 @@ $ java -jar APKEditor.jar x -i input.apk
 
 </details>
 
-#### 5- Protect (Under development - coming soon)
-Now it's time to support app developers against decompilers to make the battle even.
-This protection promises to protect apk resources against almost all decompile tools (including this one).
+#### 5- Protect  (⭐NEW⭐)
+Protects apk resources against almost all known decompile/modify tools.
+<details> <summary><code>java -jar APKEditor.jar <b>p</b> -i path/to/input.apk</code></summary>
 
-* Archive protection: Protect apk file from extraction (unzipping). It's custom/tradition to use "<b>res</b>" as resource directory name, and some obfuscators use "<b>r</b>". How about using "<b>AndroidManifest.xml</b>" or "<b>classes.dex</b>" as resource directory name 😱 ???
-* Confuse resource name: Most obfuscated resource names have fixed length sequential names like a1, a2, a3 ... but this function
-  generates variable length random names.
-* Confuse xml parsers: Keep in mind that android devices don't care about any names to execute apk thus it's valid to rename type ``` 'string' ``` to ``` '" </string>' ``` . Consider a normal entry ``` <string name="app_name">My App</string> ``` and if decompiler attempts to parse the output will be malformed xml  ``` <" </string> name="app_name">My App</" </string>> ```
-* Byte offset/size confusing: Most decompilers are not parsing properly as actual device, thus we will exploit their weakness
+ ```ShellSession
+00.026 I: [PROTECT] Protecting ...
+   Input: test.apk
+ Output: test_protected.apk
+ ---------------------------- 
+00.027 I: [PROTECT] Loading apk file ...
+00.052 I: [PROTECT] Protecting files ..
+00.454 I: [PROTECT] Protecting resource table ..
+00.474 I: [PROTECT] Writing apk ...
+02.264 [PROTECT] Writing: total=47654392 bytes : resources.arsc              
+02.346 I: [PROTECT] Zip align ...
+02.451 I: [PROTECT] Saved to: test_protected.apk
+02.451 I: [PROTECT] Done
 
+```  
+
+</details>
+ 
 ---
 
 ***Build executable jar***
