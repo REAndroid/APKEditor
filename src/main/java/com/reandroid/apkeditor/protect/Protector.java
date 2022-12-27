@@ -25,8 +25,6 @@ import com.reandroid.lib.apk.*;
 import com.reandroid.lib.arsc.chunk.PackageBlock;
 import com.reandroid.lib.arsc.chunk.TableBlock;
 import com.reandroid.lib.arsc.container.SpecTypePair;
-import com.reandroid.lib.arsc.item.TypeString;
-import com.reandroid.lib.arsc.pool.TypeStringPool;
 import com.reandroid.lib.arsc.value.ResConfig;
 
 import java.io.File;
@@ -46,7 +44,6 @@ public class Protector extends BaseCommand implements WriteProgress {
         log("Protecting files ..");
         confuseResDir(module);
         log("Protecting resource table ..");
-        //confuseTypeNames(module);
         confuseByteOffset(module);
         module.getTableBlock().refresh();
         log("Writing apk ...");
@@ -55,22 +52,6 @@ public class Protector extends BaseCommand implements WriteProgress {
         ZipAlign.align4(options.outputFile);
         log("Saved to: "+options.outputFile);
         log("Done");
-    }
-    private void confuseTypeNames(ApkModule apkModule) throws IOException {
-        TableBlock tableBlock=apkModule.getTableBlock();
-        for(PackageBlock packageBlock:tableBlock.listPackages()){
-            TypeStringPool pool = packageBlock.getTypeStringPool();
-            for(TypeString typeString:pool.listStrings()){
-                String old=typeString.get();
-                if("string".equals(old)){
-                    continue;
-                }
-                String type="string";
-                String rep="/// </"+type+">/\\\"";
-                typeString.set(rep);
-                log("Renamed: '"+old+"' ==> '"+rep+"'");
-            }
-        }
     }
     private void confuseByteOffset(ApkModule apkModule) throws IOException {
         TableBlock tableBlock=apkModule.getTableBlock();
