@@ -25,6 +25,7 @@ import com.reandroid.lib.apk.*;
 import com.reandroid.lib.arsc.chunk.PackageBlock;
 import com.reandroid.lib.arsc.chunk.TableBlock;
 import com.reandroid.lib.arsc.container.SpecTypePair;
+import com.reandroid.lib.arsc.value.EntryBlock;
 import com.reandroid.lib.arsc.value.ResConfig;
 
 import java.io.File;
@@ -77,6 +78,12 @@ public class Protector extends BaseCommand implements WriteProgress {
             }
             int method=resFile.getInputSource().getMethod();
             String path = resFile.getFilePath();
+            EntryBlock entryBlock = resFile.pickOne();
+            // TODO: make other solution to decide user which types/dirs to ignore
+            if(entryBlock!=null && "font".equals(entryBlock.getTypeName())){
+                log("  Ignored: "+path);
+                continue;
+            }
             String pathNew = ApkUtil.replaceRootDir(path, dirNames[i]);
             if(method==ZipEntry.STORED){
                 uf.replacePath(path, pathNew);
