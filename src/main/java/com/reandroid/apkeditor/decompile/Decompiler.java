@@ -22,6 +22,8 @@ import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.lib.apk.APKLogger;
 import com.reandroid.lib.apk.ApkJsonDecoder;
 import com.reandroid.lib.apk.ApkModule;
+import com.reandroid.lib.apk.ApkModuleXmlDecoder;
+import com.reandroid.xml.XMLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,9 +46,19 @@ public class Decompiler {
             log("Validating resources dir ...");
             apkModule.validateResourcesDir();
         }
-        log("Decompiling to json ...");
-        ApkJsonDecoder decoder=new ApkJsonDecoder(apkModule, options.splitJson);
-        decoder.writeToDirectory(options.outputFile);
+        if(!"xml".equals(options.type)){
+            log("Decompiling to json ...");
+            ApkJsonDecoder decoder=new ApkJsonDecoder(apkModule, options.splitJson);
+            decoder.writeToDirectory(options.outputFile);
+        }else {
+            log("Decompiling to xml ...");
+            ApkModuleXmlDecoder xmlDecoder=new ApkModuleXmlDecoder(apkModule);
+            try {
+                xmlDecoder.decodeTo(options.outputFile);
+            } catch (XMLException ex) {
+                throw new IOException(ex.getMessage(), ex);
+            }
+        }
         log("Done");
     }
     private APKLogger getAPKLogger(){

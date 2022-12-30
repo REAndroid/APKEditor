@@ -27,7 +27,9 @@ public class DecompileOptions extends Options {
     public boolean splitJson;
     public boolean validateResDir;
     public String resDirName;
+    public String type;
     public DecompileOptions(){
+        type="json";
     }
     @Override
     public void parse(String[] args) throws ARGException {
@@ -36,7 +38,14 @@ public class DecompileOptions extends Options {
         parseSplitResources(args);
         parseResDirName(args);
         parseValidateResDir(args);
+        parseDecompileType(args);
         super.parse(args);
+    }
+    private void parseDecompileType(String[] args) throws ARGException {
+        this.type=parseArgValue(ARG_type, true, args);
+        if(this.type==null){
+            this.type="json";
+        }
     }
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
@@ -112,7 +121,8 @@ public class DecompileOptions extends Options {
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_split_resources, ARG_DESC_split_resources},
-                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
+                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir},
+                new String[]{ARG_type, ARG_DESC_type}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();
@@ -130,4 +140,7 @@ public class DecompileOptions extends Options {
     }
     private static final String ARG_split_resources="-split-json";
     private static final String ARG_DESC_split_resources="splits resources.arsc into multiple parts as per type entries (use this for large files)";
+
+    private static final String ARG_type="-t";
+    private static final String ARG_DESC_type="Decompile types: \n1) json \n2) xml \n default=json";
 }
