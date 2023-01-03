@@ -21,6 +21,7 @@ import com.reandroid.apkeditor.merge.Merger;
 import com.reandroid.apkeditor.protect.Protector;
 import com.reandroid.apkeditor.refactor.Refactor;
 import com.reandroid.commons.command.ARGException;
+import com.reandroid.lib.apk.xmlencoder.EncodeException;
 
 import java.io.IOException;
 
@@ -35,7 +36,7 @@ public class Main {
         args=Util.trimNull(args);
         try {
             execute(command, args);
-        } catch (ARGException ex) {
+        } catch (ARGException| EncodeException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
         } catch (IOException ex2) {
