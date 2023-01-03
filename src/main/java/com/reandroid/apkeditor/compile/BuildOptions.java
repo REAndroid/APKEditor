@@ -25,6 +25,7 @@ import java.io.File;
 public class BuildOptions extends Options {
     public boolean validateResDir;
     public String resDirName;
+    public boolean isXml;
     public BuildOptions(){
     }
     @Override

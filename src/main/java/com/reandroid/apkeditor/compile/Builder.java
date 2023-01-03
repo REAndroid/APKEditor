@@ -16,7 +16,6 @@
 package com.reandroid.apkeditor.compile;
 
 import com.reandroid.apkeditor.Util;
-import com.reandroid.apkeditor.decompile.DecompileOptions;
 import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive.ZipAlign;
 import com.reandroid.commons.command.ARGException;
@@ -24,7 +23,9 @@ import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.lib.apk.APKLogger;
 import com.reandroid.lib.apk.ApkJsonEncoder;
 import com.reandroid.lib.apk.ApkModule;
+import com.reandroid.lib.apk.ApkModuleXmlEncoder;
 import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
+import com.reandroid.xml.XMLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +38,14 @@ public class Builder implements WriteProgress {
         this.options=options;
     }
     public void run() throws IOException {
-        log("Scanning direc tory ...");
+        if(options.isXml){
+            buildXml();
+        }else {
+            buildJson();
+        }
+    }
+    public void buildJson() throws IOException {
+        log("Scanning JSON directory ...");
         ApkJsonEncoder encoder=new ApkJsonEncoder();
         ApkModule loadedModule=encoder.scanDirectory(options.inputFile);
         loadedModule.setAPKLogger(getAPKLogger());
@@ -53,6 +61,25 @@ public class Builder implements WriteProgress {
         loadedModule.writeApk(options.outputFile, this);
         log("Zip align ...");
         ZipAlign.align4(options.outputFile);
+        log("Built to: "+options.outputFile);
+        log("Done");
+    }
+    public void buildXml() throws IOException {
+        log("Scanning XML directory ...");
+        ApkModuleXmlEncoder encoder=new ApkModuleXmlEncoder();
+        encoder.setApkLogger(getAPKLogger());
+        ApkModule loadedModule;
+        try {
+            encoder.scanDirectory(options.inputFile);
+            loadedModule=encoder.getApkModule();
+        } catch (XMLException ex) {
+            throw new IOException(ex.getMessage(), ex);
+        }
+        log("Writing apk...");
+        loadedModule.writeApk(options.outputFile, this);
+        log("Zip align ...");
+        ZipAlign.align4(options.outputFile);
+        log("Built to: "+options.outputFile);
         log("Done");
     }
     private APKLogger getAPKLogger(){
@@ -70,6 +97,9 @@ public class Builder implements WriteProgress {
             }
             @Override
             public void logVerbose(String msg) {
+                if(msg.length()>50){
+                    msg=msg.substring(msg.length()-50);
+                }
                 Logger.sameLine(getLogTag()+msg);
             }
         };
@@ -79,14 +109,8 @@ public class Builder implements WriteProgress {
     public void onCompressFile(String path, int method, long length) {
         StringBuilder builder=new StringBuilder();
         builder.append("Writing:");
-        if(method == ZipEntry.STORED){
-            builder.append(" method=STORED");
-        }
-        builder.append(" total=");
-        builder.append(length);
-        builder.append(" bytes : ");
-        if(path.length()>50){
-            path=path.substring(path.length()-50);
+        if(path.length()>30){
+            path=path.substring(path.length()-30);
         }
         builder.append(path);
         logSameLine(builder.toString());
@@ -97,7 +121,13 @@ public class Builder implements WriteProgress {
         }
         BuildOptions option=new BuildOptions();
         option.parse(args);
-        option.inputFile=getInDir(option.inputFile);
+        if(isJsonInDir(option.inputFile)){
+            option.inputFile = getJsonInDir(option.inputFile);
+        }else if (isXmlInDir(option.inputFile)){
+            option.isXml=true;
+        }else {
+            throw new ARGException("Not xml/json directory: "+option.inputFile);
+        }
         File outDir=option.outputFile;
         Util.deleteEmptyDirectories(outDir);
         if(outDir.exists()){
@@ -111,7 +141,26 @@ public class Builder implements WriteProgress {
         Builder builder=new Builder(option);
         builder.run();
     }
-    private static File getInDir(File dir) throws ARGException {
+    private static boolean isXmlInDir(File dir){
+        File manifest=new File(dir, AndroidManifestBlock.FILE_NAME);
+        return manifest.isFile();
+    }
+    private static boolean isJsonInDir(File dir) {
+        if(isModuleDir(dir)){
+            return true;
+        }
+        File[] files=dir.listFiles();
+        if(files==null){
+            return false;
+        }
+        for(File file:files){
+            if(isModuleDir(file)){
+                return true;
+            }
+        }
+        return false;
+    }
+    private static File getJsonInDir(File dir) throws ARGException {
         if(isModuleDir(dir)){
             return dir;
         }
@@ -155,5 +204,5 @@ public class Builder implements WriteProgress {
     }
     public static final String ARG_SHORT="b";
     public static final String ARG_LONG="build";
-    public static final String DESCRIPTION="Builds android binary from json";
+    public static final String DESCRIPTION="Builds android binary from json/xml";
 }
