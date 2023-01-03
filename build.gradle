@@ -26,7 +26,6 @@ dependencies {
     // lets manually copy jar files to libs directory,
     // until we get decent repository like maven
     compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
-    compile(files("$rootProject.projectDir/libs/Commons.jar"))
 }
 
 processResources {
