@@ -26,7 +26,8 @@ Usage:
 </details>
 
 #### 1- Decompile
-Decompiles resources of apk to human readable json string.
+* Decompiles resources of apk to human readable json string.
+* Decompiles resources of apk to XML source code (for un-obfuscated apk only). Use  ``` -t xml ```
 <details> <summary><code>java -jar APKEditor.jar <b>d</b> -i path/to/your-file.apk</code></summary>
 
 ```ShellSession
@@ -43,7 +44,7 @@ Output: test_json
 </details>
 
 #### 2- Build
-Builds back to apk from decompiled json files
+Builds back to apk from decompiled json/XML files
 <details> <summary><code>java -jar APKEditor.jar <b>b</b> -i path/to/decompiled-directory</code></summary>
 
 ```ShellSession
