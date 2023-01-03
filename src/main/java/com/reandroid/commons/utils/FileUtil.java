@@ -88,10 +88,7 @@ public class FileUtil implements ShutdownHook.ShutdownListener {
         if(current_pid!=0){
             return current_pid;
         }
-        long pid = ProcessHandle.current().pid();
-        if(pid==0){
-            pid=System.currentTimeMillis();
-        }
+        long pid = System.currentTimeMillis();
         current_pid=pid;
         return pid;
     }
