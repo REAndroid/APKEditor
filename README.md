@@ -154,7 +154,7 @@ Protects apk resources against almost all known decompile/modify tools.
 # NB: Due to my lazyness , the dependency ARSCLib.jar is pre-built and placed under APKEditor/libs/ARSCLib.jar or you can build yourself and replace it.
 git clone https://github.com/REAndroid/APKEditor
 cd APKEditor
-./gradlew -fatJar
+./gradlew fatJar
 # Executable jar will be placed ./build/libs/APKEditor-x.x.x.jar
 
  ```
