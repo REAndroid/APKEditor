@@ -147,7 +147,7 @@ Protects apk resources against almost all known decompile/modify tools.
 ---
 
 ***Build executable jar***
-<details> <summary> <code> ./gradlew -fatJar </code> </summary>
+<details> <summary> <code> ./gradlew fatJar </code> </summary>
 
  ```ShellSession
  
