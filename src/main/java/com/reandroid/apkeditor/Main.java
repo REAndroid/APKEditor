@@ -37,10 +37,12 @@ public class Main {
         try {
             execute(command, args);
         } catch (ARGException| EncodeException ex) {
-            System.err.println(ex.getMessage());
+            System.err.flush();
+            System.err.println("\nERROR:\n"+ex.getMessage());
             System.exit(1);
         } catch (IOException ex2) {
-            System.err.println(ex2.getMessage());
+            System.err.flush();
+            System.err.println("\nERROR:\n"+ex2.getMessage());
             ex2.printStackTrace(System.err);
             System.exit(1);
         }
