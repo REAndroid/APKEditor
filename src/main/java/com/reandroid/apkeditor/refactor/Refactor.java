@@ -26,7 +26,6 @@ package com.reandroid.apkeditor.refactor;
 
  import java.io.File;
  import java.io.IOException;
- import java.util.zip.ZipEntry;
 
  public class Refactor extends BaseCommand implements WriteProgress {
      private final RefactorOptions options;
@@ -41,9 +40,17 @@ package com.reandroid.apkeditor.refactor;
          if(!module.hasTableBlock()){
              throw new IOException("Don't have resources.arsc");
          }
+         log("Auto refactoring ...");
          AutoRefactor autoRefactor=new AutoRefactor(module);
-         int renameCount=autoRefactor.refactor();
-         log("Renamed entries: "+renameCount);
+         int autoRenameCount=autoRefactor.refactor();
+         log("Auto renamed entries: "+autoRenameCount);
+         if(options.publicXml!=null){
+             log("Renaming from: "+options.publicXml);
+             PublicXmlRefactor publicXmlRefactor =
+                     new PublicXmlRefactor(module, options.publicXml);
+             int pubXmlRenameCount = publicXmlRefactor.refactor();
+             log("Renamed from public.xml entries: "+pubXmlRenameCount);
+         }
          removeSignature(module);
          log("Writing apk ...");
          module.writeApk(options.outputFile, this);
@@ -55,13 +62,7 @@ package com.reandroid.apkeditor.refactor;
      @Override
      public void onCompressFile(String path, int method, long length) {
          StringBuilder builder=new StringBuilder();
-         builder.append("Writing:");
-         if(method == ZipEntry.STORED){
-             builder.append(" method=STORED");
-         }
-         builder.append(" total=");
-         builder.append(length);
-         builder.append(" bytes : ");
+         builder.append("Writing: ");
          if(path.length()>30){
              path=path.substring(path.length()-30);
          }

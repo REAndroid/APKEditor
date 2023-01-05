@@ -23,11 +23,27 @@ package com.reandroid.apkeditor.refactor;
  import java.io.File;
 
  public class RefactorOptions extends Options {
+     public File publicXml;
+     public RefactorOptions(){
+         super();
+     }
      @Override
      public void parse(String[] args) throws ARGException {
          parseInput(args);
          parseOutput(args);
+         parsePublicXml(args);
          super.parse(args);
+     }
+     private void parsePublicXml(String[] args) throws ARGException {
+         this.publicXml=null;
+         File file=parseFile(ARG_public_xml, args);
+         if(file==null){
+             return;
+         }
+         if(!file.isFile()){
+             throw new ARGException("No such file: "+file);
+         }
+         this.publicXml=file;
      }
      private void parseOutput(String[] args) throws ARGException {
          this.outputFile=null;
@@ -64,8 +80,11 @@ package com.reandroid.apkeditor.refactor;
      @Override
      public String toString(){
          StringBuilder builder=new StringBuilder();
-         builder.append("   Input: ").append(inputFile);
-         builder.append("\n Output: ").append(outputFile);
+         builder.append("      Input: ").append(inputFile);
+         builder.append("\n    Output: ").append(outputFile);
+         if(publicXml!=null){
+             builder.append("\n PublicXml: ").append(publicXml);
+         }
          if(force){
              builder.append("\n Force: true");
          }
@@ -78,7 +97,8 @@ package com.reandroid.apkeditor.refactor;
          builder.append("\nOptions:\n");
          String[][] table=new String[][]{
                  new String[]{ARG_input, ARG_DESC_input},
-                 new String[]{ARG_output, ARG_DESC_output}
+                 new String[]{ARG_output, ARG_DESC_output},
+                 new String[]{ARG_public_xml, ARG_DESC_public_xml}
          };
          StringHelper.printTwoColumns(builder, "   ", 75, table);
          builder.append("\nFlags:\n");
@@ -93,4 +113,7 @@ package com.reandroid.apkeditor.refactor;
          builder.append(" ").append(ARG_output).append(" path/to/out.apk");
          return builder.toString();
      }
+
+     private static final String ARG_public_xml = "-public-xml";
+     private static final String ARG_DESC_public_xml = "Path of resource ids xml file (public.xml)\nLoads names and applies to resources from 'public.xml' file";
 }
