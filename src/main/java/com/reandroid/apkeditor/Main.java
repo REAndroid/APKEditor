@@ -36,7 +36,11 @@ public class Main {
         args=Util.trimNull(args);
         try {
             execute(command, args);
-        } catch (ARGException| EncodeException ex) {
+        } catch (ARGException ex1) {
+            System.err.flush();
+            System.err.println(ex1.getMessage());
+            System.exit(1);
+        }catch (EncodeException ex) {
             System.err.flush();
             System.err.println("\nERROR:\n"+ex.getMessage());
             System.exit(1);
