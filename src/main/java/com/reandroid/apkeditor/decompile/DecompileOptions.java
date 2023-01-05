@@ -29,23 +29,28 @@ public class DecompileOptions extends Options {
     public String resDirName;
     public String type;
     public DecompileOptions(){
-        type="json";
+        type=TYPE_JSON;
     }
     @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
+        parseDecompileType(args);
         parseOutput(args);
         parseSplitResources(args);
         parseResDirName(args);
         parseValidateResDir(args);
-        parseDecompileType(args);
         super.parse(args);
     }
     private void parseDecompileType(String[] args) throws ARGException {
-        this.type=parseArgValue(ARG_type, true, args);
+        this.type = parseArgValue(ARG_type, true, args);
         if(this.type==null){
-            this.type="json";
+            this.type = TYPE_JSON;
         }
+        type=type.trim().toLowerCase();
+        if(TYPE_JSON.equals(type) || TYPE_XML.equals(type)){
+            return;
+        }
+        throw new ARGException("Unknown decompile type: "+type);
     }
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
@@ -70,7 +75,7 @@ public class DecompileOptions extends Options {
         if(i>0){
             name=name.substring(0, i);
         }
-        name=name+"_out";
+        name=name+"_decompile_"+type;
         File dir=file.getParentFile();
         if(dir==null){
             return new File(name);
@@ -103,7 +108,10 @@ public class DecompileOptions extends Options {
         if(force){
             builder.append("\n Force: true");
         }
-        builder.append("\n Split: ").append(splitJson);
+        builder.append("\n Type: ").append(type);
+        if(!TYPE_XML.equals(type)){
+            builder.append("\n Split: ").append(splitJson);
+        }
         builder.append("\n ---------------------------- ");
         return builder.toString();
     }
@@ -114,15 +122,15 @@ public class DecompileOptions extends Options {
         String[][] table=new String[][]{
                 new String[]{ARG_input, ARG_DESC_input},
                 new String[]{ARG_output, ARG_DESC_output},
-                new String[]{ARG_resDir, ARG_DESC_resDir}
+                new String[]{ARG_resDir, ARG_DESC_resDir},
+                new String[]{ARG_type, ARG_DESC_type}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_split_resources, ARG_DESC_split_resources},
-                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir},
-                new String[]{ARG_type, ARG_DESC_type}
+                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();
@@ -136,11 +144,20 @@ public class DecompileOptions extends Options {
         builder.append("\nExample-3:");
         builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
                 .append(ARG_input).append(" path/to/input.apk").append(" ").append(ARG_split_resources);
+        builder.append("\nExample-4: (XML)");
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
+                .append(ARG_type).append(" ").append(TYPE_XML).append(" ").append(ARG_input)
+                .append(" path/to/input.apk");
         return builder.toString();
     }
     private static final String ARG_split_resources="-split-json";
     private static final String ARG_DESC_split_resources="splits resources.arsc into multiple parts as per type entries (use this for large files)";
 
     private static final String ARG_type="-t";
-    private static final String ARG_DESC_type="Decompile types: \n1) json \n2) xml \n default=json";
+    private static final String ARG_DESC_type = "Decompile types: \n1) json \n2) xml \n default=json" +
+            "\n * Output directory contains \n   a) res package directory(s) name={index number}-{package name}" +
+            "\n   b) root: directory of raw files like dex, assets, lib ... \n   c) AndroidManifest.xml";
+
+    public static final String TYPE_JSON = "json";
+    public static final String TYPE_XML = "xml";
 }

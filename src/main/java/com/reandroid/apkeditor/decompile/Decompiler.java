@@ -46,12 +46,12 @@ public class Decompiler {
             log("Validating resources dir ...");
             apkModule.validateResourcesDir();
         }
-        if(!"xml".equals(options.type)){
-            log("Decompiling to json ...");
+        if(DecompileOptions.TYPE_JSON.equals(options.type)){
+            log("Decompiling to JSON ...");
             ApkJsonDecoder decoder=new ApkJsonDecoder(apkModule, options.splitJson);
             decoder.writeToDirectory(options.outputFile);
-        }else {
-            log("Decompiling to xml ...");
+        }else{
+            log("Decompiling to XML ...");
             ApkModuleXmlDecoder xmlDecoder=new ApkModuleXmlDecoder(apkModule);
             try {
                 xmlDecoder.decodeTo(options.outputFile);
