@@ -185,7 +185,7 @@ public class Builder implements WriteProgress {
         if(manifest.isFile()){
             return true;
         }
-        File file=new File(dir, "uncompressed-files.json");
+        File file=new File(dir, "AndroidManifest.xml.json");
         return file.isFile();
     }
     private static void logSameLine(String msg){
