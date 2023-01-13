@@ -2,7 +2,7 @@
 apply plugin: 'java'
 
 group 'com.reandroid.apkeditor'
-version '1.1.2'
+version '1.1.3'
 
 java {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -18,13 +18,10 @@ if (JavaVersion.current().isJava8Compatible()) {
 }
 repositories {
     mavenCentral()
-    mavenLocal()
 }
 
 dependencies {
-    // TODO
-    // lets manually copy jar files to libs directory,
-    // until we get decent repository like maven
+    //implementation("io.github.reandroid:ARSCLib:+")
     compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
 }
 
@@ -32,6 +29,13 @@ processResources {
     filesMatching('apkeditor.properties') {
         expand('version': version)
     }
+}
+
+javadoc {
+    exclude('com/reandroid/test/**')
+}
+jar {
+    exclude('com/reandroid/test/**')
 }
 
 task fatJar(type: Jar) {
