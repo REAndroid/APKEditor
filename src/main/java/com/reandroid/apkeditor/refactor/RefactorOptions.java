@@ -24,6 +24,7 @@ package com.reandroid.apkeditor.refactor;
 
  public class RefactorOptions extends Options {
      public File publicXml;
+     public boolean fixTypeNames;
      public RefactorOptions(){
          super();
      }
@@ -32,7 +33,11 @@ package com.reandroid.apkeditor.refactor;
          parseInput(args);
          parseOutput(args);
          parsePublicXml(args);
+         parseFixTypes(args);
          super.parse(args);
+     }
+     private void parseFixTypes(String[] args) throws ARGException {
+         fixTypeNames=containsArg(ARG_fix_types, true, args);
      }
      private void parsePublicXml(String[] args) throws ARGException {
          this.publicXml=null;
@@ -103,6 +108,7 @@ package com.reandroid.apkeditor.refactor;
          StringHelper.printTwoColumns(builder, "   ", 75, table);
          builder.append("\nFlags:\n");
          table=new String[][]{
+                 new String[]{ARG_fix_types, ARG_DESC_fix_types},
                  new String[]{ARG_force, ARG_DESC_force}
          };
          StringHelper.printTwoColumns(builder, "   ", 75, table);
@@ -116,4 +122,7 @@ package com.reandroid.apkeditor.refactor;
 
      private static final String ARG_public_xml = "-public-xml";
      private static final String ARG_DESC_public_xml = "Path of resource ids xml file (public.xml)\nLoads names and applies to resources from 'public.xml' file";
+
+     private static final String ARG_fix_types = "-fix-types";
+     private static final String ARG_DESC_fix_types = "Corrects resource type names based on usages and values";
 }

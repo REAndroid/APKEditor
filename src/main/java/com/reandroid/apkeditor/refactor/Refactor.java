@@ -40,6 +40,11 @@ package com.reandroid.apkeditor.refactor;
          if(!module.hasTableBlock()){
              throw new IOException("Don't have resources.arsc");
          }
+         if(options.fixTypeNames){
+             TypeNameRefactor typeNameRefactor=new TypeNameRefactor(module);
+             typeNameRefactor.setApkLogger(getAPKLogger());
+             typeNameRefactor.refactor();
+         }
          log("Auto refactoring ...");
          AutoRefactor autoRefactor=new AutoRefactor(module);
          int autoRenameCount=autoRefactor.refactor();
