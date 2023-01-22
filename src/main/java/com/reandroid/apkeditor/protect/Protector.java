@@ -21,12 +21,12 @@ import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive.ZipAlign;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
-import com.reandroid.lib.apk.*;
-import com.reandroid.lib.arsc.chunk.PackageBlock;
-import com.reandroid.lib.arsc.chunk.TableBlock;
-import com.reandroid.lib.arsc.container.SpecTypePair;
-import com.reandroid.lib.arsc.value.EntryBlock;
-import com.reandroid.lib.arsc.value.ResConfig;
+import com.reandroid.apk.*;
+import com.reandroid.arsc.chunk.PackageBlock;
+import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.arsc.container.SpecTypePair;
+import com.reandroid.arsc.value.EntryBlock;
+import com.reandroid.arsc.value.ResConfig;
 
 import java.io.File;
 import java.io.IOException;

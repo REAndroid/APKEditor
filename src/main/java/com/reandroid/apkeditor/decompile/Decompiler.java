@@ -19,10 +19,10 @@ import com.reandroid.apkeditor.Util;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.FileUtil;
 import com.reandroid.commons.utils.log.Logger;
-import com.reandroid.lib.apk.APKLogger;
-import com.reandroid.lib.apk.ApkJsonDecoder;
-import com.reandroid.lib.apk.ApkModule;
-import com.reandroid.lib.apk.ApkModuleXmlDecoder;
+import com.reandroid.apk.APKLogger;
+import com.reandroid.apk.ApkJsonDecoder;
+import com.reandroid.apk.ApkModule;
+import com.reandroid.apk.ApkModuleXmlDecoder;
 import com.reandroid.xml.XMLException;
 
 import java.io.File;

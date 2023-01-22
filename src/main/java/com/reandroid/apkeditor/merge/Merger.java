@@ -23,16 +23,16 @@ package com.reandroid.apkeditor.merge;
  import com.reandroid.archive.ZipAlign;
  import com.reandroid.commons.command.ARGException;
  import com.reandroid.commons.utils.log.Logger;
- import com.reandroid.lib.apk.APKLogger;
- import com.reandroid.lib.apk.ApkBundle;
- import com.reandroid.lib.apk.ApkModule;
- import com.reandroid.lib.arsc.chunk.TableBlock;
- import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
- import com.reandroid.lib.arsc.chunk.xml.ResXmlAttribute;
- import com.reandroid.lib.arsc.chunk.xml.ResXmlElement;
- import com.reandroid.lib.arsc.group.EntryGroup;
- import com.reandroid.lib.arsc.value.EntryBlock;
- import com.reandroid.lib.arsc.value.ValueType;
+ import com.reandroid.apk.APKLogger;
+ import com.reandroid.apk.ApkBundle;
+ import com.reandroid.apk.ApkModule;
+ import com.reandroid.arsc.chunk.TableBlock;
+ import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
+ import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
+ import com.reandroid.arsc.chunk.xml.ResXmlElement;
+ import com.reandroid.arsc.group.EntryGroup;
+ import com.reandroid.arsc.value.EntryBlock;
+ import com.reandroid.arsc.value.ValueType;
 
  import java.io.File;
  import java.io.IOException;
@@ -116,7 +116,7 @@ package com.reandroid.apkeditor.merge;
             return false;
         }
         TableBlock tableBlock=apkModule.getTableBlock();
-        EntryGroup entryGroup = tableBlock.search(valueAttribute.getRawValue());
+        EntryGroup entryGroup = tableBlock.search(valueAttribute.getData());
         if(entryGroup==null){
             return false;
         }

@@ -20,11 +20,11 @@ import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive.ZipAlign;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
-import com.reandroid.lib.apk.APKLogger;
-import com.reandroid.lib.apk.ApkJsonEncoder;
-import com.reandroid.lib.apk.ApkModule;
-import com.reandroid.lib.apk.ApkModuleXmlEncoder;
-import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
+import com.reandroid.apk.APKLogger;
+import com.reandroid.apk.ApkJsonEncoder;
+import com.reandroid.apk.ApkModule;
+import com.reandroid.apk.ApkModuleXmlEncoder;
+import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.xml.XMLException;
 
 import java.io.File;

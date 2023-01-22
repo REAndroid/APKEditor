@@ -15,7 +15,7 @@
   */
 package com.reandroid.apkeditor;
 
-import com.reandroid.lib.arsc.BuildInfo;
+import com.reandroid.arsc.BuildInfo;
 
 import java.io.File;
 import java.io.IOException;

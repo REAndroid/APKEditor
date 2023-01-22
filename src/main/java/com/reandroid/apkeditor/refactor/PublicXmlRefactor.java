@@ -15,8 +15,8 @@
   */
 package com.reandroid.apkeditor.refactor;
 
-import com.reandroid.lib.apk.ApkModule;
-import com.reandroid.lib.apk.ResourceIds;
+import com.reandroid.apk.ApkModule;
+import com.reandroid.apk.ResourceIds;
 
 import java.io.File;
 import java.io.IOException;

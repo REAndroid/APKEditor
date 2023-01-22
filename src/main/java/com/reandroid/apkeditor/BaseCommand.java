@@ -16,7 +16,7 @@
 package com.reandroid.apkeditor;
 
 import com.reandroid.archive.APKArchive;
-import com.reandroid.lib.apk.ApkModule;
+import com.reandroid.apk.ApkModule;
 
 import java.util.regex.Pattern;
 

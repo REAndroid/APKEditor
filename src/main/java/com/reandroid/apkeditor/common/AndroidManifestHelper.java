@@ -15,12 +15,12 @@
   */
 package com.reandroid.apkeditor.common;
 
-import com.reandroid.lib.arsc.array.ResXmlAttributeArray;
-import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
-import com.reandroid.lib.arsc.chunk.xml.ResXmlAttribute;
-import com.reandroid.lib.arsc.chunk.xml.ResXmlElement;
-import com.reandroid.lib.arsc.chunk.xml.ResXmlStartElement;
-import com.reandroid.lib.arsc.value.ValueType;
+import com.reandroid.arsc.array.ResXmlAttributeArray;
+import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
+import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
+import com.reandroid.arsc.chunk.xml.ResXmlElement;
+import com.reandroid.arsc.chunk.xml.ResXmlStartElement;
+import com.reandroid.arsc.value.ValueType;
 
 import java.util.ArrayList;
 import java.util.List;

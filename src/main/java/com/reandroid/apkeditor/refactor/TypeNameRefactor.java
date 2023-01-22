@@ -15,26 +15,26 @@
   */
 package com.reandroid.apkeditor.refactor;
 
-import com.reandroid.lib.apk.APKLogger;
-import com.reandroid.lib.apk.ApkModule;
-import com.reandroid.lib.apk.ResFile;
-import com.reandroid.lib.arsc.chunk.PackageBlock;
-import com.reandroid.lib.arsc.chunk.TableBlock;
-import com.reandroid.lib.arsc.chunk.xml.AndroidManifestBlock;
-import com.reandroid.lib.arsc.chunk.xml.ResXmlAttribute;
-import com.reandroid.lib.arsc.chunk.xml.ResXmlBlock;
-import com.reandroid.lib.arsc.chunk.xml.ResXmlElement;
-import com.reandroid.lib.arsc.group.EntryGroup;
-import com.reandroid.lib.arsc.item.TypeString;
-import com.reandroid.lib.arsc.util.FrameworkTable;
-import com.reandroid.lib.arsc.value.EntryBlock;
-import com.reandroid.lib.arsc.value.ResValueBag;
-import com.reandroid.lib.arsc.value.ValueType;
-import com.reandroid.lib.arsc.value.array.ArrayBag;
-import com.reandroid.lib.arsc.value.attribute.AttributeBag;
-import com.reandroid.lib.arsc.value.attribute.AttributeValueType;
-import com.reandroid.lib.arsc.value.plurals.PluralsBag;
-import com.reandroid.lib.common.Frameworks;
+import com.reandroid.apk.APKLogger;
+import com.reandroid.apk.ApkModule;
+import com.reandroid.apk.ResFile;
+import com.reandroid.arsc.chunk.PackageBlock;
+import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
+import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
+import com.reandroid.arsc.chunk.xml.ResXmlDocument;
+import com.reandroid.arsc.chunk.xml.ResXmlElement;
+import com.reandroid.arsc.group.EntryGroup;
+import com.reandroid.arsc.item.TypeString;
+import com.reandroid.arsc.util.FrameworkTable;
+import com.reandroid.arsc.value.EntryBlock;
+import com.reandroid.arsc.value.ResValueBag;
+import com.reandroid.arsc.value.ValueType;
+import com.reandroid.arsc.value.array.ArrayBag;
+import com.reandroid.arsc.value.attribute.AttributeBag;
+import com.reandroid.arsc.value.attribute.AttributeValueType;
+import com.reandroid.arsc.value.plurals.PluralsBag;
+import com.reandroid.common.Frameworks;
 import com.reandroid.xml.XMLDocument;
 import com.reandroid.xml.XMLElement;
 
@@ -175,9 +175,9 @@ public class TypeNameRefactor {
                 break;
             }
             if(resFile.isBinaryXml()){
-                ResXmlBlock resXmlBlock=new ResXmlBlock();
-                resXmlBlock.readBytes(resFile.getInputSource().openStream());
-                scanXml(resXmlBlock, resFile.pickOne().getResourceId());
+                ResXmlDocument resXmlDocument=new ResXmlDocument();
+                resXmlDocument.readBytes(resFile.getInputSource().openStream());
+                scanXml(resXmlDocument, resFile.pickOne().getResourceId());
             }
         }
     }
@@ -191,7 +191,7 @@ public class TypeNameRefactor {
             }
         }
     }
-    private void scanXml(ResXmlBlock xmlBlock, int resourceId){
+    private void scanXml(ResXmlDocument xmlBlock, int resourceId){
         boolean isManifest=(xmlBlock instanceof AndroidManifestBlock);
         if(!isManifest && resourceId!=0 && !hasRefactoredId(resourceId)){
             boolean renameOk;
@@ -239,7 +239,7 @@ public class TypeNameRefactor {
             return;
         }
         renameOk = checkAttr(attribute);
-        if(hasRefactoredId(attribute.getRawValue())){
+        if(hasRefactoredId(attribute.getData())){
             return;
         }
         if(!renameOk){
@@ -258,12 +258,12 @@ public class TypeNameRefactor {
             renameOk = checkBool(attribute);
         }
     }
-    private boolean checkInterpolator(ResXmlBlock resXmlBlock, int resourceId){
+    private boolean checkInterpolator(ResXmlDocument resXmlDocument, int resourceId){
         String name="interpolator";
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlBlock.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getResXmlElement();
         if(root==null){
             return false;
         }
@@ -273,7 +273,7 @@ public class TypeNameRefactor {
         }
         return rename(resourceId, name);
     }
-    private boolean checkAnim(ResXmlBlock resXmlBlock, int resourceId){
+    private boolean checkAnim(ResXmlDocument resXmlDocument, int resourceId){
         String name="anim";
         if(hasRefactoredName(name)){
             return false;
@@ -281,7 +281,7 @@ public class TypeNameRefactor {
         if(!hasRefactoredName("animator")){
             return false;
         }
-        ResXmlElement root=resXmlBlock.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getResXmlElement();
         if(root==null){
             return false;
         }
@@ -294,12 +294,12 @@ public class TypeNameRefactor {
         }
         return rename(resourceId, name);
     }
-    private boolean checkXml(ResXmlBlock resXmlBlock, int resourceId){
+    private boolean checkXml(ResXmlDocument resXmlDocument, int resourceId){
         String name="xml";
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlBlock.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getResXmlElement();
         if(root==null){
             return false;
         }
@@ -308,12 +308,12 @@ public class TypeNameRefactor {
         }
         return rename(resourceId, name);
     }
-    private boolean checkMenu(ResXmlBlock resXmlBlock, int resourceId){
+    private boolean checkMenu(ResXmlDocument resXmlDocument, int resourceId){
         String name="menu";
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlBlock.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getResXmlElement();
         if(root==null){
             return false;
         }
@@ -325,12 +325,12 @@ public class TypeNameRefactor {
         }
         return rename(resourceId, name);
     }
-    private boolean checkAnimator(ResXmlBlock resXmlBlock, int resourceId){
+    private boolean checkAnimator(ResXmlDocument resXmlDocument, int resourceId){
         String name="animator";
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlBlock.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getResXmlElement();
         if(root==null){
             return false;
         }
@@ -354,12 +354,12 @@ public class TypeNameRefactor {
         }
         return rename(resourceId, name);
     }
-    private boolean checkDrawable(ResXmlBlock resXmlBlock, int resourceId){
+    private boolean checkDrawable(ResXmlDocument resXmlDocument, int resourceId){
         String name="drawable";
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlBlock.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getResXmlElement();
         if(root==null){
             return false;
         }
@@ -378,12 +378,12 @@ public class TypeNameRefactor {
         }
         return rename(resourceId, name);
     }
-    private boolean checkLayout(ResXmlBlock resXmlBlock, int resourceId){
+    private boolean checkLayout(ResXmlDocument resXmlDocument, int resourceId){
         String name="layout";
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlBlock.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getResXmlElement();
         if(root==null){
             return false;
         }
@@ -415,7 +415,7 @@ public class TypeNameRefactor {
         if(attribute.getValueType() != ValueType.REFERENCE){
             return true;
         }
-        rename(attribute.getRawValue(), name);
+        rename(attribute.getData(), name);
         return true;
     }
     private boolean checkBool(ResXmlAttribute attribute){
@@ -442,7 +442,7 @@ public class TypeNameRefactor {
         if(!isEqualAndroidAttributeType(nameId, attributeValueType)){
             return false;
         }
-        rename(attribute.getRawValue(), name);
+        rename(attribute.getData(), name);
         return true;
     }
     private boolean checkDimen(ResXmlAttribute attribute){
@@ -459,7 +459,7 @@ public class TypeNameRefactor {
         if(attribute.getValueType() != ValueType.REFERENCE){
             return true;
         }
-        rename(attribute.getRawValue(), name);
+        rename(attribute.getData(), name);
         return true;
     }
     private boolean checkId(ResXmlAttribute attribute){
@@ -473,7 +473,7 @@ public class TypeNameRefactor {
         if(attribute.getValueType() != ValueType.REFERENCE){
             return true;
         }
-        rename(attribute.getRawValue(), name);
+        rename(attribute.getData(), name);
         return true;
     }
     private boolean checkStyle(ResXmlAttribute attribute){
@@ -487,7 +487,7 @@ public class TypeNameRefactor {
         if(attribute.getValueType() != ValueType.REFERENCE){
             return true;
         }
-        rename(attribute.getRawValue(), name);
+        rename(attribute.getData(), name);
         return true;
     }
     private boolean checkString(ResXmlAttribute attribute){
@@ -501,7 +501,7 @@ public class TypeNameRefactor {
         if(attribute.getValueType() != ValueType.REFERENCE){
             return true;
         }
-        rename(attribute.getRawValue(), name);
+        rename(attribute.getData(), name);
         return true;
     }
     private boolean isXml(ResXmlElement root){

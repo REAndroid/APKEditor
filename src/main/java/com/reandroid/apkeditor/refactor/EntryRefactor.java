@@ -15,8 +15,8 @@
   */
 package com.reandroid.apkeditor.refactor;
 
-import com.reandroid.lib.apk.ResourceIds;
-import com.reandroid.lib.arsc.chunk.TableBlock;
+import com.reandroid.apk.ResourceIds;
+import com.reandroid.arsc.chunk.TableBlock;
 
 import java.util.*;
 

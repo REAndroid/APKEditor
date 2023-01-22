@@ -21,8 +21,8 @@ package com.reandroid.apkeditor.refactor;
  import com.reandroid.archive.ZipAlign;
  import com.reandroid.commons.command.ARGException;
  import com.reandroid.commons.utils.log.Logger;
- import com.reandroid.lib.apk.APKLogger;
- import com.reandroid.lib.apk.ApkModule;
+ import com.reandroid.apk.APKLogger;
+ import com.reandroid.apk.ApkModule;
 
  import java.io.File;
  import java.io.IOException;

@@ -15,10 +15,10 @@
   */
 package com.reandroid.apkeditor.refactor;
 
-import com.reandroid.lib.apk.ApkModule;
-import com.reandroid.lib.apk.ResFile;
-import com.reandroid.lib.apk.ResourceIds;
-import com.reandroid.lib.arsc.chunk.TableBlock;
+import com.reandroid.apk.ApkModule;
+import com.reandroid.apk.ResFile;
+import com.reandroid.apk.ResourceIds;
+import com.reandroid.arsc.chunk.TableBlock;
 
 import java.io.IOException;
 import java.util.List;
