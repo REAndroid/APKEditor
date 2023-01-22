@@ -19,6 +19,7 @@ import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive.ZipAlign;
+import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.apk.*;
@@ -42,6 +43,7 @@ public class Protector extends BaseCommand implements WriteProgress {
         log("Loading apk file ...");
         ApkModule module=ApkModule.loadApkFile(options.inputFile);
         module.setAPKLogger(getAPKLogger());
+        confuseAndroidManifest(module);
         log("Protecting files ..");
         confuseResDir(module);
         log("Protecting resource table ..");
@@ -53,6 +55,12 @@ public class Protector extends BaseCommand implements WriteProgress {
         ZipAlign.align4(options.outputFile);
         log("Saved to: "+options.outputFile);
         log("Done");
+    }
+    private void confuseAndroidManifest(ApkModule apkModule) throws IOException {
+        log("Confusing AndroidManifest ...");
+        AndroidManifestBlock manifestBlock = apkModule.getAndroidManifestBlock();
+        manifestBlock.setAttributesUnitSize(24, true);
+        manifestBlock.refresh();
     }
     private void confuseByteOffset(ApkModule apkModule) throws IOException {
         TableBlock tableBlock=apkModule.getTableBlock();
