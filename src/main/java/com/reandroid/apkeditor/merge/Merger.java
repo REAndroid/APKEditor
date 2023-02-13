@@ -21,6 +21,8 @@ package com.reandroid.apkeditor.merge;
  import com.reandroid.archive.APKArchive;
  import com.reandroid.archive.WriteProgress;
  import com.reandroid.archive.ZipAlign;
+ import com.reandroid.arsc.value.ResTableEntry;
+ import com.reandroid.arsc.value.ResValue;
  import com.reandroid.commons.command.ARGException;
  import com.reandroid.commons.utils.log.Logger;
  import com.reandroid.apk.APKLogger;
@@ -31,7 +33,7 @@ package com.reandroid.apkeditor.merge;
  import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
  import com.reandroid.arsc.chunk.xml.ResXmlElement;
  import com.reandroid.arsc.group.EntryGroup;
- import com.reandroid.arsc.value.EntryBlock;
+ import com.reandroid.arsc.value.Entry;
  import com.reandroid.arsc.value.ValueType;
 
  import java.io.File;
@@ -121,14 +123,19 @@ package com.reandroid.apkeditor.merge;
             return false;
         }
         APKArchive apkArchive=apkModule.getApkArchive();
-        for(EntryBlock entryBlock:entryGroup.listItems()){
-            String path=entryBlock.getValueAsString();
+        List<Entry> entryList = entryGroup.listItems();
+        for(Entry entryBlock:entryList){
+            if(entryBlock==null){
+                continue;
+            }
+            ResValue resValue = ((ResTableEntry)entryBlock.getTableEntry()).getValue();
+            String path = resValue.getValueAsString();
             log("Removed from table: "+path);
             //Remove file entry
             apkArchive.remove(path);
             // It's not safe to destroy entry, resource id might be used in dex code.
             // Better replace it with boolean value
-            entryBlock.setValueAsBoolean(false);
+            entryBlock.setNull(true);
         }
         tableBlock.refresh();
         return true;

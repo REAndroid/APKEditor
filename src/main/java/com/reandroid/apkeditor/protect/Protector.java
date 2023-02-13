@@ -26,7 +26,7 @@ import com.reandroid.apk.*;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.container.SpecTypePair;
-import com.reandroid.arsc.value.EntryBlock;
+import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResConfig;
 
 import java.io.File;
@@ -39,6 +39,7 @@ public class Protector extends BaseCommand implements WriteProgress {
     public Protector(ProtectorOptions options){
         this.options=options;
     }
+
     public void run() throws IOException {
         log("Loading apk file ...");
         ApkModule module=ApkModule.loadApkFile(options.inputFile);
@@ -63,6 +64,7 @@ public class Protector extends BaseCommand implements WriteProgress {
         manifestBlock.refresh();
     }
     private void confuseByteOffset(ApkModule apkModule) throws IOException {
+        log("Protecting resource table ..");
         TableBlock tableBlock=apkModule.getTableBlock();
         for(PackageBlock packageBlock:tableBlock.listPackages()){
             for(SpecTypePair specTypePair:packageBlock.listAllSpecTypePair()){
@@ -71,8 +73,10 @@ public class Protector extends BaseCommand implements WriteProgress {
                 }
             }
         }
+        tableBlock.refresh();
     }
     private void confuseResDir(ApkModule apkModule) throws IOException {
+        log("Protecting files ..");
         String[] dirNames=new String[]{
                 "AndroidManifest.xml",
                 "resources.arsc",
@@ -86,7 +90,7 @@ public class Protector extends BaseCommand implements WriteProgress {
             }
             int method=resFile.getInputSource().getMethod();
             String path = resFile.getFilePath();
-            EntryBlock entryBlock = resFile.pickOne();
+            Entry entryBlock = resFile.pickOne();
             // TODO: make other solution to decide user which types/dirs to ignore
             if(entryBlock!=null && "font".equals(entryBlock.getTypeName())){
                 log("  Ignored: "+path);

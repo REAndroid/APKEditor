@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.refactor;
 import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apk.ResFile;
+import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
@@ -27,8 +28,9 @@ import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.group.EntryGroup;
 import com.reandroid.arsc.item.TypeString;
 import com.reandroid.arsc.util.FrameworkTable;
-import com.reandroid.arsc.value.EntryBlock;
-import com.reandroid.arsc.value.ResValueBag;
+import com.reandroid.arsc.value.Entry;
+import com.reandroid.arsc.value.ResTableMapEntry;
+import com.reandroid.arsc.value.ResValueMap;
 import com.reandroid.arsc.value.ValueType;
 import com.reandroid.arsc.value.array.ArrayBag;
 import com.reandroid.arsc.value.attribute.AttributeBag;
@@ -121,14 +123,14 @@ public class TypeNameRefactor {
             return false;
         }
         boolean hasBagEntry=false;
-        Iterator<EntryBlock> itr = entryGroup.iterator(true);
+        Iterator<Entry> itr = entryGroup.iterator(true);
         while (itr.hasNext()){
-            EntryBlock entryBlock=itr.next();
-            if(!entryBlock.isEntryTypeBag()){
+            Entry entryBlock=itr.next();
+            if(!entryBlock.isComplex()){
                 return false;
             }
             hasBagEntry=true;
-            ResValueBag resValueBag=(ResValueBag) entryBlock.getResValue();
+            ResTableMapEntry resValueBag=(ResTableMapEntry) entryBlock.getTableEntry();
             if(checkPlurals(resValueBag)){
                 return true;
             }
@@ -138,33 +140,33 @@ public class TypeNameRefactor {
         }
         return hasBagEntry;
     }
-    private boolean checkArray(ResValueBag resValueBag){
+    private boolean checkArray(ResTableMapEntry resValueBag){
         String name="array";
         if(hasRefactoredName(name)){
             return false;
         }
-        if(resValueBag.getCount()<2){
+        if(resValueBag.getValue().childesCount()<2){
             return false;
         }
         if(!ArrayBag.isArray(resValueBag)){
             return false;
         }
-        int resourceId=resValueBag.getEntryBlock().getResourceId();
+        int resourceId=resValueBag.getParentEntry().getResourceId();
         rename(resourceId, name);
         return true;
     }
-    private boolean checkPlurals(ResValueBag resValueBag){
+    private boolean checkPlurals(ResTableMapEntry resValueBag){
         String name="plurals";
         if(hasRefactoredName(name)){
             return false;
         }
-        if(resValueBag.getCount()<2){
+        if(resValueBag.getValue().childesCount()<2){
             return false;
         }
         if(!PluralsBag.isPlurals(resValueBag)){
             return false;
         }
-        int resourceId=resValueBag.getEntryBlock().getResourceId();
+        int resourceId=resValueBag.getParentEntry().getResourceId();
         rename(resourceId, name);
         return true;
     }
@@ -566,12 +568,12 @@ public class TypeNameRefactor {
         if(entryGroup==null){
             return false;
         }
-        EntryBlock entryBlock = entryGroup.pickOne();
-        if(entryBlock==null || !entryBlock.isEntryTypeBag()){
+        Entry entryBlock = entryGroup.pickOne();
+        if(entryBlock==null || !entryBlock.isComplex()){
             return false;
         }
         AttributeBag attributeBag =
-                AttributeBag.create((ResValueBag) entryBlock.getResValue());
+                AttributeBag.create(((ResTableMapEntry) entryBlock.getTableEntry()).getValue());
         if(attributeBag==null){
             return false;
         }
