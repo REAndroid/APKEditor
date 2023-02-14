@@ -37,6 +37,12 @@ public class Decompiler {
     public void run() throws IOException {
         log("Loading ...");
         ApkModule apkModule=ApkModule.loadApkFile(options.inputFile);
+        String protect = Util.isProtected(apkModule);
+        if(protect!=null){
+            log(options.inputFile.getAbsolutePath());
+            log(protect);
+            return;
+        }
         apkModule.setAPKLogger(getAPKLogger());
         if(options.resDirName!=null){
             log("Renaming resources root dir: "+options.resDirName);
@@ -59,6 +65,7 @@ public class Decompiler {
                 throw new IOException(ex.getMessage(), ex);
             }
         }
+        log("Saved to: "+options.outputFile);
         log("Done");
     }
     private APKLogger getAPKLogger(){

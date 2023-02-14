@@ -43,12 +43,19 @@ public class Protector extends BaseCommand implements WriteProgress {
     public void run() throws IOException {
         log("Loading apk file ...");
         ApkModule module=ApkModule.loadApkFile(options.inputFile);
+        String protect = Util.isProtected(module);
+        if(protect!=null){
+            log(options.inputFile.getAbsolutePath());
+            log(protect);
+            return;
+        }
         module.setAPKLogger(getAPKLogger());
         confuseAndroidManifest(module);
         log("Protecting files ..");
         confuseResDir(module);
         log("Protecting resource table ..");
         confuseByteOffset(module);
+        Util.addApkEditorInfo(module, Util.EDIT_TYPE_PROTECTED);
         module.getTableBlock().refresh();
         log("Writing apk ...");
         module.writeApk(options.outputFile, this);

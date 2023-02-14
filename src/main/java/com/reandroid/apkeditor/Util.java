@@ -15,11 +15,20 @@
   */
 package com.reandroid.apkeditor;
 
+import com.reandroid.apk.ApkModule;
+import com.reandroid.arsc.chunk.PackageBlock;
+import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.arsc.item.TableString;
+import com.reandroid.arsc.pool.TableStringPool;
+
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-public class Util {
+ public class Util {
     public static boolean isHelp(String[] args){
         if(isEmpty(args)){
             return true;
@@ -104,4 +113,98 @@ public class Util {
             dir.delete();
         }
     }
+    // This is to respect someone's protection from editing,
+    // if you reach here be ethical do not patch it for distribution.
+    public static String isProtected(ApkModule apkModule){
+        Properties properties = null;
+        try {
+            TableBlock tableBlock = apkModule.getTableBlock();
+            String str = loadApkEditorProperties(tableBlock);
+            properties = loadApkEditorProperties(str);
+        } catch (IOException exception) {
+        }
+        if(properties == null){
+            return null;
+        }
+        String protect = properties.getProperty("EDIT_TYPE", null);
+        if(protect==null || !protect.contains(EDIT_TYPE_PROTECTED)){
+            return null;
+        }
+        return protect;
+    }
+    private static String loadApkEditorProperties(TableBlock tableBlock){
+        if(tableBlock == null){
+            return null;
+        }
+        TableStringPool stringPool = tableBlock.getTableStringPool();
+        int count = stringPool.countStrings();
+        TableString tableString = stringPool.get(count-1);
+        return loadApkEditorProperties(tableString);
+    }
+    private static String loadApkEditorProperties(TableString tableString){
+        if(tableString == null){
+            return null;
+        }
+        String str = tableString.get();
+        if(str==null || !(str.contains("REPO=") && str.contains(APKEditor.getRepo()))){
+            return null;
+        }
+        return str;
+    }
+    private static Properties loadApkEditorProperties(String str){
+        if(str==null || !(str.contains("REPO=") && str.contains(APKEditor.getRepo()))){
+            return null;
+        }
+        try {
+            Properties properties = new Properties();
+            properties.load(new StringReader(str));
+            return properties;
+        } catch (Exception exception) {
+            return null;
+        }
+    }
+    public static void addApkEditorInfo(ApkModule apkModule, String type){
+        try {
+            addApkEditorInfo(apkModule.getTableBlock(), type);
+        } catch (IOException ignored) {
+        }
+    }
+    private static void addApkEditorInfo(TableBlock tableBlock, String type){
+        if(tableBlock == null){
+            return;
+        }
+        TableStringPool stringPool = tableBlock.getTableStringPool();
+        int count = stringPool.countStrings();
+        if(count==0){
+            return;
+        }
+        TableString tableString = stringPool.get(count-1);
+        if(!isApkEditorInfo(tableString)){
+            stringPool.getStringsArray().ensureSize(count+1);
+            tableString = stringPool.get(count);
+        }
+        tableString.set(buildApkEditorInfo(type));
+    }
+    private static String buildApkEditorInfo(String type){
+        StringBuilder builder = new StringBuilder();
+        builder.append("NAME=").append(APKEditor.getName());
+        builder.append("\nVERSION=").append(APKEditor.getVersion());
+        builder.append("\nREPO=").append(APKEditor.getRepo());
+        builder.append("\nEDIT_TYPE=").append(type);
+        builder.append("\nTIME=").append(System.currentTimeMillis());
+        return builder.toString();
+    }
+    private static boolean isApkEditorInfo(TableString tableString){
+        if(tableString==null){
+            return false;
+        }
+        String str = tableString.getHtml();
+        if(str==null){
+            return false;
+        }
+        return str.contains("REPO=")
+                && str.contains(APKEditor.getRepo());
+    }
+
+    public static final String EDIT_TYPE_PROTECTED = "PROTECTED";
 }

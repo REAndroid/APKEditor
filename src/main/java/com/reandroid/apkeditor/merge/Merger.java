@@ -54,6 +54,14 @@ package com.reandroid.apkeditor.merge;
         bundle.setAPKLogger(getAPKLogger());
         bundle.loadApkDirectory(options.inputFile);
         log("Found modules: "+bundle.getApkModuleList().size());
+        for(ApkModule apkModule:bundle.getApkModuleList()){
+            String protect = Util.isProtected(apkModule);
+            if(protect!=null){
+                log(options.inputFile.getAbsolutePath());
+                log(protect);
+                return;
+            }
+        }
         ApkModule mergedModule=bundle.mergeModules();
         if(options.resDirName!=null){
             log("Renaming resources root dir: "+options.resDirName);
@@ -67,6 +75,7 @@ package com.reandroid.apkeditor.merge;
         if(mergedModule.hasAndroidManifestBlock()){
             sanitizeManifest(mergedModule);
         }
+        Util.addApkEditorInfo(mergedModule, getClass().getSimpleName());
         log("Writing apk ...");
         mergedModule.writeApk(options.outputFile, this);
         log("Zip align ...");

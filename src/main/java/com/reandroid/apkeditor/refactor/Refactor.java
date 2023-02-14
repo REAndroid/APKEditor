@@ -40,6 +40,12 @@ package com.reandroid.apkeditor.refactor;
          if(!module.hasTableBlock()){
              throw new IOException("Don't have resources.arsc");
          }
+         String protect = Util.isProtected(module);
+         if(protect!=null){
+             log(options.inputFile.getAbsolutePath());
+             log(protect);
+             return;
+         }
          if(options.fixTypeNames){
              TypeNameRefactor typeNameRefactor=new TypeNameRefactor(module);
              typeNameRefactor.setApkLogger(getAPKLogger());
@@ -57,6 +63,7 @@ package com.reandroid.apkeditor.refactor;
              log("Renamed from public.xml entries: "+pubXmlRenameCount);
          }
          removeSignature(module);
+         Util.addApkEditorInfo(module, getClass().getSimpleName());
          log("Writing apk ...");
          module.writeApk(options.outputFile, this);
          log("Zip align ...");

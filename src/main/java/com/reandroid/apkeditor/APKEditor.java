@@ -44,7 +44,7 @@ public class APKEditor {
         }
         sProperties=new Properties();
         try {
-            sProperties.load(APKEditor.class.getResourceAsStream("/apkeditor.properties"));
+            sProperties.load(APKEditor.class.getResourceAsStream(PATH_properties));
         } catch (IOException ex) {
             sProperties.put("app.description", ex.getMessage());
         }
@@ -60,4 +60,7 @@ public class APKEditor {
         }
         return getName()+".jar";
     }
+
+    public static final String PATH_properties = "/apkeditor.properties";
+
 }
