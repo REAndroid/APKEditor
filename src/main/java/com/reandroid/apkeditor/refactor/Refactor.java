@@ -55,6 +55,8 @@ package com.reandroid.apkeditor.refactor;
          AutoRefactor autoRefactor=new AutoRefactor(module);
          int autoRenameCount=autoRefactor.refactor();
          log("Auto renamed entries: "+autoRenameCount);
+         StringValueNameGenerator generator = new StringValueNameGenerator(module.getTableBlock());
+         generator.refactor();
          if(options.publicXml!=null){
              log("Renaming from: "+options.publicXml);
              PublicXmlRefactor publicXmlRefactor =
