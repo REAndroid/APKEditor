@@ -32,10 +32,19 @@ public class AutoRefactor {
         ResourceIds refactoredId=buildRefactor();
         TableBlock tableBlock=mApkModule.getTableBlock();
         int renameCount=refactoredId.applyTo(tableBlock);
+        refactorFilePaths();
+        return renameCount;
+    }
+    public int refactorFilePaths() throws IOException {
+        int renameCount=0;
         List<ResFile> resFileList = mApkModule.listResFiles();
         for(ResFile resFile:resFileList){
             String path=RefactorUtil.RES_DIR+"/"+resFile.buildPath();
+            if(path.equals(resFile.getFilePath())){
+                continue;
+            }
             resFile.setFilePath(path);
+            renameCount++;
         }
         return renameCount;
     }
