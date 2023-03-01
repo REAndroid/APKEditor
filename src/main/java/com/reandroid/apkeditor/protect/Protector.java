@@ -15,11 +15,16 @@
   */
 package com.reandroid.apkeditor.protect;
 
+import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive.ZipAlign;
+import com.reandroid.arsc.BuildInfo;
+import com.reandroid.arsc.chunk.UnknownChunk;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
+import com.reandroid.arsc.item.ByteArray;
+import com.reandroid.arsc.item.FixedLengthString;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.apk.*;
@@ -55,6 +60,7 @@ public class Protector extends BaseCommand implements WriteProgress {
         confuseResDir(module);
         log("Protecting resource table ..");
         confuseByteOffset(module);
+        confuseResourceTable(module);
         Util.addApkEditorInfo(module, Util.EDIT_TYPE_PROTECTED);
         module.getTableBlock().refresh();
         log("Writing apk ...");
@@ -71,7 +77,7 @@ public class Protector extends BaseCommand implements WriteProgress {
         manifestBlock.refresh();
     }
     private void confuseByteOffset(ApkModule apkModule) throws IOException {
-        log("Protecting resource table ..");
+        log("METHOD-1 Protecting resource table ..");
         TableBlock tableBlock=apkModule.getTableBlock();
         for(PackageBlock packageBlock:tableBlock.listPackages()){
             for(SpecTypePair specTypePair:packageBlock.listAllSpecTypePair()){
@@ -80,6 +86,26 @@ public class Protector extends BaseCommand implements WriteProgress {
                 }
             }
         }
+        tableBlock.refresh();
+    }
+    private void confuseResourceTable(ApkModule apkModule) throws IOException {
+        log("METHOD-2 Protecting resource table ..");
+        TableBlock tableBlock=apkModule.getTableBlock();
+        UnknownChunk unknownChunk = new UnknownChunk();
+        FixedLengthString fixedLengthString = new FixedLengthString(256);
+        fixedLengthString.set(APKEditor.getRepo());
+        ByteArray extra = unknownChunk.getHeaderBlock().getExtraBytes();
+        byte[] bts = fixedLengthString.getBytes();
+        extra.setSize(bts.length);
+        extra.putByteArray(0, bts);
+        fixedLengthString.set(BuildInfo.getRepo());
+        extra = unknownChunk.getBody();
+        bts = fixedLengthString.getBytes();
+        extra.setSize(bts.length);
+        extra.putByteArray(0, bts);
+        fixedLengthString.set(BuildInfo.getRepo());
+        unknownChunk.refresh();
+        tableBlock.getFirstPlaceHolder().setItem(unknownChunk);
         tableBlock.refresh();
     }
     private void confuseResDir(ApkModule apkModule) throws IOException {
