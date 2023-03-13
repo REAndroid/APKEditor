@@ -121,7 +121,7 @@ import java.util.Properties;
             TableBlock tableBlock = apkModule.getTableBlock();
             String str = loadApkEditorProperties(tableBlock);
             properties = loadApkEditorProperties(str);
-        } catch (IOException exception) {
+        } catch (Exception exception) {
         }
         if(properties == null){
             return null;
@@ -166,7 +166,7 @@ import java.util.Properties;
     public static void addApkEditorInfo(ApkModule apkModule, String type){
         try {
             addApkEditorInfo(apkModule.getTableBlock(), type);
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
     }
     private static void addApkEditorInfo(TableBlock tableBlock, String type){

@@ -15,9 +15,7 @@
   */
 package com.reandroid.apkeditor.refactor;
 
-import com.reandroid.apk.APKLogger;
-import com.reandroid.apk.ApkModule;
-import com.reandroid.apk.ResFile;
+import com.reandroid.apk.*;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
@@ -561,7 +559,14 @@ public class TypeNameRefactor {
         return true;
     }
     private boolean isEqualAndroidAttributeType(int attributeResourceId, AttributeValueType attributeValueType){
-        FrameworkTable frameworkTable = Frameworks.getAndroid();
+        FrameworkApk frameworkApk = AndroidFrameworks.getCurrent();
+        if(frameworkApk==null){
+            return false;
+        }
+        FrameworkTable frameworkTable = frameworkApk.getTableBlock();
+        if(frameworkTable==null){
+            return false;
+        }
         EntryGroup entryGroup = frameworkTable.search(attributeResourceId);
         if(entryGroup==null){
             return false;

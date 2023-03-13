@@ -17,7 +17,6 @@ package com.reandroid.apkeditor.decompile;
 
 import com.reandroid.apkeditor.Util;
 import com.reandroid.commons.command.ARGException;
-import com.reandroid.commons.utils.FileUtil;
 import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkJsonDecoder;
@@ -37,13 +36,13 @@ public class Decompiler {
     public void run() throws IOException {
         log("Loading ...");
         ApkModule apkModule=ApkModule.loadApkFile(options.inputFile);
+        apkModule.setAPKLogger(getAPKLogger());
         String protect = Util.isProtected(apkModule);
         if(protect!=null){
             log(options.inputFile.getAbsolutePath());
             log(protect);
             return;
         }
-        apkModule.setAPKLogger(getAPKLogger());
         if(options.resDirName!=null){
             log("Renaming resources root dir: "+options.resDirName);
             apkModule.setResourcesRootDir(options.resDirName);
