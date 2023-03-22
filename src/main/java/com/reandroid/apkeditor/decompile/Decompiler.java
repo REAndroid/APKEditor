@@ -54,10 +54,12 @@ public class Decompiler {
         if(DecompileOptions.TYPE_JSON.equals(options.type)){
             log("Decompiling to JSON ...");
             ApkJsonDecoder decoder=new ApkJsonDecoder(apkModule, options.splitJson);
+            decoder.sanitizeFilePaths();
             decoder.writeToDirectory(options.outputFile);
         }else{
             log("Decompiling to XML ...");
             ApkModuleXmlDecoder xmlDecoder=new ApkModuleXmlDecoder(apkModule);
+            xmlDecoder.sanitizeFilePaths();
             try {
                 xmlDecoder.decodeTo(options.outputFile);
             } catch (XMLException ex) {
