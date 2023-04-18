@@ -57,6 +57,10 @@ public class MergerOptions extends Options {
     }
     private File getOutputApkFromInput(File file){
         String name = file.getName();
+        int i = name.lastIndexOf('.');
+        if(i>0){
+            name = name.substring(0, i);
+        }
         name=name+"_merged.apk";
         File dir=file.getParentFile();
         if(dir==null){
@@ -70,8 +74,8 @@ public class MergerOptions extends Options {
         if(file==null){
             throw new ARGException("Missing input directory");
         }
-        if(!file.isDirectory()){
-            throw new ARGException("No such directory: "+file);
+        if(!file.exists()){
+            throw new ARGException("No such file/directory: "+file);
         }
         this.inputFile=file;
     }
@@ -114,7 +118,7 @@ public class MergerOptions extends Options {
         String jar = APKEditor.getJarName();
         builder.append("\n\nExample-1:");
         builder.append("\n   java -jar ").append(jar).append(" ").append(Merger.ARG_SHORT).append(" ")
-                .append(ARG_input).append(" path/to/input_dir");
+                .append(ARG_input).append(" path/to/input");
         builder.append(" ").append(ARG_output).append(" path/to/out.apk");
         return builder.toString();
     }

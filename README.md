@@ -17,7 +17,7 @@ Usage:
  commands: 
   1)  d | decode     -   Decodes android resources binary to readable json
   2)  b | build      -   Builds android binary from json
-  3)  m | merge      -   Merges split apk files from directory
+  3)  m | merge      -   Merges split apk files from directory or XAPK, APKM, APKS ...
   4)  x | refactor   -   Refactors obfuscated resource names
   5)  p | protect    -   Protects/Obfuscates apk resource
  run with <command> -h to get detailed help about each command
@@ -64,8 +64,8 @@ Output: test_edited.apk
 </details>
 
 #### 3- Merge
-Merges multiple splitted apk (app bundles) to standalone apk
-<details> <summary><code>java -jar APKEditor.jar <b>m</b> -i path/to/directory-of-apk-files</code></summary>
+Merges multiple splitted apk files (directory, xapk, apkm, apks ...) to standalone apk
+<details> <summary><code>java -jar APKEditor.jar <b>m</b> -i path/to/input</code></summary>
 
  ```ShellSession
 $ java -jar APKEditor.jar m -i apk_files

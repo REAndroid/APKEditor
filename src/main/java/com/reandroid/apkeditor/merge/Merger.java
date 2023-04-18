@@ -21,6 +21,7 @@ package com.reandroid.apkeditor.merge;
  import com.reandroid.archive.APKArchive;
  import com.reandroid.archive.WriteProgress;
  import com.reandroid.archive.ZipAlign;
+ import com.reandroid.archive2.Archive;
  import com.reandroid.arsc.value.ResTableEntry;
  import com.reandroid.arsc.value.ResValue;
  import com.reandroid.commons.command.ARGException;
@@ -49,10 +50,16 @@ package com.reandroid.apkeditor.merge;
         this.options=options;
     }
     public void run() throws IOException {
+        File dir = options.inputFile;
+        boolean extracted = false;
+        if(dir.isFile()){
+            dir = extractFile(dir);
+            extracted = true;
+        }
         log("Searching apk files ...");
         ApkBundle bundle=new ApkBundle();
         bundle.setAPKLogger(getAPKLogger());
-        bundle.loadApkDirectory(options.inputFile);
+        bundle.loadApkDirectory(dir, extracted);
         log("Found modules: "+bundle.getApkModuleList().size());
         for(ApkModule apkModule:bundle.getApkModuleList()){
             String protect = Util.isProtected(apkModule);
@@ -81,10 +88,38 @@ package com.reandroid.apkeditor.merge;
         Util.addApkEditorInfo(mergedModule, getClass().getSimpleName());
         log("Writing apk ...");
         mergedModule.writeApk(options.outputFile, this);
+        if(extracted){
+            Util.deleteDir(dir);
+        }
         log("Zip align ...");
         ZipAlign.align4(options.outputFile);
         log("Saved to: "+options.outputFile);
         log("Done");
+    }
+    private File extractFile(File file) throws IOException {
+        File tmp = toTmpDir(file);
+        log("Extracting to: " + tmp);
+        if(tmp.exists()){
+            log("Delete: " + tmp);
+            Util.deleteDir(tmp);
+        }
+        tmp.deleteOnExit();
+        Archive archive = new Archive(file);
+        archive.extract(tmp);
+        return tmp;
+    }
+    private File toTmpDir(File file){
+        String name = file.getName();
+        int i = name.lastIndexOf('.');
+        if(i>0){
+            name = name.substring(0, i);
+        }
+        name=name+"_tmp";
+        File dir=file.getParentFile();
+        if(dir==null){
+            return new File(name);
+        }
+        return new File(dir, name);
     }
     private void sanitizeManifest(ApkModule apkModule) throws IOException {
         AndroidManifestBlock manifest=apkModule.getAndroidManifestBlock();
@@ -231,5 +266,5 @@ package com.reandroid.apkeditor.merge;
     }
     public static final String ARG_SHORT="m";
     public static final String ARG_LONG="merge";
-    public static final String DESCRIPTION="Merges split apk files from directory";
+    public static final String DESCRIPTION="Merges split apk files from directory or XAPK, APKM, APKS ...";
 }
