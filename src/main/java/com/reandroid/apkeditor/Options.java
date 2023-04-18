@@ -131,4 +131,6 @@ public class Options {
     protected static final String ARG_DESC_validate_res_dir="validate resources dir name\n(eg. if a drawable resource file path is 'res/abc.png' then\nit will be moved to 'res/drawable/abc.png')";
     protected static final String ARG_force="-f";
     protected static final String ARG_DESC_force="force delete output path";
+    protected static final String ARG_keepMeta = "-keep-meta";
+    protected static final String ARG_DESC_keepMeta = "keeps META-INF directory";
 }

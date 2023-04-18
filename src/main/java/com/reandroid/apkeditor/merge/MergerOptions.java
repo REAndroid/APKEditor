@@ -24,6 +24,7 @@ import java.io.File;
 
 public class MergerOptions extends Options {
     public boolean validateResDir;
+    public boolean keepMeta;
     public String resDirName;
     public MergerOptions(){
         super();
@@ -34,10 +35,14 @@ public class MergerOptions extends Options {
         parseOutput(args);
         parseResDirName(args);
         parseValidateResDir(args);
+        parseKeepMeta(args);
         super.parse(args);
     }
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
+    }
+    private void parseKeepMeta(String[] args) throws ARGException {
+        keepMeta = containsArg(ARG_keepMeta, true, args);
     }
     private void parseResDirName(String[] args) throws ARGException {
         this.resDirName=parseArgValue(ARG_resDir, true, args);
@@ -84,6 +89,9 @@ public class MergerOptions extends Options {
         if(force){
             builder.append("\n Force: true");
         }
+        if(keepMeta){
+            builder.append("\n Keep meta: true");
+        }
         builder.append("\n ---------------------------- ");
         return builder.toString();
     }
@@ -99,7 +107,8 @@ public class MergerOptions extends Options {
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         builder.append("\nFlags:\n");
         table=new String[][]{
-                new String[]{ARG_force, ARG_DESC_force}
+                new String[]{ARG_force, ARG_DESC_force},
+                new String[]{ARG_keepMeta, ARG_DESC_keepMeta}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();

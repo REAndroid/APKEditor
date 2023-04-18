@@ -71,7 +71,10 @@ package com.reandroid.apkeditor.merge;
             log("Validating resources dir ...");
             mergedModule.validateResourcesDir();
         }
-        removeSignature(mergedModule);
+        if(!options.keepMeta){
+            log("Clearing META-INF ...");
+            removeSignature(mergedModule);
+        }
         if(mergedModule.hasAndroidManifestBlock()){
             sanitizeManifest(mergedModule);
         }

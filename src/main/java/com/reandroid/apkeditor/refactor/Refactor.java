@@ -64,7 +64,10 @@ package com.reandroid.apkeditor.refactor;
              int pubXmlRenameCount = publicXmlRefactor.refactor();
              log("Renamed from public.xml entries: "+pubXmlRenameCount);
          }
-         removeSignature(module);
+         if(!options.keepMeta){
+             log("Clearing META-INF ...");
+             removeSignature(module);
+         }
          Util.addApkEditorInfo(module, getClass().getSimpleName());
          log("Writing apk ...");
          module.writeApk(options.outputFile, this);

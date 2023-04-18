@@ -25,6 +25,7 @@ package com.reandroid.apkeditor.refactor;
  public class RefactorOptions extends Options {
      public File publicXml;
      public boolean fixTypeNames;
+     public boolean keepMeta;
      public RefactorOptions(){
          super();
      }
@@ -34,7 +35,11 @@ package com.reandroid.apkeditor.refactor;
          parseOutput(args);
          parsePublicXml(args);
          parseFixTypes(args);
+         parseKeepMeta(args);
          super.parse(args);
+     }
+     private void parseKeepMeta(String[] args) throws ARGException {
+         keepMeta = containsArg(ARG_keepMeta, true, args);
      }
      private void parseFixTypes(String[] args) throws ARGException {
          fixTypeNames=containsArg(ARG_fix_types, true, args);
@@ -93,6 +98,9 @@ package com.reandroid.apkeditor.refactor;
          if(force){
              builder.append("\n Force: true");
          }
+         if(keepMeta){
+             builder.append("\n Keep meta: true");
+         }
          builder.append("\n ---------------------------- ");
          return builder.toString();
      }
@@ -109,7 +117,8 @@ package com.reandroid.apkeditor.refactor;
          builder.append("\nFlags:\n");
          table=new String[][]{
                  new String[]{ARG_fix_types, ARG_DESC_fix_types},
-                 new String[]{ARG_force, ARG_DESC_force}
+                 new String[]{ARG_force, ARG_DESC_force},
+                 new String[]{ARG_keepMeta, ARG_DESC_keepMeta}
          };
          StringHelper.printTwoColumns(builder, "   ", 75, table);
          String jar = APKEditor.getJarName();
