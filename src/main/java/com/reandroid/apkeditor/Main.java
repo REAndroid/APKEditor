@@ -49,6 +49,11 @@ public class Main {
             System.err.println("\nERROR:\n"+ex2.getMessage());
             ex2.printStackTrace(System.err);
             System.exit(1);
+        }catch (Exception ex3) {
+            System.err.flush();
+            System.err.println("\nUnexpected error:\n"+ex3.getMessage());
+            ex3.printStackTrace(System.err);
+            System.exit(1);
         }
     }
     private static void execute(String command, String[] args) throws ARGException, IOException {
