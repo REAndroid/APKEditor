@@ -39,6 +39,9 @@ public class Options {
         }
         throw new ARGException("Unknown option: "+args[0]);
     }
+    protected String parseArgValue(String argSwitch, String[] args) throws ARGException {
+        return parseArgValue(argSwitch, true, args);
+    }
     protected String parseArgValue(String argSwitch, boolean ignore_case, String[] args) throws ARGException {
         if(ignore_case){
             argSwitch=argSwitch.toLowerCase();

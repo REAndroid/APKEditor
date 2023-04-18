@@ -144,7 +144,7 @@ public class TypeNameRefactor {
         if(resValueBag.getValue().childesCount()<2){
             return false;
         }
-        if(!ArrayBag.isArray(resValueBag)){
+        if(!ArrayBag.isArray(resValueBag.getParentEntry())){
             return false;
         }
         int resourceId=resValueBag.getParentEntry().getResourceId();
@@ -159,7 +159,7 @@ public class TypeNameRefactor {
         if(resValueBag.getValue().childesCount()<2){
             return false;
         }
-        if(!PluralsBag.isPlurals(resValueBag)){
+        if(!PluralsBag.isPlurals(resValueBag.getParentEntry())){
             return false;
         }
         int resourceId=resValueBag.getParentEntry().getResourceId();
