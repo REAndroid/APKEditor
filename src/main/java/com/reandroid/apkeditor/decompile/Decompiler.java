@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,6 +59,7 @@ public class Decompiler {
         }else{
             log("Decompiling to XML ...");
             ApkModuleXmlDecoder xmlDecoder=new ApkModuleXmlDecoder(apkModule);
+            xmlDecoder.setUseAndroidSerializer(true);
             xmlDecoder.sanitizeFilePaths();
             try {
                 xmlDecoder.decodeTo(options.outputFile);

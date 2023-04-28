@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,6 @@ import com.reandroid.xml.XMLException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.zip.ZipEntry;
 
 public class Builder implements WriteProgress {
     private final BuildOptions options;
@@ -47,6 +46,7 @@ public class Builder implements WriteProgress {
     public void buildJson() throws IOException {
         log("Scanning JSON directory ...");
         ApkJsonEncoder encoder=new ApkJsonEncoder();
+        encoder.setAPKLogger(getAPKLogger());
         ApkModule loadedModule=encoder.scanDirectory(options.inputFile);
         loadedModule.setAPKLogger(getAPKLogger());
         if(options.resDirName!=null){
@@ -79,8 +79,6 @@ public class Builder implements WriteProgress {
         log("Writing apk...");
         loadedModule.getApkArchive().sortApkFiles();
         loadedModule.writeApk(options.outputFile, null);
-        log("Zip align ...");
-        ZipAlign.align4(options.outputFile);
         log("Built to: "+options.outputFile);
         log("Done");
     }

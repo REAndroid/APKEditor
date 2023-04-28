@@ -20,7 +20,6 @@ package com.reandroid.apkeditor.merge;
  import com.reandroid.apkeditor.common.AndroidManifestHelper;
  import com.reandroid.archive.APKArchive;
  import com.reandroid.archive.WriteProgress;
- import com.reandroid.archive.ZipAlign;
  import com.reandroid.archive2.Archive;
  import com.reandroid.arsc.value.ResTableEntry;
  import com.reandroid.arsc.value.ResValue;
@@ -78,9 +77,10 @@ package com.reandroid.apkeditor.merge;
             log("Validating resources dir ...");
             mergedModule.validateResourcesDir();
         }
-        if(!options.keepMeta){
+        if(options.cleanMeta){
             log("Clearing META-INF ...");
             removeSignature(mergedModule);
+            mergedModule.setApkSignatureBlock(null);
         }
         if(mergedModule.hasAndroidManifestBlock()){
             sanitizeManifest(mergedModule);
@@ -91,8 +91,6 @@ package com.reandroid.apkeditor.merge;
         if(extracted){
             Util.deleteDir(dir);
         }
-        log("Zip align ...");
-        ZipAlign.align4(options.outputFile);
         log("Saved to: "+options.outputFile);
         log("Done");
     }

@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ import java.io.File;
 
 public class MergerOptions extends Options {
     public boolean validateResDir;
-    public boolean keepMeta;
+    public boolean cleanMeta;
     public String resDirName;
     public MergerOptions(){
         super();
@@ -35,14 +35,14 @@ public class MergerOptions extends Options {
         parseOutput(args);
         parseResDirName(args);
         parseValidateResDir(args);
-        parseKeepMeta(args);
+        parseCleanMeta(args);
         super.parse(args);
     }
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
     }
-    private void parseKeepMeta(String[] args) throws ARGException {
-        keepMeta = containsArg(ARG_keepMeta, true, args);
+    private void parseCleanMeta(String[] args) throws ARGException {
+        cleanMeta = containsArg(ARG_cleanMeta, true, args);
     }
     private void parseResDirName(String[] args) throws ARGException {
         this.resDirName=parseArgValue(ARG_resDir, true, args);
@@ -93,7 +93,7 @@ public class MergerOptions extends Options {
         if(force){
             builder.append("\n Force: true");
         }
-        if(keepMeta){
+        if(cleanMeta){
             builder.append("\n Keep meta: true");
         }
         builder.append("\n ---------------------------- ");
@@ -112,7 +112,7 @@ public class MergerOptions extends Options {
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
-                new String[]{ARG_keepMeta, ARG_DESC_keepMeta}
+                new String[]{ARG_cleanMeta, ARG_DESC_cleanMeta}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();

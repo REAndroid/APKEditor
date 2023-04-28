@@ -39,7 +39,7 @@ package com.reandroid.apkeditor.refactor;
          super.parse(args);
      }
      private void parseKeepMeta(String[] args) throws ARGException {
-         keepMeta = containsArg(ARG_keepMeta, true, args);
+         keepMeta = containsArg(ARG_cleanMeta, true, args);
      }
      private void parseFixTypes(String[] args) throws ARGException {
          fixTypeNames=containsArg(ARG_fix_types, true, args);
@@ -118,7 +118,7 @@ package com.reandroid.apkeditor.refactor;
          table=new String[][]{
                  new String[]{ARG_fix_types, ARG_DESC_fix_types},
                  new String[]{ARG_force, ARG_DESC_force},
-                 new String[]{ARG_keepMeta, ARG_DESC_keepMeta}
+                 new String[]{ARG_cleanMeta, ARG_DESC_cleanMeta}
          };
          StringHelper.printTwoColumns(builder, "   ", 75, table);
          String jar = APKEditor.getJarName();
