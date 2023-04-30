@@ -60,8 +60,6 @@ public class Builder implements WriteProgress {
         log("Writing apk...");
         loadedModule.getApkArchive().sortApkFiles();
         loadedModule.writeApk(options.outputFile, this);
-        log("Zip align ...");
-        ZipAlign.align4(options.outputFile);
         log("Built to: "+options.outputFile);
         log("Done");
     }
