@@ -25,7 +25,7 @@ package com.reandroid.apkeditor.refactor;
  public class RefactorOptions extends Options {
      public File publicXml;
      public boolean fixTypeNames;
-     public boolean keepMeta;
+     public boolean cleanMeta;
      public RefactorOptions(){
          super();
      }
@@ -36,10 +36,11 @@ package com.reandroid.apkeditor.refactor;
          parsePublicXml(args);
          parseFixTypes(args);
          parseKeepMeta(args);
+
          super.parse(args);
      }
      private void parseKeepMeta(String[] args) throws ARGException {
-         keepMeta = containsArg(ARG_cleanMeta, true, args);
+         cleanMeta = containsArg(ARG_cleanMeta, true, args);
      }
      private void parseFixTypes(String[] args) throws ARGException {
          fixTypeNames=containsArg(ARG_fix_types, true, args);
@@ -98,7 +99,7 @@ package com.reandroid.apkeditor.refactor;
          if(force){
              builder.append("\n Force: true");
          }
-         if(keepMeta){
+         if(cleanMeta){
              builder.append("\n Keep meta: true");
          }
          builder.append("\n ---------------------------- ");

@@ -39,6 +39,9 @@ public class DecompileOptions extends Options {
         parseResDirName(args);
         parseValidateResDir(args);
         parseSignaturesDir(args);
+        if(signaturesDirectory == null && type == null){
+            type = TYPE_JSON;
+        }
         super.parse(args);
     }
     private void parseValidateResDir(String[] args) throws ARGException {

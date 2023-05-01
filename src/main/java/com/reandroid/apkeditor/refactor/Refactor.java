@@ -18,7 +18,6 @@ package com.reandroid.apkeditor.refactor;
  import com.reandroid.apkeditor.BaseCommand;
  import com.reandroid.apkeditor.Util;
  import com.reandroid.archive.WriteProgress;
- import com.reandroid.archive.ZipAlign;
  import com.reandroid.commons.command.ARGException;
  import com.reandroid.commons.utils.log.Logger;
  import com.reandroid.apk.APKLogger;
@@ -64,15 +63,13 @@ package com.reandroid.apkeditor.refactor;
              int pubXmlRenameCount = publicXmlRefactor.refactor();
              log("Renamed from public.xml entries: "+pubXmlRenameCount);
          }
-         if(!options.keepMeta){
+         if(options.cleanMeta){
              log("Clearing META-INF ...");
              removeSignature(module);
          }
          Util.addApkEditorInfo(module, getClass().getSimpleName());
          log("Writing apk ...");
          module.writeApk(options.outputFile, this);
-         log("Zip align ...");
-         ZipAlign.align4(options.outputFile);
          log("Saved to: "+options.outputFile);
          log("Done");
      }
