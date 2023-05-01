@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,22 @@ public class BuildOptions extends Options {
         parseOutput(args);
         parseResDirName(args);
         parseValidateResDir(args);
+        parseSignaturesDir(args);
+        parseType(args);
+        if(TYPE_SIG.equals(type)){
+            if(signaturesDirectory == null){
+                throw new ARGException("Signatures directory missing! " + ARG_sig + " path/to/signatures_dir");
+            }
+            if(!signaturesDirectory.isDirectory()){
+                throw new ARGException("No such directory: " + signaturesDirectory);
+            }
+            if(!inputFile.isFile()){
+                throw new ARGException("Missing apk file: " + inputFile);
+            }
+        }else if(signaturesDirectory != null){
+            throw new ARGException("Invalid parameter combination! " +
+                    "\nSignatures directory provided but missing: -t " + TYPE_SIG);
+        }
         super.parse(args);
     }
     private void parseValidateResDir(String[] args) throws ARGException {
@@ -61,16 +77,16 @@ public class BuildOptions extends Options {
     }
     private void parseOutput(String[] args) throws ARGException {
         this.outputFile=null;
-        File file=parseFile(ARG_output, args);
+        File file = parseFile(ARG_output, args);
         if(file==null){
-            file=getOutputApkFromInput(inputFile);
+            file = getOutputApkFromInput(inputFile);
         }
         this.outputFile=file;
     }
     private File getOutputApkFromInput(File file){
         String name = file.getName();
         name=name+"_out.apk";
-        File dir=file.getParentFile();
+        File dir = file.getParentFile();
         if(dir==null){
             return new File(name);
         }
@@ -78,14 +94,14 @@ public class BuildOptions extends Options {
     }
     private void parseInput(String[] args) throws ARGException {
         this.inputFile=null;
-        File file=parseFile(ARG_input, args);
+        File file = parseFile(ARG_input, args);
         if(file==null){
             throw new ARGException("Missing input directory");
         }
-        if(!file.isDirectory()){
-            throw new ARGException("No such directory: "+file);
+        if(!file.exists()){
+            throw new ARGException("No such file/directory: "+file);
         }
-        this.inputFile=file;
+        this.inputFile = file;
     }
     public static String getHelp(){
         StringBuilder builder=new StringBuilder();
@@ -94,6 +110,7 @@ public class BuildOptions extends Options {
         String[][] table=new String[][]{
                 new String[]{ARG_input, ARG_DESC_input},
                 new String[]{ARG_output, ARG_DESC_output},
+                new String[]{ARG_sig, ARG_DESC_sig},
                 new String[]{ARG_resDir, ARG_DESC_resDir}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
@@ -111,6 +128,14 @@ public class BuildOptions extends Options {
         builder.append("\nExample-2:");
         builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
                 .append(ARG_input).append(" path/to/input_dir");
+
+        builder.append("\nExample-3 (restore signatures):");
+
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT)
+                .append(" ").append(ARG_type).append(" ").append(TYPE_SIG)
+                .append(" ").append(ARG_input).append(" path/to/input.apk")
+                .append(" ").append(ARG_sig).append(" path/to/signatures_dir");
+
         return builder.toString();
     }
 }

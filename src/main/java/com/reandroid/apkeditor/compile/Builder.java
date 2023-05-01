@@ -17,7 +17,9 @@ package com.reandroid.apkeditor.compile;
 
 import com.reandroid.apkeditor.Util;
 import com.reandroid.archive.WriteProgress;
-import com.reandroid.archive.ZipAlign;
+import com.reandroid.archive2.Archive;
+import com.reandroid.archive2.block.ApkSignatureBlock;
+import com.reandroid.archive2.writer.ApkWriter;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.apk.APKLogger;
@@ -37,11 +39,28 @@ public class Builder implements WriteProgress {
         this.options=options;
     }
     public void run() throws IOException {
+        if(options.signaturesDirectory != null && options.inputFile.isFile()){
+            restoreSignatures();
+            return;
+        }
         if(options.isXml){
             buildXml();
         }else {
             buildJson();
         }
+    }
+    private void restoreSignatures() throws IOException {
+        log("Restoring signatures ...");
+        Archive archive = new Archive(options.inputFile);
+        ApkWriter apkWriter = new ApkWriter(options.outputFile, archive.mapEntrySource().values());
+        apkWriter.setAPKLogger(getAPKLogger());
+        ApkSignatureBlock apkSignatureBlock = new ApkSignatureBlock();
+        apkSignatureBlock.scanSplitFiles(options.signaturesDirectory);
+        apkWriter.setApkSignatureBlock(apkSignatureBlock);
+        log("Writing apk...");
+        apkWriter.write();
+        log("Built to: "+options.outputFile);
+        log("Done");
     }
     public void buildJson() throws IOException {
         log("Scanning JSON directory ...");
@@ -123,7 +142,7 @@ public class Builder implements WriteProgress {
             option.inputFile = getJsonInDir(option.inputFile);
         }else if (isXmlInDir(option.inputFile)){
             option.isXml=true;
-        }else {
+        }else if(option.signaturesDirectory == null){
             throw new ARGException("Not xml/json directory: "+option.inputFile);
         }
         File outDir=option.outputFile;

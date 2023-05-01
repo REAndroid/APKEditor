@@ -23,11 +23,30 @@ public class Options {
     public File inputFile;
     public File outputFile;
     public boolean force;
+    public File signaturesDirectory;
+    public String type;
     public Options(){
     }
     public void parse(String[] args) throws ARGException {
         parseForce(args);
         checkUnknownOptions(args);
+    }
+
+    protected void parseType(String[] args) throws ARGException {
+        this.type = parseArgValue(ARG_type, true, args);
+        if(type == null){
+            return;
+        }
+        type = type.trim().toLowerCase();
+        if(TYPE_JSON.equals(type)
+                || TYPE_XML.equals(type)
+                || TYPE_SIG.equals(type)){
+            return;
+        }
+        throw new ARGException("Unknown decompile type: "+type);
+    }
+    protected void parseSignaturesDir(String[] args) throws ARGException {
+        this.signaturesDirectory = parseFile(ARG_sig, args);
     }
     private void parseForce(String[] args) throws ARGException {
         force=containsArg(ARG_force, true, args);
@@ -133,4 +152,17 @@ public class Options {
     protected static final String ARG_DESC_force="force delete output path";
     protected static final String ARG_cleanMeta = "-clean-meta";
     protected static final String ARG_DESC_cleanMeta = "cleans META-INF directory along with signature block";
+
+    protected static final String ARG_sig = "-sig";
+    protected static final String ARG_DESC_sig = "signatures directory path";
+    public static final String ARG_type = "-t";
+
+    public static final String ARG_DESC_type = "Decode types: \n1) json \n2) xml \n3) sig \n default=json" +
+            "\n * Output directory contains \n   a) res package directory(s) name={index number}-{package name}" +
+            "\n   b) root: directory of raw files like dex, assets, lib ... \n   c) AndroidManifest.xml";
+
+    public static final String TYPE_SIG = "sig";
+    public static final String TYPE_JSON = "json";
+    public static final String TYPE_XML = "xml";
+
 }

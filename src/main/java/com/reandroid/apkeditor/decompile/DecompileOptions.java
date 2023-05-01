@@ -27,30 +27,19 @@ public class DecompileOptions extends Options {
     public boolean splitJson;
     public boolean validateResDir;
     public String resDirName;
-    public String type;
     public DecompileOptions(){
         type=TYPE_JSON;
     }
     @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
-        parseDecompileType(args);
+        parseType(args);
         parseOutput(args);
         parseSplitResources(args);
         parseResDirName(args);
         parseValidateResDir(args);
+        parseSignaturesDir(args);
         super.parse(args);
-    }
-    private void parseDecompileType(String[] args) throws ARGException {
-        this.type = parseArgValue(ARG_type, true, args);
-        if(this.type==null){
-            this.type = TYPE_JSON;
-        }
-        type=type.trim().toLowerCase();
-        if(TYPE_JSON.equals(type) || TYPE_XML.equals(type)){
-            return;
-        }
-        throw new ARGException("Unknown decompile type: "+type);
     }
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
@@ -84,7 +73,7 @@ public class DecompileOptions extends Options {
     }
     private void parseInput(String[] args) throws ARGException {
         this.inputFile=null;
-        File file=parseFile(ARG_input, args);
+        File file = parseFile(ARG_input, args);
         if(file==null){
             throw new ARGException("Missing input file");
         }
@@ -98,7 +87,13 @@ public class DecompileOptions extends Options {
     public String toString(){
         StringBuilder builder=new StringBuilder();
         builder.append("   Input: ").append(inputFile);
-        builder.append("\n Output: ").append(outputFile);
+        File out;
+        if(signaturesDirectory != null){
+            out = signaturesDirectory;
+        }else {
+            out = outputFile;
+        }
+        builder.append("\n Output: ").append(out);
         if(resDirName!=null){
             builder.append("\nres dir: ").append(resDirName);
         }
@@ -109,7 +104,7 @@ public class DecompileOptions extends Options {
             builder.append("\n Force: true");
         }
         builder.append("\n Type: ").append(type);
-        if(!TYPE_XML.equals(type)){
+        if(!TYPE_XML.equals(type) && signaturesDirectory == null){
             builder.append("\n Split: ").append(splitJson);
         }
         builder.append("\n ---------------------------- ");
@@ -122,8 +117,9 @@ public class DecompileOptions extends Options {
         String[][] table=new String[][]{
                 new String[]{ARG_input, ARG_DESC_input},
                 new String[]{ARG_output, ARG_DESC_output},
-                new String[]{ARG_resDir, ARG_DESC_resDir},
-                new String[]{ARG_type, ARG_DESC_type}
+                new String[]{ARG_sig, ARG_DESC_sig},
+                new String[]{ARG_type, ARG_DESC_type},
+                new String[]{ARG_resDir, ARG_DESC_resDir}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         builder.append("\nFlags:\n");
@@ -148,16 +144,18 @@ public class DecompileOptions extends Options {
         builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
                 .append(ARG_type).append(" ").append(TYPE_XML).append(" ").append(ARG_input)
                 .append(" path/to/input.apk");
+        builder.append("\nExample-5: (signatures)");
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
+                .append(ARG_type).append(" ").append(TYPE_SIG).append(" ").append(ARG_input)
+                .append(" path/to/input.apk")
+                .append(" ").append(ARG_sig).append(" path/to/signatures_dir");
         return builder.toString();
     }
     private static final String ARG_split_resources="-split-json";
     private static final String ARG_DESC_split_resources="splits resources.arsc into multiple parts as per type entries (use this for large files)";
 
-    private static final String ARG_type="-t";
-    private static final String ARG_DESC_type = "Decompile types: \n1) json \n2) xml \n default=json" +
+    private static final String ARG_DESC_type = "Decode types: \n1) json \n2) xml \n3) sig \n default=json" +
             "\n * Output directory contains \n   a) res package directory(s) name={index number}-{package name}" +
             "\n   b) root: directory of raw files like dex, assets, lib ... \n   c) AndroidManifest.xml";
 
-    public static final String TYPE_JSON = "json";
-    public static final String TYPE_XML = "xml";
 }

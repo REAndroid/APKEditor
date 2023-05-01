@@ -16,13 +16,14 @@
 package com.reandroid.apkeditor.decompile;
 
 import com.reandroid.apkeditor.Util;
+import com.reandroid.archive2.Archive;
+import com.reandroid.archive2.block.ApkSignatureBlock;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkJsonDecoder;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apk.ApkModuleXmlDecoder;
-import com.reandroid.xml.XMLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,10 @@ public class Decompiler {
         log("Loading ...");
         ApkModule apkModule=ApkModule.loadApkFile(options.inputFile);
         apkModule.setAPKLogger(getAPKLogger());
+        if(options.signaturesDirectory != null){
+            dumpSignatureBlock();
+            return;
+        }
         String protect = Util.isProtected(apkModule);
         if(protect!=null){
             log(options.inputFile.getAbsolutePath());
@@ -59,16 +64,26 @@ public class Decompiler {
         }else{
             log("Decompiling to XML ...");
             ApkModuleXmlDecoder xmlDecoder=new ApkModuleXmlDecoder(apkModule);
-            xmlDecoder.setUseAndroidSerializer(true);
             xmlDecoder.sanitizeFilePaths();
             try {
                 xmlDecoder.decodeTo(options.outputFile);
-            } catch (XMLException ex) {
+            } catch (Exception ex) {
                 throw new IOException(ex.getMessage(), ex);
             }
         }
         log("Saved to: "+options.outputFile);
         log("Done");
+    }
+    private void dumpSignatureBlock() throws IOException {
+        log("Dumping signature blocks ...");
+        Archive archive = new Archive(options.inputFile);
+        ApkSignatureBlock apkSignatureBlock = archive.getApkSignatureBlock();
+        if(apkSignatureBlock == null){
+            log("Don't have signature block");
+            return;
+        }
+        apkSignatureBlock.writeSplitRawToDirectory(options.signaturesDirectory);
+        log("Signatures dumped to: " + options.signaturesDirectory);
     }
     private APKLogger getAPKLogger(){
         if(mApkLogger!=null){
@@ -97,7 +112,12 @@ public class Decompiler {
         DecompileOptions option=new DecompileOptions();
         option.parse(args);
         log("Decompiling ...\n"+option);
-        File outDir=option.outputFile;
+        File outDir;
+        if(option.signaturesDirectory != null){
+            outDir = option.signaturesDirectory;
+        }else {
+            outDir = option.outputFile;
+        }
         Util.deleteEmptyDirectories(outDir);
         if(outDir.exists()){
             if(!option.force){
@@ -124,5 +144,5 @@ public class Decompiler {
     }
     public static final String ARG_SHORT="d";
     public static final String ARG_LONG="decode";
-    public static final String DESCRIPTION="Decodes android resources binary to readable json";
+    public static final String DESCRIPTION="Decodes android resources binary to readable json/xml";
 }
