@@ -35,6 +35,7 @@ public class Options {
     protected void parseType(String[] args) throws ARGException {
         this.type = parseArgValue(ARG_type, true, args);
         if(type == null){
+            type = TYPE_JSON;
             return;
         }
         type = type.trim().toLowerCase();
