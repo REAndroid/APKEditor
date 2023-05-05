@@ -71,6 +71,10 @@ public class Protector extends BaseCommand implements WriteProgress {
         log("Done");
     }
     private void confuseAndroidManifest(ApkModule apkModule) throws IOException {
+        if(options.skipManifest){
+            log("Skip AndroidManifest");
+            return;
+        }
         log("Confusing AndroidManifest ...");
         AndroidManifestBlock manifestBlock = apkModule.getAndroidManifestBlock();
         manifestBlock.setAttributesUnitSize(24, true);

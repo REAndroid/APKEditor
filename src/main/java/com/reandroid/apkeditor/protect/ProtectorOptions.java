@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +23,16 @@ import com.reandroid.commons.command.ARGException;
 import java.io.File;
 
 public class ProtectorOptions extends Options {
+    public boolean skipManifest;
     @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
         parseOutput(args);
+        parseSkipManifest(args);
         super.parse(args);
+    }
+    private void parseSkipManifest(String[] args) throws ARGException {
+        this.skipManifest = containsArg(ARG_skipManifest, true, args);
     }
     private void parseOutput(String[] args) throws ARGException {
         this.outputFile=null;
@@ -83,7 +88,8 @@ public class ProtectorOptions extends Options {
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         builder.append("\nFlags:\n");
         table=new String[][]{
-                new String[]{ARG_force, ARG_DESC_force}
+                new String[]{ARG_force, ARG_DESC_force},
+                new String[]{ARG_skipManifest, ARG_DESC_skipManifest}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();
@@ -93,4 +99,7 @@ public class ProtectorOptions extends Options {
         builder.append(" ").append(ARG_output).append(" path/to/out.apk");
         return builder.toString();
     }
+
+    protected static final String ARG_skipManifest = "-skip-manifest";
+    protected static final String ARG_DESC_skipManifest = "skips/ignores manifest";
 }
