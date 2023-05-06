@@ -65,8 +65,6 @@ public class Protector extends BaseCommand implements WriteProgress {
         module.getTableBlock().refresh();
         log("Writing apk ...");
         module.writeApk(options.outputFile, this);
-        log("Zip align ...");
-        ZipAlign.align4(options.outputFile);
         log("Saved to: "+options.outputFile);
         log("Done");
     }
