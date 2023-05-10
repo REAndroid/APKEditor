@@ -17,12 +17,17 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 repositories {
+    google()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     //implementation("io.github.reandroid:ARSCLib:+")
     compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
+    implementation("com.android.tools.smali:smali-dexlib2:3.0.3")
+    implementation("com.android.tools.smali:smali:3.0.3")
+    implementation("com.android.tools.smali:smali-baksmali:3.0.3")
 }
 
 processResources {

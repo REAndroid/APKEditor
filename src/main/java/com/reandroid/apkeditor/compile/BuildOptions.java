@@ -24,6 +24,7 @@ import java.io.File;
 
 public class BuildOptions extends Options {
     public boolean validateResDir;
+    public boolean assembleDexFiles;
     public String resDirName;
     public boolean isXml;
     public BuildOptions(){
@@ -34,6 +35,7 @@ public class BuildOptions extends Options {
         parseOutput(args);
         parseResDirName(args);
         parseValidateResDir(args);
+        parseDisassembleDexFiles(args);
         parseSignaturesDir(args);
         parseType(args);
         if(TYPE_SIG.equals(type)){
@@ -55,6 +57,9 @@ public class BuildOptions extends Options {
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
     }
+    private void parseDisassembleDexFiles(String[] args) throws ARGException {
+        assembleDexFiles =containsArg(ARG_assemble_dex_files, true, args);
+    }
     private void parseResDirName(String[] args) throws ARGException {
         this.resDirName=parseArgValue(ARG_resDir, true, args);
     }
@@ -68,6 +73,9 @@ public class BuildOptions extends Options {
         }
         if(validateResDir){
             builder.append("\n Validate res dir name: true");
+        }
+        if(assembleDexFiles){
+            builder.append("\n Assemble dex files: true");
         }
         if(force){
             builder.append("\n Force: true");
@@ -117,7 +125,8 @@ public class BuildOptions extends Options {
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
-                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
+                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir},
+                new String[]{ARG_assemble_dex_files, ARG_DESC_assemble_dex_files}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();

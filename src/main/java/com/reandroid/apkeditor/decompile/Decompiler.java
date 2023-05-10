@@ -15,18 +15,21 @@
   */
 package com.reandroid.apkeditor.decompile;
 
+import com.android.tools.smali.baksmali.Baksmali;
+import com.android.tools.smali.baksmali.BaksmaliOptions;
+import com.android.tools.smali.dexlib2.Opcodes;
+import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile;
+import com.reandroid.apk.*;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.block.ApkSignatureBlock;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
-import com.reandroid.apk.APKLogger;
-import com.reandroid.apk.ApkJsonDecoder;
-import com.reandroid.apk.ApkModule;
-import com.reandroid.apk.ApkModuleXmlDecoder;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class Decompiler {
     private final DecompileOptions options;
@@ -71,8 +74,34 @@ public class Decompiler {
                 throw new IOException(ex.getMessage(), ex);
             }
         }
+        if(options.disassembleDexFiles){
+            log("Disassembling DEX files ...");
+            disassembleDexFiles(apkModule);
+        }
         log("Saved to: "+options.outputFile);
         log("Done");
+    }
+    private void disassembleDexFiles(ApkModule apkModule) {
+        final List<DexFileInputSource> dexFiles = apkModule.listDexFiles();
+        for (DexFileInputSource dexFileInputSource : dexFiles) {
+            try {
+                final String dexName = dexFileInputSource.getName();
+                log("Disassembling " + dexName + " ...");
+                final File smaliDir = new File(options.outputFile, "smali_classes" + dexFileInputSource.getDexNumber());
+                if(!Baksmali.disassembleDexFile(
+                        DexBackedDexFile.fromInputStream(
+                                Opcodes.getDefault(),
+                                new BufferedInputStream(dexFileInputSource.openStream())
+                        ),smaliDir,
+                        Runtime.getRuntime().availableProcessors(),
+                        new BaksmaliOptions()
+                )) {
+                    log("Failed disassemble " + dexName);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
     private void dumpSignatureBlock() throws IOException {
         log("Dumping signature blocks ...");

@@ -26,6 +26,7 @@ import java.io.File;
 public class DecompileOptions extends Options {
     public boolean splitJson;
     public boolean validateResDir;
+    public boolean disassembleDexFiles;
     public String resDirName;
     public DecompileOptions(){
         type=TYPE_JSON;
@@ -38,6 +39,7 @@ public class DecompileOptions extends Options {
         parseSplitResources(args);
         parseResDirName(args);
         parseValidateResDir(args);
+        parseDisassembleDexFiles(args);
         parseSignaturesDir(args);
         if(signaturesDirectory == null && type == null){
             type = TYPE_JSON;
@@ -46,6 +48,9 @@ public class DecompileOptions extends Options {
     }
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
+    }
+    private void parseDisassembleDexFiles(String[] args) throws ARGException {
+        disassembleDexFiles=containsArg(ARG_disassemble_dex_files, true, args);
     }
     private void parseResDirName(String[] args) throws ARGException {
         this.resDirName=parseArgValue(ARG_resDir, true, args);
@@ -103,6 +108,9 @@ public class DecompileOptions extends Options {
         if(validateResDir){
             builder.append("\n Validate res dir name: true");
         }
+        if(disassembleDexFiles){
+            builder.append("\n Disassemble dex files: true");
+        }
         if(force){
             builder.append("\n Force: true");
         }
@@ -129,7 +137,8 @@ public class DecompileOptions extends Options {
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_split_resources, ARG_DESC_split_resources},
-                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
+                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir},
+                new String[]{ARG_disassemble_dex_files, ARG_DESC_disassemble_dex_files}
         };
         StringHelper.printTwoColumns(builder, "   ", 75, table);
         String jar = APKEditor.getJarName();

@@ -161,7 +161,10 @@ public class Options {
     public static final String ARG_DESC_type = "Decode types: \n1) json \n2) xml \n3) sig \n default=json" +
             "\n * Output directory contains \n   a) res package directory(s) name={index number}-{package name}" +
             "\n   b) root: directory of raw files like dex, assets, lib ... \n   c) AndroidManifest.xml";
-
+    protected static final String ARG_disassemble_dex_files="-disassemble";
+    protected static final String ARG_DESC_disassemble_dex_files="Disassemble classes[0-9].dex files";
+    protected static final String ARG_assemble_dex_files="-assemble";
+    protected static final String ARG_DESC_assemble_dex_files="Assemble smali_classes[0-9]";
     public static final String TYPE_SIG = "sig";
     public static final String TYPE_JSON = "json";
     public static final String TYPE_XML = "xml";
