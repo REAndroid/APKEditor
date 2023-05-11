@@ -87,7 +87,7 @@ public class Decompiler {
             try {
                 final String dexName = dexFileInputSource.getName();
                 log("Disassembling " + dexName + " ...");
-                final File smaliDir = new File(options.outputFile, "smali_classes" + dexFileInputSource.getDexNumber());
+                final File smaliDir = new File(options.outputFile, "smali_" + dexName.replace(".dex", ""));
                 if(!Baksmali.disassembleDexFile(
                         DexBackedDexFile.fromInputStream(
                                 Opcodes.getDefault(),

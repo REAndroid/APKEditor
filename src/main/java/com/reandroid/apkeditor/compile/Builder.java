@@ -79,7 +79,7 @@ public class Builder implements WriteProgress {
                     if (smaliDir.isDirectory() && smaliDir.getName().startsWith("smali_classes")) {
                         final String smaliDirName = smaliDir.getName();
                         final String dexName = smaliDirName.replace("smali_", "") + ".dex";
-                        log("Assembling " + smaliDirName + " ...");
+                        log("Assembling " + smaliDirName + " folder into " + dexName + " ...");
                         build(smaliDir, new File(rootDir,  dexName));
                     }
                     return FileVisitResult.CONTINUE;
