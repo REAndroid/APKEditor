@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,14 +25,13 @@ import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.group.EntryGroup;
 import com.reandroid.arsc.item.TypeString;
 import com.reandroid.arsc.util.FrameworkTable;
+import com.reandroid.arsc.value.AttributeDataFormat;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
 import com.reandroid.arsc.value.ValueType;
 import com.reandroid.arsc.value.array.ArrayBag;
 import com.reandroid.arsc.value.attribute.AttributeBag;
-import com.reandroid.arsc.value.attribute.AttributeValueType;
 import com.reandroid.arsc.value.plurals.PluralsBag;
-import com.reandroid.common.Frameworks;
 import com.reandroid.xml.XMLDocument;
 import com.reandroid.xml.XMLElement;
 
@@ -418,15 +417,15 @@ public class TypeNameRefactor {
     }
     private boolean checkBool(ResXmlAttribute attribute){
         return checkWithAndroidAttribute("bool",
-                attribute, AttributeValueType.BOOL);
+                attribute, AttributeDataFormat.BOOL);
     }
     private boolean checkInteger(ResXmlAttribute attribute){
         return checkWithAndroidAttribute("integer",
-                attribute, AttributeValueType.INTEGER);
+                attribute, AttributeDataFormat.INTEGER);
     }
     private boolean checkWithAndroidAttribute(String name,
                                               ResXmlAttribute attribute,
-                                              AttributeValueType attributeValueType){
+                                              AttributeDataFormat attributeValueType){
         if(hasRefactoredName(name)){
             return false;
         }
@@ -558,7 +557,7 @@ public class TypeNameRefactor {
         typeString.set(name);
         return true;
     }
-    private boolean isEqualAndroidAttributeType(int attributeResourceId, AttributeValueType attributeValueType){
+    private boolean isEqualAndroidAttributeType(int attributeResourceId, AttributeDataFormat attributeValueType){
         FrameworkApk frameworkApk = AndroidFrameworks.getCurrent();
         if(frameworkApk==null){
             return false;

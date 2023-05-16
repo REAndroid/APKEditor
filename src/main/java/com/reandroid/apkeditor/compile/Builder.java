@@ -77,7 +77,7 @@ public class Builder implements WriteProgress {
             loadedModule.validateResourcesDir();
         }
         log("Writing apk...");
-        loadedModule.getApkArchive().sortApkFiles();
+        loadedModule.getApkArchive().autoSortApkFiles();
         loadedModule.writeApk(options.outputFile, this);
         log("Built to: "+options.outputFile);
         log("Done");
@@ -94,7 +94,6 @@ public class Builder implements WriteProgress {
             throw new IOException(ex.getMessage(), ex);
         }
         log("Writing apk...");
-        loadedModule.getApkArchive().sortApkFiles();
         loadedModule.writeApk(options.outputFile, null);
         log("Built to: "+options.outputFile);
         log("Done");
