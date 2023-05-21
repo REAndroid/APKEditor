@@ -89,7 +89,7 @@ public class Builder implements WriteProgress {
         ApkModule loadedModule;
         try {
             loadedModule=encoder.getApkModule();
-            loadedModule.setPreferredFramework(options.framework);
+            loadedModule.setPreferredFramework(options.frameworkVersion);
             encoder.scanDirectory(options.inputFile);
             loadedModule=encoder.getApkModule();
         } catch (XMLException ex) {

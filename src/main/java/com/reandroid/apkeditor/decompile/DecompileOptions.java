@@ -106,6 +106,9 @@ public class DecompileOptions extends Options {
         if(force){
             builder.append("\n Force: true");
         }
+        if(frameworkVersion != null){
+            builder.append("\nframework: ").append(frameworkVersion);
+        }
         builder.append("\n Type: ").append(type);
         if(!TYPE_XML.equals(type) && signaturesDirectory == null){
             builder.append("\n Split: ").append(splitJson);
@@ -120,6 +123,7 @@ public class DecompileOptions extends Options {
         String[][] table=new String[][]{
                 new String[]{ARG_input, ARG_DESC_input},
                 new String[]{ARG_output, ARG_DESC_output},
+                new String[]{ARG_framework_version, ARG_DESC_framework_version},
                 new String[]{ARG_sig, ARG_DESC_sig},
                 new String[]{ARG_type, ARG_DESC_type},
                 new String[]{ARG_resDir, ARG_DESC_resDir}

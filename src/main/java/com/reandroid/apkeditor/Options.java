@@ -25,21 +25,25 @@ public class Options {
     public boolean force;
     public File signaturesDirectory;
     public String type;
-    public Integer framework;
+    public Integer frameworkVersion;
     public Options(){
     }
     public void parse(String[] args) throws ARGException {
         parseForce(args);
-        parseFramework(args);
+        parseFrameworkVersion(args);
         checkUnknownOptions(args);
     }
 
-    protected void parseFramework(String[] args) throws ARGException {
-        String frame = parseArgValue(ARG_framework, args);
-        if(frame == null){
+    protected void parseFrameworkVersion(String[] args) throws ARGException {
+        String version = parseArgValue(ARG_framework_version, args);
+        if(version == null){
             return;
         }
-        this.framework = Integer.parseInt(frame);
+        try {
+            this.frameworkVersion = Integer.parseInt(version);
+        }catch (NumberFormatException ex){
+            throw new ARGException("Invalid number value for: " + ARG_framework_version );
+        }
     }
     protected void parseType(String[] args) throws ARGException {
         this.type = parseArgValue(ARG_type, true, args);
@@ -165,8 +169,8 @@ public class Options {
 
     protected static final String ARG_sig = "-sig";
     protected static final String ARG_DESC_sig = "signatures directory path";
-    protected static final String ARG_framework = "-framework";
-    protected static final String ARG_DESC_framework = "framework version number";
+    protected static final String ARG_framework_version = "-framework-version";
+    protected static final String ARG_DESC_framework_version = "preferred framework version number";
     public static final String ARG_type = "-t";
 
     public static final String ARG_DESC_type = "Decode types: \n1) json \n2) xml \n3) sig \n default=json" +

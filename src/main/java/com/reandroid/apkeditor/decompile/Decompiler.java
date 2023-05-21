@@ -37,7 +37,7 @@ public class Decompiler {
     public void run() throws IOException {
         log("Loading ...");
         ApkModule apkModule=ApkModule.loadApkFile(options.inputFile);
-        apkModule.setPreferredFramework(options.framework);
+        apkModule.setPreferredFramework(options.frameworkVersion);
         apkModule.setAPKLogger(getAPKLogger());
         if(options.signaturesDirectory != null){
             dumpSignatureBlock();
