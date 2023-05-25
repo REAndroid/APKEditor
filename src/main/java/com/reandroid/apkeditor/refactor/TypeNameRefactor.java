@@ -603,20 +603,6 @@ public class TypeNameRefactor {
     private void removeTypeString(int resourceId){
         mTypeStrings.remove(resourceId&0xffff0000);
     }
-    private boolean isColor(ValueType valueType){
-        if(valueType==null){
-            return false;
-        }
-        switch (valueType){
-            case INT_COLOR_ARGB4:
-            case INT_COLOR_RGB4:
-            case INT_COLOR_ARGB8:
-            case INT_COLOR_RGB8:
-                return true;
-            default:
-                return false;
-        }
-    }
     private List<ResXmlAttribute> listAttributes(ResXmlElement element){
         if(element==null){
             return new ArrayList<>();
