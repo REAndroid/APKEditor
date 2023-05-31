@@ -117,13 +117,13 @@ public class BuildOptions extends Options {
                 new String[]{ARG_sig, ARG_DESC_sig},
                 new String[]{ARG_resDir, ARG_DESC_resDir}
         };
-        StringHelper.printTwoColumns(builder, "   ", 75, table);
+        StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
         };
-        StringHelper.printTwoColumns(builder, "   ", 75, table);
+        StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         String jar = APKEditor.getJarName();
         builder.append("\n\nExample-1:");
         builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")

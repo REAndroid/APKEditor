@@ -108,13 +108,13 @@ public class MergerOptions extends Options {
                 new String[]{ARG_output, ARG_DESC_output},
                 new String[]{ARG_resDir, ARG_DESC_resDir}
         };
-        StringHelper.printTwoColumns(builder, "   ", 75, table);
+        StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_cleanMeta, ARG_DESC_cleanMeta}
         };
-        StringHelper.printTwoColumns(builder, "   ", 75, table);
+        StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         String jar = APKEditor.getJarName();
         builder.append("\n\nExample-1:");
         builder.append("\n   java -jar ").append(jar).append(" ").append(Merger.ARG_SHORT).append(" ")

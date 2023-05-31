@@ -85,13 +85,13 @@ public class ProtectorOptions extends Options {
                 new String[]{ARG_input, ARG_DESC_input},
                 new String[]{ARG_output, ARG_DESC_output}
         };
-        StringHelper.printTwoColumns(builder, "   ", 75, table);
+        StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_skipManifest, ARG_DESC_skipManifest}
         };
-        StringHelper.printTwoColumns(builder, "   ", 75, table);
+        StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         String jar = APKEditor.getJarName();
         builder.append("\n\nExample-1:");
         builder.append("\n   java -jar ").append(jar).append(" ").append(Protector.ARG_SHORT).append(" ")

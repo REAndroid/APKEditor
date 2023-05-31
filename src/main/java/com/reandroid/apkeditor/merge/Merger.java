@@ -1,48 +1,48 @@
- /*
-  *  Copyright (C) 2022 github.com/REAndroid
-  *
-  *  Licensed under the Apache License, Version 2.0 (the "License");
-  *  you may not use this file except in compliance with the License.
-  *  You may obtain a copy of the License at
-  *
-  *      http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
+/*
+ *  Copyright (C) 2022 github.com/REAndroid
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.reandroid.apkeditor.merge;
 
- import com.reandroid.apkeditor.BaseCommand;
- import com.reandroid.apkeditor.Util;
- import com.reandroid.apkeditor.common.AndroidManifestHelper;
- import com.reandroid.archive.APKArchive;
- import com.reandroid.archive.WriteProgress;
- import com.reandroid.archive2.Archive;
- import com.reandroid.arsc.value.ResTableEntry;
- import com.reandroid.arsc.value.ResValue;
- import com.reandroid.commons.command.ARGException;
- import com.reandroid.commons.utils.log.Logger;
- import com.reandroid.apk.APKLogger;
- import com.reandroid.apk.ApkBundle;
- import com.reandroid.apk.ApkModule;
- import com.reandroid.arsc.chunk.TableBlock;
- import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
- import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
- import com.reandroid.arsc.chunk.xml.ResXmlElement;
- import com.reandroid.arsc.group.EntryGroup;
- import com.reandroid.arsc.value.Entry;
- import com.reandroid.arsc.value.ValueType;
+import com.reandroid.apkeditor.BaseCommand;
+import com.reandroid.apkeditor.Util;
+import com.reandroid.apkeditor.common.AndroidManifestHelper;
+import com.reandroid.archive.APKArchive;
+import com.reandroid.archive.WriteProgress;
+import com.reandroid.archive2.Archive;
+import com.reandroid.arsc.container.SpecTypePair;
+import com.reandroid.arsc.value.ResValue;
+import com.reandroid.commons.command.ARGException;
+import com.reandroid.commons.utils.log.Logger;
+import com.reandroid.apk.APKLogger;
+import com.reandroid.apk.ApkBundle;
+import com.reandroid.apk.ApkModule;
+import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
+import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
+import com.reandroid.arsc.chunk.xml.ResXmlElement;
+import com.reandroid.arsc.group.EntryGroup;
+import com.reandroid.arsc.value.Entry;
+import com.reandroid.arsc.value.ValueType;
 
- import java.io.File;
- import java.io.IOException;
- import java.util.List;
- import java.util.Objects;
- import java.util.zip.ZipEntry;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.zip.ZipEntry;
 
- public class Merger extends BaseCommand implements WriteProgress {
+public class Merger extends BaseCommand implements WriteProgress {
     private final MergerOptions options;
     private APKLogger mApkLogger;
     public Merger(MergerOptions options){
@@ -79,13 +79,19 @@ package com.reandroid.apkeditor.merge;
         }
         if(options.cleanMeta){
             log("Clearing META-INF ...");
-            removeSignature(mergedModule);
-            mergedModule.setApkSignatureBlock(null);
+            clearMeta(mergedModule);
         }
-        if(mergedModule.hasAndroidManifestBlock()){
-            sanitizeManifest(mergedModule);
-        }
+        sanitizeManifest(mergedModule);
         Util.addApkEditorInfo(mergedModule, getClass().getSimpleName());
+        String message = mergedModule.refreshTable();
+        if(message != null){
+            log(message);
+        }
+        message = mergedModule.refreshManifest();
+        if(message != null){
+            log(message);
+        }
+
         log("Writing apk ...");
         mergedModule.writeApk(options.outputFile, this);
         if(extracted){
@@ -119,9 +125,11 @@ package com.reandroid.apkeditor.merge;
         }
         return new File(dir, name);
     }
-    private void sanitizeManifest(ApkModule apkModule) throws IOException {
-        AndroidManifestBlock manifest=apkModule.getAndroidManifestBlock();
-
+    private void sanitizeManifest(ApkModule apkModule) {
+        if(!apkModule.hasAndroidManifestBlock()){
+            return;
+        }
+        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
         log("Sanitizing manifest ...");
         boolean removed = AndroidManifestHelper.removeApplicationAttribute(manifest,
                 AndroidManifestBlock.ID_extractNativeLibs);
@@ -145,9 +153,9 @@ package com.reandroid.apkeditor.merge;
         }
         manifest.refresh();
     }
-    private boolean removeSplitsTableEntry(ResXmlElement metaElement, ApkModule apkModule) throws IOException {
+    private boolean removeSplitsTableEntry(ResXmlElement metaElement, ApkModule apkModule) {
         ResXmlAttribute nameAttribute = metaElement.searchAttributeByResourceId(AndroidManifestBlock.ID_name);
-        if(nameAttribute.getValueType()!= ValueType.STRING){
+        if(nameAttribute == null){
             return false;
         }
         if(!"com.android.vending.splits".equals(nameAttribute.getValueAsString())){
@@ -159,30 +167,39 @@ package com.reandroid.apkeditor.merge;
             valueAttribute=metaElement.searchAttributeByResourceId(
                     AndroidManifestBlock.ID_resource);
         }
-        if(valueAttribute==null || valueAttribute.getValueType()!=ValueType.REFERENCE){
+        if(valueAttribute == null
+                || valueAttribute.getValueType() != ValueType.REFERENCE){
             return false;
         }
-        TableBlock tableBlock=apkModule.getTableBlock();
+        if(!apkModule.hasTableBlock()){
+            return false;
+        }
+        TableBlock tableBlock = apkModule.getTableBlock();
         EntryGroup entryGroup = tableBlock.search(valueAttribute.getData());
-        if(entryGroup==null){
+        if(entryGroup == null){
             return false;
         }
-        APKArchive apkArchive=apkModule.getApkArchive();
+        APKArchive apkArchive = apkModule.getApkArchive();
         List<Entry> entryList = entryGroup.listItems();
-        for(Entry entryBlock:entryList){
-            if(entryBlock==null){
+        for(Entry entry : entryList){
+            if(entry == null){
                 continue;
             }
-            ResValue resValue = ((ResTableEntry)entryBlock.getTableEntry()).getValue();
+            ResValue resValue = entry.getResValue();
+            if(resValue == null){
+                continue;
+            }
             String path = resValue.getValueAsString();
             log("Removed from table: "+path);
             //Remove file entry
             apkArchive.remove(path);
             // It's not safe to destroy entry, resource id might be used in dex code.
-            // Better replace it with boolean value
-            entryBlock.setNull(true);
+            // Better replace it with boolean value.
+            entry.setNull(true);
+            SpecTypePair specTypePair = entry.getTypeBlock()
+                    .getParentSpecTypePair();
+            specTypePair.removeNullEntries(entry.getId());
         }
-        tableBlock.refresh();
         return true;
     }
     @Override
@@ -264,5 +281,5 @@ package com.reandroid.apkeditor.merge;
     }
     public static final String ARG_SHORT="m";
     public static final String ARG_LONG="merge";
-    public static final String DESCRIPTION="Merges split apk files from directory or XAPK, APKM, APKS ...";
+    public static final String DESCRIPTION="Merges split apk files from directory or compressed apk files like XAPK, APKM, APKS ...";
 }

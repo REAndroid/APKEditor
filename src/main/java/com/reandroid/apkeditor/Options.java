@@ -46,18 +46,8 @@ public class Options {
         }
     }
     protected void parseType(String[] args) throws ARGException {
-        this.type = parseArgValue(ARG_type, true, args);
-        if(type == null){
-            type = TYPE_JSON;
-            return;
-        }
-        type = type.trim().toLowerCase();
-        if(TYPE_JSON.equals(type)
-                || TYPE_XML.equals(type)
-                || TYPE_SIG.equals(type)){
-            return;
-        }
-        throw new ARGException("Unknown decompile type: "+type);
+        String[] choices = new String[]{TYPE_JSON, TYPE_XML, TYPE_SIG};
+        this.type = parseType(ARG_type, args, choices, TYPE_JSON);
     }
     protected void parseSignaturesDir(String[] args) throws ARGException {
         this.signaturesDirectory = parseFile(ARG_sig, args);
@@ -71,6 +61,32 @@ public class Options {
             return;
         }
         throw new ARGException("Unknown option: "+args[0]);
+    }
+
+    protected String parseType(String argSwitch, String[] args, String[] availableTypes, String def) throws ARGException {
+        String type = parseArgValue(argSwitch, args);
+        if(type == null){
+            return def;
+        }
+        type = type.trim();
+        String typeLower = type.toLowerCase();
+        for(String choice : availableTypes){
+            if(typeLower.equals(choice)){
+                return typeLower;
+            }
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append("Unknown type: '");
+        builder.append(type);
+        builder.append("' , must be one of {");
+        for(int i = 0; i < availableTypes.length; i++){
+            if(i != 0){
+                builder.append(", ");
+            }
+            builder.append(availableTypes[i]);
+        }
+        builder.append("}");
+        throw new ARGException(builder.toString());
     }
     protected String parseArgValue(String argSwitch, String[] args) throws ARGException {
         return parseArgValue(argSwitch, true, args);
@@ -132,7 +148,16 @@ public class Options {
         }
         return null;
     }
-    protected boolean containsArg(String argSwitch, boolean ignore_case, String[] args) throws ARGException {
+    protected boolean containsArg(String argSwitch, String[] args) {
+        return containsArg(argSwitch, true, args, false);
+    }
+    protected boolean containsArg(String argSwitch, String[] args, boolean def) {
+        return containsArg(argSwitch, true, args, def);
+    }
+    protected boolean containsArg(String argSwitch, boolean ignore_case, String[] args){
+        return containsArg(argSwitch, ignore_case, args, false);
+    }
+    protected boolean containsArg(String argSwitch, boolean ignore_case, String[] args, boolean def) {
         if(ignore_case){
             argSwitch=argSwitch.toLowerCase();
         }
@@ -151,8 +176,13 @@ public class Options {
                 return true;
             }
         }
-        return false;
+        return def;
     }
+
+    public static final int PRINT_WIDTH = 75;
+
+    protected static final String ARG_ALL_help = "-h|-help";
+    protected static final String ARG_DESC_help = "Prints this help";
 
     protected static final String ARG_output="-o";
     protected static final String ARG_DESC_output="output path";
@@ -173,12 +203,10 @@ public class Options {
     protected static final String ARG_DESC_framework_version = "preferred framework version number";
     public static final String ARG_type = "-t";
 
-    public static final String ARG_DESC_type = "Decode types: \n1) json \n2) xml \n3) sig \n default=json" +
-            "\n * Output directory contains \n   a) res package directory(s) name={index number}-{package name}" +
-            "\n   b) root: directory of raw files like dex, assets, lib ... \n   c) AndroidManifest.xml";
-
     public static final String TYPE_SIG = "sig";
     public static final String TYPE_JSON = "json";
     public static final String TYPE_XML = "xml";
+    public static final String TYPE_TEXT = "text";
 
+    protected static final String LINE = "    ------------------------------------------------------------------------";
 }

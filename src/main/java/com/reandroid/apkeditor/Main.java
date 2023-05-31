@@ -1,25 +1,28 @@
- /*
-  *  Copyright (C) 2022 github.com/REAndroid
-  *
-  *  Licensed under the Apache License, Version 2.0 (the "License");
-  *  you may not use this file except in compliance with the License.
-  *  You may obtain a copy of the License at
-  *
-  *      http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
+/*
+ *  Copyright (C) 2022 github.com/REAndroid
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.reandroid.apkeditor;
 
+import com.reandroid.apkeditor.cloner.Cloner;
 import com.reandroid.apkeditor.compile.Builder;
 import com.reandroid.apkeditor.decompile.Decompiler;
+import com.reandroid.apkeditor.info.Info;
 import com.reandroid.apkeditor.merge.Merger;
 import com.reandroid.apkeditor.protect.Protector;
 import com.reandroid.apkeditor.refactor.Refactor;
+import com.reandroid.apkeditor.utils.StringHelper;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.xmlencoder.EncodeException;
 
@@ -77,6 +80,14 @@ public class Main {
             Protector.execute(args);
             return;
         }
+        if(Cloner.isCommand(command)){
+            Cloner.execute(args);
+            return;
+        }
+        if(Info.isCommand(command)){
+            Info.execute(args);
+            return;
+        }
         throw new ARGException("Unknown command: "+command);
     }
     private static String getHelp(){
@@ -85,18 +96,21 @@ public class Main {
         builder.append("\nUsage: \n");
         builder.append(" java -jar ").append(APKEditor.getJarName());
         builder.append(" <command> <args>");
-        builder.append("\n commands: ");
-        builder.append("\n  1)  ").append(Decompiler.ARG_SHORT).append(" | ").append(Decompiler.ARG_LONG);
-        builder.append("     -   ").append(Decompiler.DESCRIPTION);
-        builder.append("\n  2)  ").append(Builder.ARG_SHORT).append(" | ").append(Builder.ARG_LONG);
-        builder.append("      -   ").append(Builder.DESCRIPTION);
-        builder.append("\n  3)  ").append(Merger.ARG_SHORT).append(" | ").append(Merger.ARG_LONG);
-        builder.append("      -   ").append(Merger.DESCRIPTION);
-        builder.append("\n  4)  ").append(Refactor.ARG_SHORT).append(" | ").append(Refactor.ARG_LONG);
-        builder.append("   -   ").append(Refactor.DESCRIPTION);
-        builder.append("\n  5)  ").append(Protector.ARG_SHORT).append(" | ").append(Protector.ARG_LONG);
-        builder.append("    -   ").append(Protector.DESCRIPTION);
-        builder.append("\n run with <command> -h to get detailed help about each command");
+        builder.append("\n commands: \n");
+        String[][] table = new String[][]{
+                new String[]{"  1)  " + Decompiler.ARG_SHORT + " | " + Decompiler.ARG_LONG, Decompiler.DESCRIPTION},
+                new String[]{"  2)  " + Builder.ARG_SHORT + " | " + Builder.ARG_LONG, Builder.DESCRIPTION},
+                new String[]{"  3)  " + Merger.ARG_SHORT + " | " + Merger.ARG_LONG, Merger.DESCRIPTION},
+                new String[]{"  4)  " + Refactor.ARG_SHORT + " | " + Refactor.ARG_LONG, Refactor.DESCRIPTION},
+                new String[]{"  5)  " + Protector.ARG_SHORT + " | " + Protector.ARG_LONG, Protector.DESCRIPTION},
+                //new String[]{"  6)  " + Cloner.ARG_SHORT + " | " + Cloner.ARG_LONG, Cloner.DESCRIPTION},
+                new String[]{"  6)  " + Info.ARG_SHORT, Info.DESCRIPTION}
+        };
+
+        StringHelper.printTwoColumns(builder, "  ", "  -  ", Options.PRINT_WIDTH, table);
+
+        builder.append("\n\n run with <command> -h to get detailed help about each command\n");
+
         return builder.toString();
     }
     private static String getWelcome(){

@@ -1,44 +1,59 @@
- /*
-  *  Copyright (C) 2022 github.com/REAndroid
-  *
-  *  Licensed under the Apache License, Version 2.0 (the "License");
-  *  you may not use this file except in compliance with the License.
-  *  You may obtain a copy of the License at
-  *
-  *      http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  */
+/*
+ *  Copyright (C) 2022 github.com/REAndroid
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.reandroid.apkeditor;
 
 import com.reandroid.apk.ApkModule;
-import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.arsc.item.IntegerItem;
 import com.reandroid.arsc.item.TableString;
 import com.reandroid.arsc.pool.TableStringPool;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
- public class Util {
+public class Util {
     public static boolean isHelp(String[] args){
         if(isEmpty(args)){
             return true;
         }
-        String command=args[0];
+        return isHelp(args[0]);
+    }
+    public static boolean containsHelp(String[] args){
+        if(isEmpty(args)){
+            return false;
+        }
+        for(String command : args){
+            if(isHelp(command)){
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean isHelp(String command){
+        if(isEmpty(command)){
+            return false;
+        }
         command=command.toLowerCase().trim();
         return command.equals("-h")
                 ||command.equals("-help")
-                ||command.equals("h")
-                ||command.equals("help");
+                ||command.equals("--h")
+                ||command.equals("--help");
     }
     public static String[] trimNull(String[] args){
         if(isEmpty(args)){
@@ -184,6 +199,9 @@ import java.util.Properties;
             tableString = stringPool.get(count);
         }
         tableString.set(buildApkEditorInfo(type));
+        IntegerItem dummyReference = new IntegerItem();
+        dummyReference.set(tableString.getIndex());
+        tableString.addReference(dummyReference);
     }
     private static String buildApkEditorInfo(String type){
         StringBuilder builder = new StringBuilder();

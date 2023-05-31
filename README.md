@@ -2,7 +2,7 @@
 
 # APKEditor
 ### Powerful android apk resources editor
-This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has five main features
+This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has six main features
 
 <details><summary><code>java -jar APKEditor.jar <b>-h</b></code></summary>
 
@@ -20,6 +20,7 @@ Usage:
   3)  m | merge      -   Merges split apk files from directory or XAPK, APKM, APKS ...
   4)  x | refactor   -   Refactors obfuscated resource names
   5)  p | protect    -   Protects/Obfuscates apk resource
+  6)  info           -   Prints information of apk
  run with <command> -h to get detailed help about each command
  
 ```
@@ -122,7 +123,7 @@ $ java -jar APKEditor.jar x -i input.apk
 
 </details>
 
-#### 5- Protect  (⭐NEW⭐)
+#### 5- Protect
 Protects apk resources against almost all known decompile/modify tools.
 <details> <summary><code>java -jar APKEditor.jar <b>p</b> -i path/to/input.apk</code></summary>
 
@@ -143,7 +144,30 @@ Protects apk resources against almost all known decompile/modify tools.
 ```  
 
 </details>
- 
+
+#### 6- Info  (⭐NEW⭐)
+Prints/dumps from basic up to detailed information of apk.
+<details> <summary><code>java -jar APKEditor.jar <b>info</b> -v -resources -i input.apk </code></summary>
+
+ ```ShellSession
+Package name=com.mypackage id=0x7f
+  type string id=1 entryCount=1
+    resource 0x7f010000 string/app_name
+      () My Application
+      (-de) Meine Bewerbung
+      (-ru-rRU) Мое заявление
+  type mipmap id=2 entryCount=1
+    resource 0x7f020000 mipmap/ic_launcher_round
+      () res/mipmap/ic_launcher_round.png
+  type drawable id=3 entryCount=1
+    resource 0x7f030000 drawable/ic_launcher
+      () #006400
+
+```  
+
+</details>
+
+
 ---
 
 ***Build executable jar***

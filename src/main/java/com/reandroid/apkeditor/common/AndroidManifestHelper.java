@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,9 @@
   */
 package com.reandroid.apkeditor.common;
 
-import com.reandroid.arsc.array.ResXmlAttributeArray;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
-import com.reandroid.arsc.chunk.xml.ResXmlStartElement;
 import com.reandroid.arsc.value.ValueType;
 
 import java.util.ArrayList;
@@ -27,22 +25,20 @@ import java.util.List;
 
  public class AndroidManifestHelper {
     public static List<ResXmlElement> listSplitRequired(ResXmlElement parentElement){
-        List<ResXmlElement> results=new ArrayList<>();
-        if(parentElement==null){
+        List<ResXmlElement> results = new ArrayList<>();
+        if(parentElement == null){
             return results;
         }
-        List<ResXmlElement> metaDataList = parentElement.listElements(AndroidManifestBlock.TAG_meta_data);
+        List<ResXmlElement> metaDataList = parentElement
+                .listElements(AndroidManifestBlock.TAG_meta_data);
+
         for(ResXmlElement metaData:metaDataList){
-            ResXmlAttribute nameAttribute = metaData.getStartElement()
-                    .getAttribute(AndroidManifestBlock.ID_name);
-            if(nameAttribute==null){
+            ResXmlAttribute nameAttribute = metaData
+                    .searchAttributeByResourceId(AndroidManifestBlock.ID_name);
+            if(nameAttribute == null){
                 continue;
             }
             if(nameAttribute.getValueType() != ValueType.STRING){
-                /*
-                 * TODO: could be reference ,
-                 *  thus we need TableBlock/EntryStore to resolve string value.
-                 */
                 continue;
             }
             String value = nameAttribute.getValueAsString();
@@ -54,18 +50,16 @@ import java.util.List;
         return results;
     }
     public static boolean removeApplicationAttribute(AndroidManifestBlock manifest, int resId){
-        ResXmlElement app = manifest.getApplicationElement();
-        if(app==null){
+        ResXmlElement applicationElement = manifest.getApplicationElement();
+        if(applicationElement == null){
             return true;
         }
-        ResXmlStartElement start = app.getStartElement();
-        ResXmlAttribute attr = start.getAttribute(resId);
-        if(attr==null){
+        ResXmlAttribute attribute = applicationElement
+                .searchAttributeByResourceId(resId);
+        if(attribute == null){
             return false;
         }
-        ResXmlAttributeArray array = start.getResXmlAttributeArray();
-        array.remove(attr);
-        manifest.refresh();
+        applicationElement.removeAttribute(attribute);
         return true;
     }
 }
