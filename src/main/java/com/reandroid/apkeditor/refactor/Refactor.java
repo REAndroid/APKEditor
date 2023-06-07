@@ -50,18 +50,18 @@ public class Refactor extends BaseCommand implements WriteProgress {
             typeNameRefactor.setApkLogger(getAPKLogger());
             typeNameRefactor.refactor();
         }
-        log("Auto refactoring ...");
-        AutoRefactor autoRefactor=new AutoRefactor(module);
-        int autoRenameCount=autoRefactor.refactor();
-        log("Auto renamed entries: "+autoRenameCount);
-        StringValueNameGenerator generator = new StringValueNameGenerator(module.getTableBlock());
-        generator.refactor();
-        if(options.publicXml!=null){
-            log("Renaming from: "+options.publicXml);
+        if(options.publicXml != null){
+            log("Renaming from: " + options.publicXml);
             PublicXmlRefactor publicXmlRefactor =
                     new PublicXmlRefactor(module, options.publicXml);
-            int pubXmlRenameCount = publicXmlRefactor.refactor();
-            log("Renamed from public.xml entries: "+pubXmlRenameCount);
+            publicXmlRefactor.refactor();
+        }else {
+            log("Auto refactoring ...");
+            AutoRefactor autoRefactor=new AutoRefactor(module);
+            autoRefactor.refactor();
+            log("Auto renamed entries");
+            StringValueNameGenerator generator = new StringValueNameGenerator(module.getTableBlock());
+            generator.refactor();
         }
         if(options.cleanMeta){
             log("Clearing META-INF ...");

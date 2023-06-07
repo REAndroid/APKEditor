@@ -15,15 +15,12 @@
   */
 package com.reandroid.apkeditor.decompile;
 
+import com.reandroid.apk.*;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.block.ApkSignatureBlock;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
-import com.reandroid.apk.APKLogger;
-import com.reandroid.apk.ApkJsonDecoder;
-import com.reandroid.apk.ApkModule;
-import com.reandroid.apk.ApkModuleXmlDecoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,15 +56,16 @@ public class Decompiler {
         }
         if(DecompileOptions.TYPE_JSON.equals(options.type)){
             log("Decompiling to JSON ...");
-            ApkJsonDecoder decoder=new ApkJsonDecoder(apkModule, options.splitJson);
+            ApkModuleJsonDecoder decoder = new ApkModuleJsonDecoder(apkModule, options.splitJson);
             decoder.sanitizeFilePaths();
-            decoder.writeToDirectory(options.outputFile);
+            decoder.decode(options.outputFile);
         }else{
             log("Decompiling to XML ...");
-            ApkModuleXmlDecoder xmlDecoder=new ApkModuleXmlDecoder(apkModule);
+            ApkModuleXmlDecoder xmlDecoder = new ApkModuleXmlDecoder(apkModule);
+            xmlDecoder.setKeepResPath(options.keepResPath);
             xmlDecoder.sanitizeFilePaths();
             try {
-                xmlDecoder.decodeTo(options.outputFile);
+                xmlDecoder.decode(options.outputFile);
             } catch (Exception ex) {
                 throw new IOException(ex.getMessage(), ex);
             }

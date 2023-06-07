@@ -15,6 +15,7 @@
   */
 package com.reandroid.apkeditor.compile;
 
+import com.reandroid.apk.*;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive2.Archive;
@@ -22,12 +23,7 @@ import com.reandroid.archive2.block.ApkSignatureBlock;
 import com.reandroid.archive2.writer.ApkWriter;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
-import com.reandroid.apk.APKLogger;
-import com.reandroid.apk.ApkJsonEncoder;
-import com.reandroid.apk.ApkModule;
-import com.reandroid.apk.ApkModuleXmlEncoder;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
-import com.reandroid.xml.XMLException;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,9 +60,10 @@ public class Builder implements WriteProgress {
     }
     public void buildJson() throws IOException {
         log("Scanning JSON directory ...");
-        ApkJsonEncoder encoder=new ApkJsonEncoder();
-        encoder.setAPKLogger(getAPKLogger());
-        ApkModule loadedModule=encoder.scanDirectory(options.inputFile);
+        ApkModuleJsonEncoder encoder=new ApkModuleJsonEncoder();
+        encoder.setApkLogger(getAPKLogger());
+        encoder.scanDirectory(options.inputFile);
+        ApkModule loadedModule = encoder.getApkModule();
         loadedModule.setAPKLogger(getAPKLogger());
         if(options.resDirName!=null){
             log("Renaming resources root dir: "+options.resDirName);
@@ -86,15 +83,10 @@ public class Builder implements WriteProgress {
         log("Scanning XML directory ...");
         ApkModuleXmlEncoder encoder=new ApkModuleXmlEncoder();
         encoder.setApkLogger(getAPKLogger());
-        ApkModule loadedModule;
-        try {
-            loadedModule=encoder.getApkModule();
-            loadedModule.setPreferredFramework(options.frameworkVersion);
-            encoder.scanDirectory(options.inputFile);
-            loadedModule=encoder.getApkModule();
-        } catch (XMLException ex) {
-            throw new IOException(ex.getMessage(), ex);
-        }
+        ApkModule loadedModule = encoder.getApkModule();
+        loadedModule.setPreferredFramework(options.frameworkVersion);
+        encoder.scanDirectory(options.inputFile);
+        loadedModule = encoder.getApkModule();
         log("Writing apk...");
         loadedModule.writeApk(options.outputFile, null);
         log("Built to: "+options.outputFile);
@@ -161,6 +153,9 @@ public class Builder implements WriteProgress {
     }
     private static boolean isXmlInDir(File dir){
         File manifest=new File(dir, AndroidManifestBlock.FILE_NAME);
+        if(!manifest.isFile()){
+            manifest=new File(dir, AndroidManifestBlock.FILE_NAME_BIN);
+        }
         return manifest.isFile();
     }
     private static boolean isJsonInDir(File dir) {

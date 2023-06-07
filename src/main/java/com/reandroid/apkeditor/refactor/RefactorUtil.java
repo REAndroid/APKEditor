@@ -31,6 +31,9 @@ public class RefactorUtil {
         if(isAllEqualLength(entryNames)){
             return true;
         }
+        if(isAllShortLength(entryNames)){
+            return true;
+        }
         if(isSequentialNames(entryNames)){
             return true;
         }
@@ -59,6 +62,20 @@ public class RefactorUtil {
             length=len;
         }
         return length!=0;
+    }
+    private static boolean isAllShortLength(Collection<String> entryNames){
+        int length=0;
+        for(String name:entryNames){
+            int len=name.length();
+            if(length==0){
+                length=len;
+                continue;
+            }
+            if(len>3){
+                return false;
+            }
+        }
+        return entryNames.size()>10;
     }
     public static boolean isSequentialNames(Collection<String> entryNames){
         if(entryNames.size()==0){

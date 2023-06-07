@@ -27,22 +27,27 @@ public class DecompileOptions extends Options {
     public boolean splitJson;
     public boolean validateResDir;
     public String resDirName;
+    public boolean keepResPath;
     public DecompileOptions(){
-        type=TYPE_JSON;
+        type=TYPE_XML;
     }
     @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
-        parseType(args);
+        parseType(args, type);
         parseOutput(args);
         parseSplitResources(args);
+        parseKeepResPath(args);
         parseResDirName(args);
         parseValidateResDir(args);
         parseSignaturesDir(args);
         if(signaturesDirectory == null && type == null){
-            type = TYPE_JSON;
+            type = TYPE_XML;
         }
         super.parse(args);
+    }
+    private void parseKeepResPath(String[] args) throws ARGException {
+        keepResPath = containsArg(ARG_keep_res_path, true, args);
     }
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
@@ -106,6 +111,9 @@ public class DecompileOptions extends Options {
         if(force){
             builder.append("\n Force: true");
         }
+        if(keepResPath){
+            builder.append("\n Keep res path: true");
+        }
         if(frameworkVersion != null){
             builder.append("\nframework: ").append(frameworkVersion);
         }
@@ -132,6 +140,7 @@ public class DecompileOptions extends Options {
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
+                new String[]{ARG_keep_res_path, ARG_DESC_keep_res_path},
                 new String[]{ARG_split_resources, ARG_DESC_split_resources},
                 new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
         };
@@ -161,8 +170,11 @@ public class DecompileOptions extends Options {
     private static final String ARG_split_resources="-split-json";
     private static final String ARG_DESC_split_resources="splits resources.arsc into multiple parts as per type entries (use this for large files)";
 
-    private static final String ARG_DESC_type = "Decode types: \n1) json \n2) xml \n3) sig \n default=json" +
-            "\n * Output directory contains \n   a) res package directory(s) name={index number}-{package name}" +
-            "\n   b) root: directory of raw files like dex, assets, lib ... \n   c) AndroidManifest.xml";
+    private static final String ARG_DESC_type = "Decode types: \n  1) json \n  2) xml \n  3) sig \n default=" + TYPE_XML;
+
+
+    private static final String ARG_keep_res_path = "-keep-res-path";
+    private static final String ARG_DESC_keep_res_path = "Keeps original res/* file paths:" + "\n  *Applies only when decoding to xml" +
+            "\n  *All res/* files will be placed on dir <res-files>\n  *The relative paths will be linked to values/*xml";
 
 }

@@ -46,8 +46,11 @@ public class Options {
         }
     }
     protected void parseType(String[] args) throws ARGException {
+        parseType(args, TYPE_JSON);
+    }
+    protected void parseType(String[] args, String def) throws ARGException {
         String[] choices = new String[]{TYPE_JSON, TYPE_XML, TYPE_SIG};
-        this.type = parseType(ARG_type, args, choices, TYPE_JSON);
+        this.type = parseType(ARG_type, args, choices, def);
     }
     protected void parseSignaturesDir(String[] args) throws ARGException {
         this.signaturesDirectory = parseFile(ARG_sig, args);
