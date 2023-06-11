@@ -109,7 +109,7 @@ public class Merger extends BaseCommand implements WriteProgress {
         }
         tmp.deleteOnExit();
         Archive archive = new Archive(file);
-        archive.extract(tmp);
+        archive.extractAll(tmp);
         return tmp;
     }
     private File toTmpDir(File file){
