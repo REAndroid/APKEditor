@@ -16,6 +16,7 @@
 package com.reandroid.apkeditor;
 
 import com.reandroid.apk.ApkModule;
+import com.reandroid.arsc.array.StringArray;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.item.IntegerItem;
 import com.reandroid.arsc.item.TableString;
@@ -193,9 +194,11 @@ public class Util {
         if(count==0){
             return;
         }
-        TableString tableString = stringPool.get(count-1);
+        TableString tableString = stringPool.get(count - 1);
         if(!isApkEditorInfo(tableString)){
-            stringPool.getStringsArray().ensureSize(count+1);
+            StringArray<TableString> stringsArray = stringPool.getStringsArray();
+            count = stringsArray.childesCount();
+            stringsArray.ensureSize(count + 1);
             tableString = stringPool.get(count);
         }
         tableString.set(buildApkEditorInfo(type));
