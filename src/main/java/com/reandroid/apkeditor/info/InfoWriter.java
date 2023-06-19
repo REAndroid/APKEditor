@@ -18,17 +18,14 @@ package com.reandroid.apkeditor.info;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.container.SpecTypePair;
-import com.reandroid.arsc.group.EntryGroup;
+import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.util.HexUtil;
 import com.reandroid.arsc.value.*;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public abstract class InfoWriter implements Closeable {
     private final Writer writer;
@@ -37,12 +34,13 @@ public abstract class InfoWriter implements Closeable {
     }
 
     public void writeResources(PackageBlock packageBlock, List<String> typeFilters, boolean writeEntries) throws IOException {
-        List<EntryGroup> entryGroupList = toSortedEntryGroups(packageBlock.listEntryGroup());
-        for(EntryGroup entryGroup : entryGroupList){
-            writeResources(entryGroup, writeEntries);
+        Iterator<ResourceEntry> itr = packageBlock.getResources();
+        while (itr.hasNext()){
+            ResourceEntry resourceEntry = itr.next();
+            writeResources(resourceEntry, writeEntries);
         }
     }
-    public abstract void writeResources(EntryGroup entryGroup, boolean writeEntries) throws IOException;
+    public abstract void writeResources(ResourceEntry resourceEntry, boolean writeEntries) throws IOException;
     public abstract void writePackageNames(Collection<PackageBlock> packageBlocks) throws IOException;
     public abstract void writeEntries(String name, List<Entry> entryList) throws IOException;
     public abstract void writeArray(String name, Object[] values) throws IOException;
@@ -91,40 +89,6 @@ public abstract class InfoWriter implements Closeable {
             return HexUtil.toHex8("@0x", value.getData());
         }
         return HexUtil.toHex8("0x", value.getData());
-    }
-
-    static List<EntryGroup> toSortedEntryGroups(Collection<EntryGroup> entryGroups){
-        List<EntryGroup> results = new ArrayList<>(entryGroups);
-        sortEntryGroups(results);
-        return results;
-    }
-    static void sortEntryGroups(List<EntryGroup> entryGroups){
-        Comparator<EntryGroup> cmp = new Comparator<EntryGroup>() {
-            @Override
-            public int compare(EntryGroup entryGroup1, EntryGroup entryGroup2) {
-                long l1 = 0x00000000ffffffffL & entryGroup1.getResourceId();
-                long l2 = 0x00000000ffffffffL & entryGroup2.getResourceId();
-                return Long.compare(l1, l2);
-            }
-        };
-        entryGroups.sort(cmp);
-    }
-
-    static List<Entry> sortEntries(Collection<Entry> entryCollection) {
-        ArrayList<Entry> results;
-        if(entryCollection instanceof ArrayList){
-            results = (ArrayList<Entry>) entryCollection;
-        }else {
-            results = new ArrayList<>(entryCollection);
-        }
-        Comparator<Entry> cmp = new Comparator<Entry>() {
-            @Override
-            public int compare(Entry entry1, Entry entry2) {
-                return entry1.getResConfig().compareTo(entry2.getResConfig());
-            }
-        };
-        results.sort(cmp);
-        return results;
     }
 
     static final String TAG_RES_PACKAGES = "resource-packages";

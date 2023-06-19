@@ -22,7 +22,7 @@ import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlDocument;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
-import com.reandroid.arsc.group.EntryGroup;
+import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.item.TypeString;
 import com.reandroid.arsc.util.FrameworkTable;
 import com.reandroid.arsc.value.AttributeDataFormat;
@@ -96,29 +96,28 @@ public class TypeNameRefactor {
         }
     }
     private void scanPackageEntries(PackageBlock packageBlock){
-        for(EntryGroup entryGroup:packageBlock.listEntryGroup()){
-            if(isFinished()){
-                break;
-            }
-            checkEntryGroup(entryGroup);
+        Iterator<ResourceEntry> itr = packageBlock.getResources();
+        while (itr.hasNext() && !isFinished()){
+            ResourceEntry resourceEntry = itr.next();
+            checkEntryGroup(resourceEntry);
         }
     }
-    private void checkEntryGroup(EntryGroup entryGroup){
-        int resourceId=entryGroup.getResourceId();
+    private void checkEntryGroup(ResourceEntry resourceEntry){
+        int resourceId=resourceEntry.getResourceId();
         if(hasRefactoredId(resourceId)){
             return;
         }
-        boolean renameOk = checkBag(entryGroup);
+        boolean renameOk = checkBag(resourceEntry);
         if(renameOk){
             return;
         }
     }
-    private boolean checkBag(EntryGroup entryGroup){
+    private boolean checkBag(ResourceEntry resourceEntry){
         if(!hasRefactoredName("style") || !hasRefactoredName("attr")){
             return false;
         }
         boolean hasBagEntry=false;
-        Iterator<Entry> itr = entryGroup.iterator(true);
+        Iterator<Entry> itr = resourceEntry.iterator(true);
         while (itr.hasNext()){
             Entry entryBlock=itr.next();
             if(!entryBlock.isComplex()){
@@ -566,11 +565,11 @@ public class TypeNameRefactor {
         if(frameworkTable==null){
             return false;
         }
-        EntryGroup entryGroup = frameworkTable.search(attributeResourceId);
-        if(entryGroup==null){
+        ResourceEntry resourceEntry = frameworkTable.getResource(attributeResourceId);
+        if(resourceEntry==null){
             return false;
         }
-        Entry entryBlock = entryGroup.pickOne();
+        Entry entryBlock = resourceEntry.get();
         if(entryBlock==null || !entryBlock.isComplex()){
             return false;
         }

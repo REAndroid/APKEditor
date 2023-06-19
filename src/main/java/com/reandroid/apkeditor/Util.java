@@ -87,6 +87,32 @@ public class Util {
         return str.length()==0;
     }
 
+    public static File ensureUniqueFile(File file){
+        if(!file.exists()){
+            return file;
+        }
+        File dir = file.getParentFile();
+        String name = file.getName();
+        String ext = "";
+        if(file.isFile()){
+            int i = name.lastIndexOf('.');
+            if(i > 0){
+                ext = name.substring(i);
+                name = name.substring(0, i);
+            }
+        }
+        int i = 1;
+        while (i < 1000 && file.exists()){
+            String newName = name + "_" + i + ext;
+            if(dir == null){
+                file = new File(newName);
+            }else {
+                file = new File(dir, newName);
+            }
+            i++;
+        }
+        return file;
+    }
     public static void deleteDir(File dir){
         if(!dir.exists()){
             return;

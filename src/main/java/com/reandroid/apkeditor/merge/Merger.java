@@ -21,7 +21,10 @@ import com.reandroid.apkeditor.common.AndroidManifestHelper;
 import com.reandroid.archive.APKArchive;
 import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive2.Archive;
+import com.reandroid.archive2.ArchiveEntry;
 import com.reandroid.arsc.container.SpecTypePair;
+import com.reandroid.arsc.model.ResourceEntry;
+import com.reandroid.arsc.util.HexUtil;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.commons.utils.log.Logger;
@@ -32,7 +35,6 @@ import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
-import com.reandroid.arsc.group.EntryGroup;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ValueType;
 
@@ -40,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 
 public class Merger extends BaseCommand implements WriteProgress {
@@ -94,8 +97,9 @@ public class Merger extends BaseCommand implements WriteProgress {
 
         log("Writing apk ...");
         mergedModule.writeApk(options.outputFile, this);
+        mergedModule.close();
         if(extracted){
-            Util.deleteDir(dir);
+            //Util.deleteDir(dir);
         }
         log("Saved to: "+options.outputFile);
         log("Done");
@@ -109,21 +113,27 @@ public class Merger extends BaseCommand implements WriteProgress {
         }
         tmp.deleteOnExit();
         Archive archive = new Archive(file);
-        archive.extractAll(tmp);
+        archive.extractAll(tmp, new Predicate<ArchiveEntry>() {
+            @Override
+            public boolean test(ArchiveEntry archiveEntry) {
+                return archiveEntry.getName().endsWith(".apk");
+            }
+        });
+        archive.close();
         return tmp;
     }
     private File toTmpDir(File file){
         String name = file.getName();
-        int i = name.lastIndexOf('.');
-        if(i>0){
-            name = name.substring(0, i);
+        name = HexUtil.toHex8("tmp_", name.hashCode());
+        File dir = file.getParentFile();
+        File tmp;
+        if(dir == null){
+            tmp = new File(name);
+        }else {
+            tmp = new File(dir, name);
         }
-        name=name+"_tmp";
-        File dir=file.getParentFile();
-        if(dir==null){
-            return new File(name);
-        }
-        return new File(dir, name);
+        tmp = Util.ensureUniqueFile(tmp);
+        return tmp;
     }
     private void sanitizeManifest(ApkModule apkModule) {
         if(!apkModule.hasAndroidManifestBlock()){
@@ -175,13 +185,12 @@ public class Merger extends BaseCommand implements WriteProgress {
             return false;
         }
         TableBlock tableBlock = apkModule.getTableBlock();
-        EntryGroup entryGroup = tableBlock.search(valueAttribute.getData());
-        if(entryGroup == null){
+        ResourceEntry resourceEntry = tableBlock.getResource(valueAttribute.getData());
+        if(resourceEntry == null){
             return false;
         }
         APKArchive apkArchive = apkModule.getApkArchive();
-        List<Entry> entryList = entryGroup.listItems();
-        for(Entry entry : entryList){
+        for(Entry entry : resourceEntry){
             if(entry == null){
                 continue;
             }

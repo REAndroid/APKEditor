@@ -19,7 +19,6 @@ import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.archive.WriteProgress;
-import com.reandroid.archive.ZipAlign;
 import com.reandroid.arsc.BuildInfo;
 import com.reandroid.arsc.chunk.UnknownChunk;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
@@ -68,7 +67,7 @@ public class Protector extends BaseCommand implements WriteProgress {
         log("Saved to: "+options.outputFile);
         log("Done");
     }
-    private void confuseAndroidManifest(ApkModule apkModule) throws IOException {
+    private void confuseAndroidManifest(ApkModule apkModule) {
         if(options.skipManifest){
             log("Skip AndroidManifest");
             return;
@@ -78,11 +77,11 @@ public class Protector extends BaseCommand implements WriteProgress {
         manifestBlock.setAttributesUnitSize(24, true);
         manifestBlock.refresh();
     }
-    private void confuseByteOffset(ApkModule apkModule) throws IOException {
+    private void confuseByteOffset(ApkModule apkModule) {
         log("METHOD-1 Protecting resource table ..");
         TableBlock tableBlock=apkModule.getTableBlock();
         for(PackageBlock packageBlock:tableBlock.listPackages()){
-            for(SpecTypePair specTypePair:packageBlock.listAllSpecTypePair()){
+            for(SpecTypePair specTypePair:packageBlock.listSpecTypePairs()){
                 for(ResConfig resConfig:specTypePair.listResConfig()){
                     resConfig.trimToSize(ResConfig.SIZE_16);
                 }
@@ -90,7 +89,7 @@ public class Protector extends BaseCommand implements WriteProgress {
         }
         tableBlock.refresh();
     }
-    private void confuseResourceTable(ApkModule apkModule) throws IOException {
+    private void confuseResourceTable(ApkModule apkModule) {
         log("METHOD-2 Protecting resource table ..");
         TableBlock tableBlock=apkModule.getTableBlock();
         UnknownChunk unknownChunk = new UnknownChunk();
@@ -110,7 +109,7 @@ public class Protector extends BaseCommand implements WriteProgress {
         tableBlock.getFirstPlaceHolder().setItem(unknownChunk);
         tableBlock.refresh();
     }
-    private void confuseResDir(ApkModule apkModule) throws IOException {
+    private void confuseResDir(ApkModule apkModule) {
         log("Protecting files ..");
         String[] dirNames=new String[]{
                 "AndroidManifest.xml",

@@ -26,7 +26,7 @@ import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.coder.EncodeResult;
 import com.reandroid.arsc.coder.ReferenceString;
 import com.reandroid.arsc.coder.ValueCoder;
-import com.reandroid.arsc.group.EntryGroup;
+import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.util.HexUtil;
 import com.reandroid.arsc.value.AttributeDataFormat;
 import com.reandroid.arsc.value.Entry;
@@ -141,12 +141,12 @@ public class Info extends BaseCommand {
         }
         TableBlock tableBlock = apkModule.getTableBlock();
         for(PackageBlock packageBlock : tableBlock.listPackages()){
-            EntryGroup entryGroup = packageBlock
-                    .getEntryGroup(referenceString.type, referenceString.name);
-            if(entryGroup == null){
+            ResourceEntry resourceEntry = packageBlock
+                    .getResource(referenceString.type, referenceString.name);
+            if(resourceEntry == null){
                 continue;
             }
-            printEntries(apkModule, "resource", entryGroup.getResourceId());
+            printEntries(apkModule, "resource", resourceEntry.getResourceId());
             return;
         }
         logMessage("WARN: resource not found: " + res);

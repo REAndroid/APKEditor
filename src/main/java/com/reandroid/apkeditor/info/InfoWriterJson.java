@@ -18,7 +18,7 @@ package com.reandroid.apkeditor.info;
 import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.container.SpecTypePair;
-import com.reandroid.arsc.group.EntryGroup;
+import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
 import com.reandroid.arsc.value.ResValue;
@@ -28,6 +28,7 @@ import com.reandroid.json.JSONWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 public class InfoWriterJson extends InfoWriter{
@@ -62,28 +63,30 @@ public class InfoWriterJson extends InfoWriter{
                 .key("type").value(specTypePair.getTypeName())
                 .key("entries").array();
 
-        List<EntryGroup> entryGroupList = toSortedEntryGroups(
-                specTypePair.createEntryGroups(true).values());
-
-        for(EntryGroup entryGroup : entryGroupList){
-            writeResources(entryGroup, writeEntries);
+        Iterator<ResourceEntry> iterator = specTypePair.getResources();
+        while (iterator.hasNext()){
+            ResourceEntry resourceEntry = iterator.next();
+            writeResources(resourceEntry, writeEntries);
         }
         jsonWriter.endArray().endObject();
     }
     @Override
-    public void writeResources(EntryGroup entryGroup, boolean writeEntries) throws IOException {
+    public void writeResources(ResourceEntry resourceEntry, boolean writeEntries) throws IOException {
+        if(resourceEntry.isEmpty()){
+            return;
+        }
         JSONWriter jsonWriter = mJsonWriter.object()
-                .key("id").value(entryGroup.getResourceId())
-                .key("type").value(entryGroup.getTypeName())
-                .key("name").value(entryGroup.getSpecName());
+                .key("id").value(resourceEntry.getResourceId())
+                .key("type").value(resourceEntry.getType())
+                .key("name").value(resourceEntry.getName());
         if(writeEntries){
             jsonWriter.key("configs");
-            writeEntries(sortEntries(entryGroup.listItems()));
+            writeEntries(resourceEntry);
         }
         jsonWriter.endObject();
     }
 
-    public void writeEntries(List<Entry> entryList) throws IOException {
+    public void writeEntries(ResourceEntry entryList) throws IOException {
         JSONWriter jsonWriter = mJsonWriter.array();
         for(Entry entry : entryList){
             writeEntry(entry);

@@ -2,7 +2,8 @@ package com.reandroid.apkeditor.refactor;
 
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
-import com.reandroid.arsc.group.EntryGroup;
+import com.reandroid.arsc.container.SpecTypePair;
+import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.value.*;
 
 import java.util.*;
@@ -19,37 +20,37 @@ public class StringValueNameGenerator {
         this.mSkipIds=new HashSet<>();
     }
     public void refactor(){
-        Map<Integer, EntryGroup> groupMap = mapGroups();
+        Map<Integer, ResourceEntry> resourceEntryMap = mapResourceEntries();
         Map<Integer, String> nameMap = generate();
         for(Map.Entry<Integer, String> entry:nameMap.entrySet()){
-            EntryGroup entryGroup = groupMap.get(entry.getKey());
+            ResourceEntry resourceEntry = resourceEntryMap.get(entry.getKey());
             String name = entry.getValue();
-            entryGroup.renameSpec(name);
+            resourceEntry.setName(name);
         }
     }
-    private boolean isGenerated(EntryGroup entryGroup){
+    private boolean isGenerated(ResourceEntry resourceEntry){
        String generated = RefactorUtil.generateUniqueName(
-                entryGroup.getTypeName(),
-                entryGroup.getResourceId());
-       return generated.equals(entryGroup.getSpecName());
+                resourceEntry.getType(),
+                resourceEntry.getResourceId());
+       return generated.equals(resourceEntry.getName());
     }
     private Map<Integer, String> generate(){
         mGeneratedNames.clear();
         mSkipIds.clear();
         Map<Integer, String> results = new HashMap<>();
         Set<Integer> skipIds = this.mSkipIds;
-        List<EntryGroup> groupList = listGroups();
-        for(EntryGroup entryGroup:groupList){
-            if(!isGenerated(entryGroup)){
-                skipIds.add(entryGroup.getResourceId());
+        List<ResourceEntry> resourceEntryList = listResources();
+        for(ResourceEntry resourceEntry:resourceEntryList){
+            if(!isGenerated(resourceEntry)){
+                skipIds.add(resourceEntry.getResourceId());
             }
         }
-        for(EntryGroup entryGroup:groupList){
-            int resourceId = entryGroup.getResourceId();
+        for(ResourceEntry resourceEntry:resourceEntryList){
+            int resourceId = resourceEntry.getResourceId();
             if(results.containsKey(resourceId) || skipIds.contains(resourceId)){
                 continue;
             }
-            Entry entry = getEnglishOrDefault(entryGroup);
+            Entry entry = getEnglishOrDefault(resourceEntry);
             if(entry==null){
                 continue;
             }
@@ -63,9 +64,9 @@ public class StringValueNameGenerator {
         }
         return results;
     }
-    private Entry getEnglishOrDefault(EntryGroup entryGroup){
+    private Entry getEnglishOrDefault(ResourceEntry resourceEntry){
         Entry def = null;
-        for(Entry entry:entryGroup.listItems()){
+        for(Entry entry:resourceEntry){
             if(entry==null){
                 continue;
             }
@@ -90,16 +91,23 @@ public class StringValueNameGenerator {
         }
         return def;
     }
-    private List<EntryGroup> listGroups(){
-        return new ArrayList<>(mapGroups().values());
+    private List<ResourceEntry> listResources(){
+        return new ArrayList<>(mapResourceEntries().values());
     }
-    private Map<Integer, EntryGroup> mapGroups(){
-        Map<Integer, EntryGroup> results = new HashMap<>();
+    private Map<Integer, ResourceEntry> mapResourceEntries(){
+        Map<Integer, ResourceEntry> results = new HashMap<>();
         for(PackageBlock packageBlock:tableBlock.listPackages()){
-            for(EntryGroup entryGroup:packageBlock.listEntryGroup()){
-                if(TYPE.equals(entryGroup.getTypeName())){
-                    results.put(entryGroup.getResourceId(), entryGroup);
+            SpecTypePair specTypePair = packageBlock.getSpecTypePair(TYPE);
+            if(specTypePair == null){
+                continue;
+            }
+            Iterator<ResourceEntry> itr = specTypePair.getResources();
+            while (itr.hasNext()){
+                ResourceEntry resourceEntry = itr.next();
+                if(resourceEntry.isEmpty()){
+                    continue;
                 }
+                results.put(resourceEntry.getResourceId(), resourceEntry);
             }
         }
         return results;
