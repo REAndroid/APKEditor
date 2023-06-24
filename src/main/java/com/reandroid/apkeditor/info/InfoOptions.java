@@ -59,6 +59,8 @@ public class InfoOptions extends Options {
 
         parseResourceFilterList(args);
 
+        parseFrameworks(args);
+
         packageName = containsArg(ARG_package, args, packageName);
         versionCode = containsArg(ARG_version_code, args, versionCode);
         versionName = containsArg(ARG_version_name, args, versionName);
@@ -153,6 +155,7 @@ public class InfoOptions extends Options {
                 new String[]{ARG_output, ARG_DESC_output},
                 new String[]{ARG_res, ARG_DESC_res},
                 new String[]{ARG_filter_type, ARG_DESC_filter_type},
+                new String[]{ARG_framework, ARG_DESC_framework},
         };
         StringHelper.printTwoColumns(builder, "   ", PRINT_WIDTH, table);
         builder.append("\n\nFlags:\n");

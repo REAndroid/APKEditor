@@ -18,6 +18,8 @@ package com.reandroid.apkeditor;
 import com.reandroid.commons.command.ARGException;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Options {
     public File inputFile;
@@ -26,14 +28,40 @@ public class Options {
     public File signaturesDirectory;
     public String type;
     public Integer frameworkVersion;
+    public File[] frameworks;
     public Options(){
     }
     public void parse(String[] args) throws ARGException {
         parseForce(args);
         parseFrameworkVersion(args);
+        parseFrameworks(args);
         checkUnknownOptions(args);
     }
 
+    protected void parseFrameworks(String[] args) throws ARGException {
+        frameworks = null;
+        File file = parseFramework(args);
+        if(file == null){
+            return;
+        }
+        List<File> fileList = new ArrayList<>();
+        while (file != null){
+            fileList.add(file);
+            file = parseFramework(args);
+        }
+        frameworks = fileList.toArray(new File[0]);
+    }
+    private File parseFramework(String[] args) throws ARGException {
+        String path = parseArgValue(ARG_framework, args);
+        if(path == null){
+            return null;
+        }
+        File file = new File(path);
+        if(!file.isFile()){
+            throw new ARGException("No such file: " + path);
+        }
+        return file;
+    }
     protected void parseFrameworkVersion(String[] args) throws ARGException {
         String version = parseArgValue(ARG_framework_version, args);
         if(version == null){
@@ -204,6 +232,8 @@ public class Options {
     protected static final String ARG_DESC_sig = "signatures directory path";
     protected static final String ARG_framework_version = "-framework-version";
     protected static final String ARG_DESC_framework_version = "preferred framework version number";
+    protected static final String ARG_framework = "-framework";
+    protected static final String ARG_DESC_framework = "path of framework file (can be multiple)";
     public static final String ARG_type = "-t";
 
     public static final String TYPE_SIG = "sig";

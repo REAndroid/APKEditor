@@ -17,7 +17,6 @@ package com.reandroid.apkeditor.decompile;
 
 import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.Options;
-import com.reandroid.apkeditor.compile.Builder;
 import com.reandroid.apkeditor.utils.StringHelper;
 import com.reandroid.commons.command.ARGException;
 
@@ -115,11 +114,18 @@ public class DecompileOptions extends Options {
             builder.append("\n Keep res path: true");
         }
         if(frameworkVersion != null){
-            builder.append("\nframework: ").append(frameworkVersion);
+            builder.append("\nFramework version: ").append(frameworkVersion);
         }
         builder.append("\n Type: ").append(type);
         if(!TYPE_XML.equals(type) && signaturesDirectory == null){
             builder.append("\n Split: ").append(splitJson);
+        }
+        if(frameworks != null && frameworks.length > 0){
+            builder.append("\nFrameworks:");
+            for(File file : frameworks){
+                builder.append("\n           ");
+                builder.append(file);
+            }
         }
         builder.append("\n ---------------------------- ");
         return builder.toString();
@@ -132,6 +138,7 @@ public class DecompileOptions extends Options {
                 new String[]{ARG_input, ARG_DESC_input},
                 new String[]{ARG_output, ARG_DESC_output},
                 new String[]{ARG_framework_version, ARG_DESC_framework_version},
+                new String[]{ARG_framework, ARG_DESC_framework},
                 new String[]{ARG_sig, ARG_DESC_sig},
                 new String[]{ARG_type, ARG_DESC_type},
                 new String[]{ARG_resDir, ARG_DESC_resDir}
@@ -147,24 +154,29 @@ public class DecompileOptions extends Options {
         StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         String jar = APKEditor.getJarName();
         builder.append("\n\nExample-1:");
-        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Decompiler.ARG_SHORT).append(" ")
                 .append(ARG_input).append(" path/to/input.apk");
         builder.append(" ").append(ARG_output).append(" path/to/out_dir");
         builder.append("\nExample-2:");
-        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Decompiler.ARG_SHORT).append(" ")
                 .append(ARG_input).append(" path/to/input.apk");
         builder.append("\nExample-3:");
-        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Decompiler.ARG_SHORT).append(" ")
                 .append(ARG_input).append(" path/to/input.apk").append(" ").append(ARG_split_resources);
         builder.append("\nExample-4: (XML)");
-        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Decompiler.ARG_SHORT).append(" ")
                 .append(ARG_type).append(" ").append(TYPE_XML).append(" ").append(ARG_input)
                 .append(" path/to/input.apk");
         builder.append("\nExample-5: (signatures)");
-        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Decompiler.ARG_SHORT).append(" ")
                 .append(ARG_type).append(" ").append(TYPE_SIG).append(" ").append(ARG_input)
                 .append(" path/to/input.apk")
                 .append(" ").append(ARG_sig).append(" path/to/signatures_dir");
+        builder.append("\nExample-6: (framework)");
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Decompiler.ARG_SHORT).append(" ")
+                .append(ARG_input).append(" input.apk");
+        builder.append(" ").append(ARG_framework).append(" framework-res.apk");
+        builder.append(" ").append(ARG_framework).append(" platforms/android-32/android.jar");
         return builder.toString();
     }
     private static final String ARG_split_resources="-split-json";

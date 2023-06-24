@@ -50,10 +50,10 @@ public class Info extends BaseCommand {
     public void run() throws IOException{
         setEnableLog(options.outputFile != null);
         logMessage("Loading: " + options.inputFile);
-        ApkModule apkModule = ApkModule.loadApkFile(options.inputFile);
+        ApkModule apkModule = ApkModule.loadApkFile(this, options.inputFile, options.frameworks);
         String msg = Util.isProtected(apkModule);
         if(msg != null){
-            logMessage(msg);
+            logWarn(msg);
             return;
         }
         apkModule.setAPKLogger(this);

@@ -84,7 +84,14 @@ public class Builder implements WriteProgress {
         ApkModuleXmlEncoder encoder=new ApkModuleXmlEncoder();
         encoder.setApkLogger(getAPKLogger());
         ApkModule loadedModule = encoder.getApkModule();
+        loadedModule.setAPKLogger(getAPKLogger());
         loadedModule.setPreferredFramework(options.frameworkVersion);
+        if(options.frameworks != null){
+            for(File file : options.frameworks){
+                loadedModule.addExternalFramework(file);
+            }
+        }
+
         encoder.scanDirectory(options.inputFile);
         loadedModule = encoder.getApkModule();
         log("Writing apk...");

@@ -73,7 +73,14 @@ public class BuildOptions extends Options {
             builder.append("\n Force: true");
         }
         if(frameworkVersion != null){
-            builder.append("\nframework: ").append(frameworkVersion);
+            builder.append("\nFramework version: ").append(frameworkVersion);
+        }
+        if(frameworks != null && frameworks.length > 0){
+            builder.append("\nFrameworks:");
+            for(File file : frameworks){
+                builder.append("\n           ");
+                builder.append(file);
+            }
         }
         builder.append("\n ---------------------------- ");
         return builder.toString();
@@ -114,6 +121,7 @@ public class BuildOptions extends Options {
                 new String[]{ARG_input, ARG_DESC_input},
                 new String[]{ARG_output, ARG_DESC_output},
                 new String[]{ARG_framework_version, ARG_DESC_framework_version},
+                new String[]{ARG_framework, ARG_DESC_framework},
                 new String[]{ARG_sig, ARG_DESC_sig},
                 new String[]{ARG_resDir, ARG_DESC_resDir}
         };
@@ -134,11 +142,16 @@ public class BuildOptions extends Options {
                 .append(ARG_input).append(" path/to/input_dir");
 
         builder.append("\nExample-3 (restore signatures):");
-
         builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT)
                 .append(" ").append(ARG_type).append(" ").append(TYPE_SIG)
                 .append(" ").append(ARG_input).append(" path/to/input.apk")
                 .append(" ").append(ARG_sig).append(" path/to/signatures_dir");
+
+        builder.append("\nExample-4: (framework)");
+        builder.append("\n   java -jar ").append(jar).append(" ").append(Builder.ARG_SHORT).append(" ")
+                .append(ARG_input).append(" input_dir");
+        builder.append(" ").append(ARG_framework).append(" framework-res.apk");
+        builder.append(" ").append(ARG_framework).append(" platforms/android-32/android.jar");
 
         return builder.toString();
     }
