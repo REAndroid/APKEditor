@@ -37,20 +37,19 @@ import com.reandroid.commons.command.ARGException;
 import java.io.*;
 import java.util.*;
 
-public class Info extends BaseCommand {
-    private final InfoOptions options;
+public class Info extends BaseCommand<InfoOptions> {
     private InfoWriter mInfoWriter;
     public Info(InfoOptions options){
-        super();
-        this.options = options;
-        super.setLogTag(LOG_TAG_INFO);
+        super(options, "[INFO] ");
         super.setEnableLog(options.outputFile != null);
     }
     @Override
     public void run() throws IOException{
+        InfoOptions options = getOptions();
         setEnableLog(options.outputFile != null);
         logMessage("Loading: " + options.inputFile);
-        ApkModule apkModule = ApkModule.loadApkFile(this, options.inputFile, options.frameworks);
+        ApkModule apkModule = ApkModule.loadApkFile(this, options.inputFile,
+                options.frameworks);
         String msg = Util.isProtected(apkModule);
         if(msg != null){
             logWarn(msg);
@@ -89,6 +88,7 @@ public class Info extends BaseCommand {
         printResources(apkModule);
     }
     private void printSourceFile() throws IOException {
+        InfoOptions options = getOptions();
         if(options.outputFile == null){
             return;
         }
@@ -98,6 +98,7 @@ public class Info extends BaseCommand {
         }
     }
     private void printResources(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.resources){
             return;
         }
@@ -112,6 +113,7 @@ public class Info extends BaseCommand {
         }
     }
     private void printResList(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(options.resList.size() == 0){
             return;
         }
@@ -152,6 +154,7 @@ public class Info extends BaseCommand {
         logMessage("WARN: resource not found: " + res);
     }
     private void printPackage(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.packageName){
             return;
         }
@@ -167,18 +170,21 @@ public class Info extends BaseCommand {
         infoWriter.writePackageNames(tableBlock.listPackages());
     }
     private void printVersionCode(AndroidManifestBlock manifest) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.versionCode || manifest == null){
             return;
         }
         getInfoWriter().writeNameValue("VersionCode" , manifest.getVersionCode());
     }
     private void printVersionName(AndroidManifestBlock manifest) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.versionName || manifest == null){
             return;
         }
         getInfoWriter().writeNameValue("VersionName" , manifest.getVersionName());
     }
     private void printAppName(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.appName){
             return;
         }
@@ -197,6 +203,7 @@ public class Info extends BaseCommand {
         printEntries(apkModule, "AppName", resourceId);
     }
     private void printAppIcon(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.appIcon){
             return;
         }
@@ -215,6 +222,7 @@ public class Info extends BaseCommand {
         printEntries(apkModule, "AppIcon", resourceId);
     }
     private void printAppRoundIcon(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.appRoundIcon){
             return;
         }
@@ -234,6 +242,7 @@ public class Info extends BaseCommand {
         printEntries(apkModule, "AppRoundIcon", resourceId);
     }
     private void printUsesPermissions(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.permissions || !options.verbose){
             return;
         }
@@ -251,6 +260,7 @@ public class Info extends BaseCommand {
         infoWriter.writeArray(tag, usesPermissions.toArray(new String[0]));
     }
     private void printActivities(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.activities){
             return;
         }
@@ -279,6 +289,7 @@ public class Info extends BaseCommand {
         infoWriter.writeArray("activities", activityNames);
     }
     private void printAppClass(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
         if(!options.appClass){
             return;
         }
@@ -317,6 +328,7 @@ public class Info extends BaseCommand {
             return;
         }
         entryList = sortEntries(entryList);
+        InfoOptions options = getOptions();
         if(!options.verbose){
             infoWriter.writeNameValue(varName, getValueAsString(entryList.get(0)));
             return;
@@ -342,6 +354,7 @@ public class Info extends BaseCommand {
         if(mInfoWriter != null){
             return mInfoWriter;
         }
+        InfoOptions options = getOptions();
         Writer writer = createWriter();
         InfoWriter infoWriter;
         if(InfoOptions.TYPE_JSON.equals(options.type)){
@@ -355,6 +368,7 @@ public class Info extends BaseCommand {
         return mInfoWriter;
     }
     private Writer createWriter() throws IOException{
+        InfoOptions options = getOptions();
         File file = options.outputFile;
         if(file == null){
             return new PrintWriter(System.out);
@@ -417,5 +431,4 @@ public class Info extends BaseCommand {
     public static final String ARG_SHORT = "info";
     public static final String DESCRIPTION = "Prints information of apk";
 
-    private static final String LOG_TAG_INFO = "[INFO] ";
 }

@@ -23,15 +23,20 @@ import com.reandroid.commons.utils.log.Logger;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class BaseCommand implements APKLogger {
+public class BaseCommand<T extends Options> implements APKLogger {
+    private final T options;
     private String mLogTag;
     private boolean mEnableLog;
-    public BaseCommand(){
-        mLogTag = "";
-        mEnableLog = true;
+    public BaseCommand(T options, String logTag){
+        this.options = options;
+        this.mLogTag = logTag;
+        this.mEnableLog = true;
     }
     public void run() throws IOException{
 
+    }
+    protected T getOptions() {
+        return options;
     }
 
     protected void setLogTag(String tag) {

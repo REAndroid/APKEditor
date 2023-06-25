@@ -16,24 +16,24 @@
 package com.reandroid.apkeditor.decompile;
 
 import com.reandroid.apk.*;
+import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.block.ApkSignatureBlock;
 import com.reandroid.commons.command.ARGException;
-import com.reandroid.commons.utils.log.Logger;
 
 import java.io.File;
 import java.io.IOException;
 
-public class Decompiler {
-    private final DecompileOptions options;
-    private APKLogger mApkLogger;
+public class Decompiler extends BaseCommand<DecompileOptions> {
     private Decompiler(DecompileOptions options){
-        this.options=options;
+        super(options, "[DECOMPILE] ");
     }
+    @Override
     public void run() throws IOException {
-        log("Loading ...");
-        ApkModule apkModule=ApkModule.loadApkFile(getAPKLogger(),
+        DecompileOptions options = getOptions();
+        logMessage("Loading ...");
+        ApkModule apkModule=ApkModule.loadApkFile(this,
                 options.inputFile, options.frameworks);
         apkModule.setPreferredFramework(options.frameworkVersion);
         if(options.signaturesDirectory != null){
@@ -42,25 +42,25 @@ public class Decompiler {
         }
         String protect = Util.isProtected(apkModule);
         if(protect!=null){
-            log(options.inputFile.getAbsolutePath());
-            log(protect);
+            logMessage(options.inputFile.getAbsolutePath());
+            logMessage(protect);
             return;
         }
         if(options.resDirName!=null){
-            log("Renaming resources root dir: "+options.resDirName);
+            logMessage("Renaming resources root dir: "+options.resDirName);
             apkModule.setResourcesRootDir(options.resDirName);
         }
         if(options.validateResDir){
-            log("Validating resources dir ...");
+            logMessage("Validating resources dir ...");
             apkModule.validateResourcesDir();
         }
         if(DecompileOptions.TYPE_JSON.equals(options.type)){
-            log("Decompiling to JSON ...");
+            logMessage("Decompiling to JSON ...");
             ApkModuleJsonDecoder decoder = new ApkModuleJsonDecoder(apkModule, options.splitJson);
             decoder.sanitizeFilePaths();
             decoder.decode(options.outputFile);
         }else{
-            log("Decompiling to XML ...");
+            logMessage("Decompiling to XML ...");
             ApkModuleXmlDecoder xmlDecoder = new ApkModuleXmlDecoder(apkModule);
             xmlDecoder.setKeepResPath(options.keepResPath);
             xmlDecoder.sanitizeFilePaths();
@@ -70,47 +70,26 @@ public class Decompiler {
                 throw new IOException(ex.getMessage(), ex);
             }
         }
-        log("Saved to: "+options.outputFile);
-        log("Done");
+        logMessage("Saved to: "+options.outputFile);
     }
     private void dumpSignatureBlock() throws IOException {
-        log("Dumping signature blocks ...");
+        logMessage("Dumping signature blocks ...");
+        DecompileOptions options = getOptions();
         Archive archive = new Archive(options.inputFile);
         ApkSignatureBlock apkSignatureBlock = archive.getApkSignatureBlock();
         if(apkSignatureBlock == null){
-            log("Don't have signature block");
+            logMessage("Don't have signature block");
             return;
         }
         apkSignatureBlock.writeSplitRawToDirectory(options.signaturesDirectory);
-        log("Signatures dumped to: " + options.signaturesDirectory);
-    }
-    private APKLogger getAPKLogger(){
-        if(mApkLogger!=null){
-            return mApkLogger;
-        }
-        mApkLogger = new APKLogger() {
-            @Override
-            public void logMessage(String msg) {
-                Logger.i(getLogTag()+msg);
-            }
-            @Override
-            public void logError(String msg, Throwable tr) {
-                Logger.e(getLogTag()+msg, tr);
-            }
-            @Override
-            public void logVerbose(String msg) {
-                Logger.sameLine(getLogTag()+msg);
-            }
-        };
-        return mApkLogger;
+        logMessage("Signatures dumped to: " + options.signaturesDirectory);
     }
     public static void execute(String[] args) throws ARGException, IOException {
         if(Util.isHelp(args)){
             throw new ARGException(DecompileOptions.getHelp());
         }
-        DecompileOptions option=new DecompileOptions();
+        DecompileOptions option = new DecompileOptions();
         option.parse(args);
-        log("Decompiling ...\n"+option);
         File outDir;
         if(option.signaturesDirectory != null){
             outDir = option.signaturesDirectory;
@@ -118,21 +97,15 @@ public class Decompiler {
             outDir = option.outputFile;
         }
         Util.deleteEmptyDirectories(outDir);
+        Decompiler decompiler = new Decompiler(option);
         if(outDir.exists()){
             if(!option.force){
                 throw new ARGException("Path already exists: "+outDir);
             }
-            log("Deleting: "+outDir);
             Util.deleteDir(outDir);
         }
-        Decompiler decompiler=new Decompiler(option);
+        decompiler.logMessage("Decompiling ...\n" + option);
         decompiler.run();
-    }
-    private static void log(String msg){
-        Logger.i(getLogTag()+msg);
-    }
-    private static String getLogTag(){
-        return "[DECOMPILE] ";
     }
     public static boolean isCommand(String command){
         if(Util.isEmpty(command)){

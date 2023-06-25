@@ -22,10 +22,9 @@ import com.reandroid.commons.command.ARGException;
 
 import java.io.IOException;
 
-public class Cloner extends BaseCommand {
-    private final ClonerOptions options;
+public class Cloner extends BaseCommand<ClonerOptions> {
     public Cloner(ClonerOptions options){
-        this.options = options;
+        super(options, "[CLONE] ");
     }
     @Override
     public void run() throws IOException{

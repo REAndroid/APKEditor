@@ -19,7 +19,6 @@ import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
 import com.reandroid.archive.APKArchive;
-import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.ArchiveEntry;
 import com.reandroid.arsc.container.SpecTypePair;
@@ -27,8 +26,6 @@ import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.util.HexUtil;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.commons.command.ARGException;
-import com.reandroid.commons.utils.log.Logger;
-import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.arsc.chunk.TableBlock;
@@ -43,72 +40,70 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.zip.ZipEntry;
 
-public class Merger extends BaseCommand implements WriteProgress {
-    private final MergerOptions options;
-    private APKLogger mApkLogger;
+public class Merger extends BaseCommand<MergerOptions> {
     public Merger(MergerOptions options){
-        this.options=options;
+        super(options, "[MERGE] ");
     }
+    @Override
     public void run() throws IOException {
+        MergerOptions options = getOptions();
         File dir = options.inputFile;
         boolean extracted = false;
         if(dir.isFile()){
             dir = extractFile(dir);
             extracted = true;
         }
-        log("Searching apk files ...");
+        logMessage("Searching apk files ...");
         ApkBundle bundle=new ApkBundle();
-        bundle.setAPKLogger(getAPKLogger());
+        bundle.setAPKLogger(this);
         bundle.loadApkDirectory(dir, extracted);
-        log("Found modules: "+bundle.getApkModuleList().size());
+        logMessage("Found modules: "+bundle.getApkModuleList().size());
         for(ApkModule apkModule:bundle.getApkModuleList()){
             String protect = Util.isProtected(apkModule);
             if(protect!=null){
-                log(options.inputFile.getAbsolutePath());
-                log(protect);
+                logMessage(options.inputFile.getAbsolutePath());
+                logMessage(protect);
                 return;
             }
         }
         ApkModule mergedModule=bundle.mergeModules();
         if(options.resDirName!=null){
-            log("Renaming resources root dir: "+options.resDirName);
+            logMessage("Renaming resources root dir: "+options.resDirName);
             mergedModule.setResourcesRootDir(options.resDirName);
         }
         if(options.validateResDir){
-            log("Validating resources dir ...");
+            logMessage("Validating resources dir ...");
             mergedModule.validateResourcesDir();
         }
         if(options.cleanMeta){
-            log("Clearing META-INF ...");
+            logMessage("Clearing META-INF ...");
             clearMeta(mergedModule);
         }
         sanitizeManifest(mergedModule);
         Util.addApkEditorInfo(mergedModule, getClass().getSimpleName());
         String message = mergedModule.refreshTable();
         if(message != null){
-            log(message);
+            logMessage(message);
         }
         message = mergedModule.refreshManifest();
         if(message != null){
-            log(message);
+            logMessage(message);
         }
 
-        log("Writing apk ...");
-        mergedModule.writeApk(options.outputFile, this);
+        logMessage("Writing apk ...");
+        mergedModule.writeApk(options.outputFile);
         mergedModule.close();
         if(extracted){
-            //Util.deleteDir(dir);
+            Util.deleteDir(dir);
         }
-        log("Saved to: "+options.outputFile);
-        log("Done");
+        logMessage("Saved to: " + options.outputFile);
     }
     private File extractFile(File file) throws IOException {
         File tmp = toTmpDir(file);
-        log("Extracting to: " + tmp);
+        logMessage("Extracting to: " + tmp);
         if(tmp.exists()){
-            log("Delete: " + tmp);
+            logMessage("Delete: " + tmp);
             Util.deleteDir(tmp);
         }
         tmp.deleteOnExit();
@@ -140,16 +135,16 @@ public class Merger extends BaseCommand implements WriteProgress {
             return;
         }
         AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
-        log("Sanitizing manifest ...");
+        logMessage("Sanitizing manifest ...");
         boolean removed = AndroidManifestHelper.removeApplicationAttribute(manifest,
                 AndroidManifestBlock.ID_extractNativeLibs);
         if(removed){
-            log("Removed: "+AndroidManifestBlock.NAME_extractNativeLibs);
+            logMessage("Removed: "+AndroidManifestBlock.NAME_extractNativeLibs);
         }
         removed = AndroidManifestHelper.removeApplicationAttribute(manifest,
                 AndroidManifestBlock.ID_isSplitRequired);
         if(removed){
-            log("Removed: "+AndroidManifestBlock.NAME_isSplitRequired);
+            logMessage("Removed: "+AndroidManifestBlock.NAME_isSplitRequired);
         }
         ResXmlElement application = manifest.getApplicationElement();
         List<ResXmlElement> splitMetaDataElements=AndroidManifestHelper.listSplitRequired(application);
@@ -158,7 +153,7 @@ public class Merger extends BaseCommand implements WriteProgress {
             if(!splits_removed){
                 splits_removed=removeSplitsTableEntry(meta, apkModule);
             }
-            log("Removed: "+meta.toString());
+            logMessage("Removed: "+meta.toString());
             application.removeElement(meta);
         }
         manifest.refresh();
@@ -199,7 +194,7 @@ public class Merger extends BaseCommand implements WriteProgress {
                 continue;
             }
             String path = resValue.getValueAsString();
-            log("Removed from table: "+path);
+            logMessage("Removed from table: "+path);
             //Remove file entry
             apkArchive.remove(path);
             // It's not safe to destroy entry, resource id might be used in dex code.
@@ -210,45 +205,6 @@ public class Merger extends BaseCommand implements WriteProgress {
             specTypePair.removeNullEntries(entry.getId());
         }
         return true;
-    }
-    @Override
-    public void onCompressFile(String path, int method, long length) {
-        StringBuilder builder=new StringBuilder();
-        builder.append("Writing:");
-        if(method == ZipEntry.STORED){
-            builder.append(" method=STORED");
-        }
-        builder.append(" total=");
-        builder.append(length);
-        builder.append(" bytes : ");
-        if(path.length()>30){
-            path=path.substring(path.length()-30);
-        }
-        builder.append(path);
-        logSameLine(builder.toString());
-    }
-    private APKLogger getAPKLogger(){
-        if(mApkLogger!=null){
-            return mApkLogger;
-        }
-        mApkLogger = new APKLogger() {
-            @Override
-            public void logMessage(String msg) {
-                Logger.i(getLogTag()+msg);
-            }
-            @Override
-            public void logError(String msg, Throwable tr) {
-                Logger.e(getLogTag()+msg, tr);
-            }
-            @Override
-            public void logVerbose(String msg) {
-                if(msg.length()>30){
-                    msg=msg.substring(msg.length()-30);
-                }
-                Logger.sameLine(getLogTag()+msg);
-            }
-        };
-        return mApkLogger;
     }
     public static void execute(String[] args) throws ARGException, IOException {
         if(Util.isHelp(args)){
@@ -261,25 +217,16 @@ public class Merger extends BaseCommand implements WriteProgress {
             throw new IOException("Output file can not be inside input directory!");
         }
         Util.deleteEmptyDirectories(outFile);
+        Merger merger = new Merger(option);
         if(outFile.exists()){
             if(!option.force){
-                throw new ARGException("Path already exists: "+outFile);
+                throw new ARGException("Path already exists: " + outFile);
             }
-            log("Deleting: "+outFile);
+            merger.logMessage("Deleting: " + outFile);
             Util.deleteDir(outFile);
         }
-        log("Merging ...\n"+option);
-        Merger merger=new Merger(option);
+        merger.logMessage("Merging ...\n"+option);
         merger.run();
-    }
-    private static void logSameLine(String msg){
-        Logger.sameLine(getLogTag()+msg);
-    }
-    private static void log(String msg){
-        Logger.i(getLogTag()+msg);
-    }
-    private static String getLogTag(){
-        return "[MERGE] ";
     }
     public static boolean isCommand(String command){
         if(Util.isEmpty(command)){

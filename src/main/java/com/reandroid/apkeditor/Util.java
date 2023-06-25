@@ -138,20 +138,27 @@ public class Util {
         if(dir==null || !dir.isDirectory()){
             return;
         }
-        File[] allFiles=dir.listFiles();
-        if(allFiles==null || allFiles.length==0){
+        File[] filesList = dir.listFiles();
+        if(filesList == null || filesList.length == 0){
             dir.delete();
             return;
         }
-        int len=allFiles.length;
-        for(int i=0;i<len;i++){
-            File file=allFiles[i];
+        int count = filesList.length;
+        for(int i = 0; i < count; i++){
+            File file = filesList[i];
+            if(file.isFile() && file.length() != 0){
+                return;
+            }
+        }
+        count = filesList.length;
+        for(int i = 0; i < count; i++){
+            File file = filesList[i];
             if(file.isDirectory()){
                 deleteEmptyDirectories(file);
             }
         }
-        allFiles=dir.listFiles();
-        if(allFiles==null || allFiles.length==0){
+        filesList = dir.listFiles();
+        if(filesList == null || filesList.length == 0){
             dir.delete();
         }
     }
@@ -220,12 +227,10 @@ public class Util {
         if(count==0){
             return;
         }
-        TableString tableString = stringPool.get(count - 1);
+        TableString tableString = stringPool.getLast();
         if(!isApkEditorInfo(tableString)){
             StringArray<TableString> stringsArray = stringPool.getStringsArray();
-            count = stringsArray.childesCount();
-            stringsArray.ensureSize(count + 1);
-            tableString = stringPool.get(count);
+            tableString = stringsArray.createNext();
         }
         tableString.set(buildApkEditorInfo(type));
         IntegerItem dummyReference = new IntegerItem();

@@ -16,25 +16,24 @@
 package com.reandroid.apkeditor.compile;
 
 import com.reandroid.apk.*;
+import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
-import com.reandroid.archive.WriteProgress;
 import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.block.ApkSignatureBlock;
 import com.reandroid.archive2.writer.ApkWriter;
 import com.reandroid.commons.command.ARGException;
-import com.reandroid.commons.utils.log.Logger;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 
 import java.io.File;
 import java.io.IOException;
 
-public class Builder implements WriteProgress {
-    private final BuildOptions options;
-    private APKLogger mApkLogger;
+public class Builder extends BaseCommand<BuildOptions> {
     public Builder(BuildOptions options){
-        this.options=options;
+        super(options, "[BUILD] ");
     }
+    @Override
     public void run() throws IOException {
+        BuildOptions options = getOptions();
         if(options.signaturesDirectory != null && options.inputFile.isFile()){
             restoreSignatures();
             return;
@@ -46,91 +45,57 @@ public class Builder implements WriteProgress {
         }
     }
     private void restoreSignatures() throws IOException {
-        log("Restoring signatures ...");
+        logMessage("Restoring signatures ...");
+        BuildOptions options = getOptions();
         Archive archive = new Archive(options.inputFile);
         ApkWriter apkWriter = new ApkWriter(options.outputFile, archive.mapEntrySource().values());
-        apkWriter.setAPKLogger(getAPKLogger());
+        apkWriter.setAPKLogger(this);
         ApkSignatureBlock apkSignatureBlock = new ApkSignatureBlock();
         apkSignatureBlock.scanSplitFiles(options.signaturesDirectory);
         apkWriter.setApkSignatureBlock(apkSignatureBlock);
-        log("Writing apk...");
+        logMessage("Writing apk...");
         apkWriter.write();
-        log("Built to: "+options.outputFile);
-        log("Done");
+        logMessage("Saved to: " + options.outputFile);
     }
     public void buildJson() throws IOException {
-        log("Scanning JSON directory ...");
+        logMessage("Scanning JSON directory ...");
         ApkModuleJsonEncoder encoder=new ApkModuleJsonEncoder();
-        encoder.setApkLogger(getAPKLogger());
+        encoder.setApkLogger(this);
+        BuildOptions options = getOptions();
         encoder.scanDirectory(options.inputFile);
         ApkModule loadedModule = encoder.getApkModule();
-        loadedModule.setAPKLogger(getAPKLogger());
+        loadedModule.setAPKLogger(this);
         if(options.resDirName!=null){
-            log("Renaming resources root dir: "+options.resDirName);
+            logMessage("Renaming resources root dir: "+options.resDirName);
             loadedModule.setResourcesRootDir(options.resDirName);
         }
         if(options.validateResDir){
-            log("Validating resources dir ...");
+            logMessage("Validating resources dir ...");
             loadedModule.validateResourcesDir();
         }
-        log("Writing apk...");
+        logMessage("Writing apk...");
         loadedModule.getApkArchive().autoSortApkFiles();
-        loadedModule.writeApk(options.outputFile, this);
-        log("Built to: "+options.outputFile);
-        log("Done");
+        loadedModule.writeApk(options.outputFile, null);
+        logMessage("Saved to: " + options.outputFile);
     }
     public void buildXml() throws IOException {
-        log("Scanning XML directory ...");
+        logMessage("Scanning XML directory ...");
         ApkModuleXmlEncoder encoder=new ApkModuleXmlEncoder();
-        encoder.setApkLogger(getAPKLogger());
+        encoder.setApkLogger(this);
         ApkModule loadedModule = encoder.getApkModule();
-        loadedModule.setAPKLogger(getAPKLogger());
+        loadedModule.setAPKLogger(this);
+        BuildOptions options = getOptions();
         loadedModule.setPreferredFramework(options.frameworkVersion);
         if(options.frameworks != null){
             for(File file : options.frameworks){
                 loadedModule.addExternalFramework(file);
             }
         }
-
         encoder.scanDirectory(options.inputFile);
         loadedModule = encoder.getApkModule();
-        log("Writing apk...");
+        logMessage("Writing apk...");
         loadedModule.writeApk(options.outputFile, null);
-        log("Built to: "+options.outputFile);
-        log("Done");
-    }
-    private APKLogger getAPKLogger(){
-        if(mApkLogger!=null){
-            return mApkLogger;
-        }
-        mApkLogger = new APKLogger() {
-            @Override
-            public void logMessage(String msg) {
-                Logger.i(getLogTag()+msg);
-            }
-            @Override
-            public void logError(String msg, Throwable tr) {
-                Logger.e(getLogTag()+msg, tr);
-            }
-            @Override
-            public void logVerbose(String msg) {
-                if(msg.length()>50){
-                    msg=msg.substring(msg.length()-50);
-                }
-                Logger.sameLine(getLogTag()+msg);
-            }
-        };
-        return mApkLogger;
-    }
-    @Override
-    public void onCompressFile(String path, int method, long length) {
-        StringBuilder builder=new StringBuilder();
-        builder.append("Writing:");
-        if(path.length()>30){
-            path=path.substring(path.length()-30);
-        }
-        builder.append(path);
-        logSameLine(builder.toString());
+        logMessage("Saved to: " + options.outputFile);
     }
     public static void execute(String[] args) throws ARGException, IOException {
         if(Util.isHelp(args)){
@@ -145,17 +110,17 @@ public class Builder implements WriteProgress {
         }else if(option.signaturesDirectory == null){
             throw new ARGException("Not xml/json directory: "+option.inputFile);
         }
-        File outDir=option.outputFile;
+        File outDir = option.outputFile;
         Util.deleteEmptyDirectories(outDir);
+        Builder builder = new Builder(option);
         if(outDir.exists()){
             if(!option.force){
                 throw new ARGException("Path already exists: "+outDir);
             }
-            log("Deleting: "+outDir);
+            builder.logMessage("Deleting: " + outDir);
             Util.deleteDir(outDir);
         }
-        log("Building ...\n"+option);
-        Builder builder=new Builder(option);
+        builder.logMessage("Building ...\n" + option.toString());
         builder.run();
     }
     private static boolean isXmlInDir(File dir){
@@ -205,15 +170,6 @@ public class Builder implements WriteProgress {
         }
         File file=new File(dir, "AndroidManifest.xml.json");
         return file.isFile();
-    }
-    private static void logSameLine(String msg){
-        Logger.sameLine(getLogTag()+msg);
-    }
-    private static void log(String msg){
-        Logger.i(getLogTag()+msg);
-    }
-    private static String getLogTag(){
-        return "[BUILD] ";
     }
     public static boolean isCommand(String command){
         if(Util.isEmpty(command)){
