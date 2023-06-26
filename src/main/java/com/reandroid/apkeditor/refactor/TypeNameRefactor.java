@@ -263,7 +263,7 @@ public class TypeNameRefactor {
         if(root==null){
             return false;
         }
-        String tag=root.getTag();
+        String tag=root.getName();
         if(!"pathInterpolator".equals(tag) && !"linearInterpolator".equals(tag)){
             return false;
         }
@@ -281,7 +281,7 @@ public class TypeNameRefactor {
         if(root==null){
             return false;
         }
-        if(!"alpha".equals(root.getTag())){
+        if(!"alpha".equals(root.getName())){
             return false;
         }
         int fromAlpha=0x010101ca;
@@ -313,7 +313,7 @@ public class TypeNameRefactor {
         if(root==null){
             return false;
         }
-        if(!"menu".equals(root.getTag())){
+        if(!"menu".equals(root.getName())){
             return false;
         }
         if(root.listElements("item").size()==0){
@@ -330,7 +330,7 @@ public class TypeNameRefactor {
         if(root==null){
             return false;
         }
-        if(!"selector".equals(root.getTag())){
+        if(!"selector".equals(root.getName())){
             return false;
         }
         int state_enabled=0x0101009e;
@@ -359,7 +359,7 @@ public class TypeNameRefactor {
         if(root==null){
             return false;
         }
-        if(!"vector".equals(root.getTag())){
+        if(!"vector".equals(root.getName())){
             return false;
         }
         int pathData=0x01010405;
@@ -383,7 +383,7 @@ public class TypeNameRefactor {
         if(root==null){
             return false;
         }
-        if(!"LinearLayout".equals(root.getTag())){
+        if(!"LinearLayout".equals(root.getName())){
             return false;
         }
         return rename(resourceId, name);
@@ -510,11 +510,11 @@ public class TypeNameRefactor {
         return false;
     }
     private boolean isPreferenceScreen(ResXmlElement root){
-        if(!"PreferenceScreen".equals(root.getTag())){
+        if(!"PreferenceScreen".equals(root.getName())){
             return false;
         }
         for(ResXmlElement element:root.listElements()){
-            String tag = element.getTag();
+            String tag = element.getName();
             if("PreferenceCategory".equals(tag)){
                 return true;
             }
@@ -525,11 +525,11 @@ public class TypeNameRefactor {
         return false;
     }
     private boolean isPaths(ResXmlElement root){
-        if(!"paths".equals(root.getTag())){
+        if(!"paths".equals(root.getName())){
             return false;
         }
         for(ResXmlElement element:root.listElements()){
-            String tag = element.getTag();
+            String tag = element.getName();
             if("files-path".equals(tag) || "cache-path".equals(tag)){
                 return true;
             }
