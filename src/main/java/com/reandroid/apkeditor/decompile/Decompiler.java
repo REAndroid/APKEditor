@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.decompile;
 import com.reandroid.apk.*;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
+import com.reandroid.apkeditor.smali.SmaliDecompiler;
 import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.block.ApkSignatureBlock;
 import com.reandroid.commons.command.ARGException;
@@ -64,6 +65,11 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
             ApkModuleXmlDecoder xmlDecoder = new ApkModuleXmlDecoder(apkModule);
             xmlDecoder.setKeepResPath(options.keepResPath);
             xmlDecoder.sanitizeFilePaths();
+            if(options.smali){
+                SmaliDecompiler smaliDecompiler = new SmaliDecompiler(apkModule.getTableBlock());
+                smaliDecompiler.setApkLogger(this);
+                xmlDecoder.setDexDecoder(smaliDecompiler);
+            }
             try {
                 xmlDecoder.decode(options.outputFile);
             } catch (Exception ex) {
@@ -98,13 +104,14 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
         }
         Util.deleteEmptyDirectories(outDir);
         Decompiler decompiler = new Decompiler(option);
+        decompiler.logMessage("Decompiling ...\n" + option);
         if(outDir.exists()){
             if(!option.force){
                 throw new ARGException("Path already exists: "+outDir);
             }
+            decompiler.logMessage("Deleting: " + outDir);
             Util.deleteDir(outDir);
         }
-        decompiler.logMessage("Decompiling ...\n" + option);
         decompiler.run();
     }
     public static boolean isCommand(String command){

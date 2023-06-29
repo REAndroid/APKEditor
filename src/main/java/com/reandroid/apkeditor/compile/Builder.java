@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.compile;
 import com.reandroid.apk.*;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
+import com.reandroid.apkeditor.smali.SmaliCompiler;
 import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.block.ApkSignatureBlock;
 import com.reandroid.archive2.writer.ApkWriter;
@@ -82,6 +83,9 @@ public class Builder extends BaseCommand<BuildOptions> {
         logMessage("Scanning XML directory ...");
         ApkModuleXmlEncoder encoder=new ApkModuleXmlEncoder();
         encoder.setApkLogger(this);
+        SmaliCompiler smaliCompiler = new SmaliCompiler();
+        smaliCompiler.setApkLogger(this);
+        encoder.setDexEncoder(smaliCompiler);
         ApkModule loadedModule = encoder.getApkModule();
         loadedModule.setAPKLogger(this);
         BuildOptions options = getOptions();
@@ -113,6 +117,7 @@ public class Builder extends BaseCommand<BuildOptions> {
         File outDir = option.outputFile;
         Util.deleteEmptyDirectories(outDir);
         Builder builder = new Builder(option);
+        builder.logMessage("Building ...\n" + option.toString());
         if(outDir.exists()){
             if(!option.force){
                 throw new ARGException("Path already exists: "+outDir);
@@ -120,7 +125,6 @@ public class Builder extends BaseCommand<BuildOptions> {
             builder.logMessage("Deleting: " + outDir);
             Util.deleteDir(outDir);
         }
-        builder.logMessage("Building ...\n" + option.toString());
         builder.run();
     }
     private static boolean isXmlInDir(File dir){

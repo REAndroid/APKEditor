@@ -23,6 +23,9 @@ repositories {
 dependencies {
     //implementation("io.github.reandroid:ARSCLib:+")
     compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
+
+    // built from: https://github.com/REAndroid/smali-lib
+    compile(files("$rootProject.projectDir/libs/smali.jar"))
 }
 
 processResources {
@@ -36,9 +39,11 @@ javadoc {
 }
 jar {
     exclude('com/reandroid/test/**')
+    duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 
 task fatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes(
                 'Main-Class': 'com.reandroid.apkeditor.Main'

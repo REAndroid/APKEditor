@@ -27,6 +27,7 @@ public class DecompileOptions extends Options {
     public boolean validateResDir;
     public String resDirName;
     public boolean keepResPath;
+    public boolean smali;
     public DecompileOptions(){
         type=TYPE_XML;
     }
@@ -36,6 +37,7 @@ public class DecompileOptions extends Options {
         parseType(args, type);
         parseOutput(args);
         parseSplitResources(args);
+        parseSmali(args);
         parseKeepResPath(args);
         parseResDirName(args);
         parseValidateResDir(args);
@@ -56,6 +58,9 @@ public class DecompileOptions extends Options {
     }
     private void parseSplitResources(String[] args) throws ARGException {
         splitJson=containsArg(ARG_split_resources, true, args);
+    }
+    private void parseSmali(String[] args) throws ARGException {
+        smali = containsArg(ARG_smali, true, args);
     }
     private void parseOutput(String[] args) throws ARGException {
         this.outputFile=null;
@@ -146,6 +151,7 @@ public class DecompileOptions extends Options {
         StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         builder.append("\nFlags:\n");
         table=new String[][]{
+                new String[]{ARG_smali, ARG_DESC_smali},
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_keep_res_path, ARG_DESC_keep_res_path},
                 new String[]{ARG_split_resources, ARG_DESC_split_resources},
@@ -188,5 +194,10 @@ public class DecompileOptions extends Options {
     private static final String ARG_keep_res_path = "-keep-res-path";
     private static final String ARG_DESC_keep_res_path = "Keeps original res/* file paths:" + "\n  *Applies only when decoding to xml" +
             "\n  *All res/* files will be placed on dir <res-files>\n  *The relative paths will be linked to values/*xml";
+
+
+    private static final String ARG_smali = "-smali";
+    private static final String ARG_DESC_smali = "Disassembles dex files to smali";
+
 
 }
