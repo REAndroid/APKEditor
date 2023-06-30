@@ -10,12 +10,15 @@ public abstract class Logger {
     private static Logger sInstance;
     private final ElapsedTime elapsedTime;
     private final ElapsedTime logTime;
+    private final ElapsedTime widthCheckTime;
     private final List<Logger> subLoggers;
     private boolean hideTime;
     private boolean enable=true;
+    private int mConsoleWidth;
     Logger(){
         this.elapsedTime=new ElapsedTime();
         this.logTime=new ElapsedTime();
+        this.widthCheckTime = new ElapsedTime();
         this.subLoggers=new ArrayList<>();
     }
     public void every2Second(String msg){
@@ -221,6 +224,35 @@ public abstract class Logger {
         getLogger().every2SecondSameLine(msg);
     }
 
+    String trimConsoleWidth(String msg){
+        checkConsoleWidth();
+        int width = mConsoleWidth;
+        if(msg.length() > width){
+            msg = msg.substring(0, width);
+        }
+        return msg;
+    }
+    private void checkConsoleWidth(){
+        if(mConsoleWidth == 0){
+            updateConsoleWidth();
+            return;
+        }
+        Boolean succeedOnce = ConsoleUtil.getSucceedOnce();
+        if(succeedOnce != null && !succeedOnce){
+            return;
+        }
+        if(!widthCheckTime.isExpired(UPDATE_CONSOLE_INTERVAL)){
+            return;
+        }
+        updateConsoleWidth();
+    }
+    private void updateConsoleWidth(){
+        widthCheckTime.reset();
+        if(mConsoleWidth == 0){
+            mConsoleWidth = 80;
+        }
+        mConsoleWidth = ConsoleUtil.getConsoleWidth();
+    }
     public static void clearFileLoggers(){
         Logger logger=getLogger();
         List<Logger> subList=new ArrayList<>(logger.subLoggers);
@@ -262,4 +294,5 @@ public abstract class Logger {
     private static final String TRACE_TAB2="        ";
     private static final int MAX_TRACE=10;
     private static final long INTERVAL=2000;
+    private static final long UPDATE_CONSOLE_INTERVAL = 4000;
 }

@@ -32,6 +32,7 @@ public class StdLogger extends Logger{
             if(line==null){
                 line="null";
             }
+            line = trimConsoleWidth(line);
             PrintStream stream=printStream;
             stream.print('\r');
             if(!mSameLine){
