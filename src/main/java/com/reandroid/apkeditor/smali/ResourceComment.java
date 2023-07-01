@@ -23,18 +23,37 @@ import com.reandroid.arsc.value.ResValue;
 import com.reandroid.arsc.value.ValueType;
 import org.jf.baksmali.CommentProvider;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ResourceComment extends CommentProvider{
     private final TableBlock tableBlock;
     private final PackageBlock packageBlock;
+    private final Map<Integer, String> mCommentCache;
     public ResourceComment(TableBlock tableBlock){
         this.tableBlock = tableBlock;
         this.packageBlock = tableBlock.pickOne();
+        this.mCommentCache = new HashMap<>();
     }
+
     @Override
     public String getComment(int resourceId){
         if(!PackageBlock.isResourceId(resourceId)){
             return null;
         }
+        synchronized (this){
+            String comment = mCommentCache.get(resourceId);
+            if(comment != null){
+                return comment;
+            }
+            comment = buildComment(resourceId);
+            if(comment != null){
+                mCommentCache.put(resourceId, comment);
+            }
+            return comment;
+        }
+    }
+    private String buildComment(int resourceId){
         ResourceEntry resourceEntry = tableBlock.getResource(resourceId);
         if(resourceEntry == null || !resourceEntry.isDeclared()){
             return null;
