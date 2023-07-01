@@ -62,7 +62,13 @@ public class Builder extends BaseCommand<BuildOptions> {
         logMessage("Scanning JSON directory ...");
         ApkModuleJsonEncoder encoder=new ApkModuleJsonEncoder();
         encoder.setApkLogger(this);
+
+        SmaliCompiler smaliCompiler = new SmaliCompiler();
+        smaliCompiler.setApkLogger(this);
+        encoder.setDexEncoder(smaliCompiler);
+
         BuildOptions options = getOptions();
+
         encoder.scanDirectory(options.inputFile);
         ApkModule loadedModule = encoder.getApkModule();
         loadedModule.setAPKLogger(this);

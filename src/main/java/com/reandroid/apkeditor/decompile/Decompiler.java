@@ -21,6 +21,7 @@ import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.smali.SmaliDecompiler;
 import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.block.ApkSignatureBlock;
+import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.commons.command.ARGException;
 
 import java.io.File;
@@ -55,28 +56,34 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
             logMessage("Validating resources dir ...");
             apkModule.validateResourcesDir();
         }
+        logMessage("Decompiling to " + options.type + " ...");
+        ApkModuleDecoder decoder = getApkModuleDecoder(apkModule);
+        decoder.decode(options.outputFile);
+        logMessage("Saved to: "+options.outputFile);
+    }
+    private ApkModuleDecoder getApkModuleDecoder(ApkModule apkModule){
+
+        DecompileOptions options = getOptions();
+        ApkModuleDecoder decoder;
         if(DecompileOptions.TYPE_JSON.equals(options.type)){
-            logMessage("Decompiling to JSON ...");
-            ApkModuleJsonDecoder decoder = new ApkModuleJsonDecoder(apkModule, options.splitJson);
-            decoder.sanitizeFilePaths();
-            decoder.decode(options.outputFile);
+            decoder = new ApkModuleJsonDecoder(apkModule, options.splitJson);
+            decoder.setDexDecoder(getSmaliDecompiler(apkModule.getTableBlock()));
         }else{
-            logMessage("Decompiling to XML ...");
             ApkModuleXmlDecoder xmlDecoder = new ApkModuleXmlDecoder(apkModule);
             xmlDecoder.setKeepResPath(options.keepResPath);
-            xmlDecoder.sanitizeFilePaths();
-            if(options.smali){
-                SmaliDecompiler smaliDecompiler = new SmaliDecompiler(apkModule.getTableBlock());
-                smaliDecompiler.setApkLogger(this);
-                xmlDecoder.setDexDecoder(smaliDecompiler);
-            }
-            try {
-                xmlDecoder.decode(options.outputFile);
-            } catch (Exception ex) {
-                throw new IOException(ex.getMessage(), ex);
-            }
+            decoder = xmlDecoder;
         }
-        logMessage("Saved to: "+options.outputFile);
+        decoder.sanitizeFilePaths();
+        decoder.setDexDecoder(getSmaliDecompiler(apkModule.getTableBlock()));
+        return decoder;
+    }
+    private SmaliDecompiler getSmaliDecompiler(TableBlock tableBlock){
+        if(!getOptions().smali){
+            return null;
+        }
+        SmaliDecompiler smaliDecompiler = new SmaliDecompiler(tableBlock);
+        smaliDecompiler.setApkLogger(this);
+        return smaliDecompiler;
     }
     private void dumpSignatureBlock() throws IOException {
         logMessage("Dumping signature blocks ...");

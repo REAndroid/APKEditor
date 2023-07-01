@@ -75,8 +75,10 @@ public class SmaliDecompiler implements DexDecoder {
     public ResourceComment getComment() {
         ResourceComment comment = this.mComment;
         if(comment == null){
-            comment = new ResourceComment(tableBlock);
-            this.mComment = comment;
+            if(tableBlock != null){
+                comment = new ResourceComment(tableBlock);
+                this.mComment = comment;
+            }
         }
         return mComment;
     }
