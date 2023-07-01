@@ -37,7 +37,7 @@ public class SmaliDecompiler implements DexDecoder {
     }
     @Override
     public boolean decodeDex(DexFileInputSource inputSource, File mainDir) throws IOException {
-        logMessage("Smali: " + inputSource.getAlias());
+        logMessage("Baksmali: " + inputSource.getAlias());
         disassembleDexFile(inputSource, mainDir);
         File cache = new File(mainDir, SmaliUtil.CACHE_DIR);
         cache = new File(cache, inputSource.getAlias());

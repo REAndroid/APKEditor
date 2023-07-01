@@ -31,7 +31,9 @@ import java.util.List;
 
 public class SmaliCompiler implements DexEncoder {
     private APKLogger apkLogger;
-    public SmaliCompiler(){
+    private final boolean noCache;
+    public SmaliCompiler(boolean noCache){
+        this.noCache = noCache;
     }
     @Override
     public List<InputSource> buildDexFiles(ApkModuleEncoder apkModuleEncoder, File mainDir) throws IOException {
@@ -61,7 +63,7 @@ public class SmaliCompiler implements DexEncoder {
         }
     }
     private InputSource build(String progress, File classesDir, File dexCacheFile) throws IOException {
-        logMessage(progress + "Baksmali: " + dexCacheFile.getName());
+        logMessage(progress + "Smali: " + dexCacheFile.getName());
         SmaliOptions smaliOptions = new SmaliOptions();
         File dir = dexCacheFile.getParentFile();
         if(dir != null && !dir.exists()){
@@ -75,7 +77,7 @@ public class SmaliCompiler implements DexEncoder {
         return new FileInputSource(dexCacheFile, dexCacheFile.getName());
     }
     private boolean isModified(File classesDir, File dexCacheFile){
-        if(!dexCacheFile.isFile()){
+        if(noCache || !dexCacheFile.isFile()){
             return true;
         }
         long dexMod = dexCacheFile.lastModified();

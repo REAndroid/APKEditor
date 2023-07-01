@@ -57,17 +57,19 @@ public class Builder extends BaseCommand<BuildOptions> {
         logMessage("Writing apk...");
         apkWriter.write();
         logMessage("Saved to: " + options.outputFile);
+        apkWriter.close();
     }
     public void buildJson() throws IOException {
         logMessage("Scanning JSON directory ...");
         ApkModuleJsonEncoder encoder=new ApkModuleJsonEncoder();
         encoder.setApkLogger(this);
 
-        SmaliCompiler smaliCompiler = new SmaliCompiler();
-        smaliCompiler.setApkLogger(this);
-        encoder.setDexEncoder(smaliCompiler);
 
         BuildOptions options = getOptions();
+
+        SmaliCompiler smaliCompiler = new SmaliCompiler(options.noCache);
+        smaliCompiler.setApkLogger(this);
+        encoder.setDexEncoder(smaliCompiler);
 
         encoder.scanDirectory(options.inputFile);
         ApkModule loadedModule = encoder.getApkModule();
@@ -83,18 +85,23 @@ public class Builder extends BaseCommand<BuildOptions> {
         logMessage("Writing apk...");
         loadedModule.getApkArchive().autoSortApkFiles();
         loadedModule.writeApk(options.outputFile, null);
+        loadedModule.close();;
         logMessage("Saved to: " + options.outputFile);
     }
     public void buildXml() throws IOException {
         logMessage("Scanning XML directory ...");
         ApkModuleXmlEncoder encoder=new ApkModuleXmlEncoder();
         encoder.setApkLogger(this);
-        SmaliCompiler smaliCompiler = new SmaliCompiler();
+
+        BuildOptions options = getOptions();
+
+        SmaliCompiler smaliCompiler = new SmaliCompiler(options.noCache);
         smaliCompiler.setApkLogger(this);
+
         encoder.setDexEncoder(smaliCompiler);
         ApkModule loadedModule = encoder.getApkModule();
         loadedModule.setAPKLogger(this);
-        BuildOptions options = getOptions();
+
         loadedModule.setPreferredFramework(options.frameworkVersion);
         if(options.frameworks != null){
             for(File file : options.frameworks){
@@ -105,6 +112,7 @@ public class Builder extends BaseCommand<BuildOptions> {
         loadedModule = encoder.getApkModule();
         logMessage("Writing apk...");
         loadedModule.writeApk(options.outputFile, null);
+        loadedModule.close();
         logMessage("Saved to: " + options.outputFile);
     }
     public static void execute(String[] args) throws ARGException, IOException {

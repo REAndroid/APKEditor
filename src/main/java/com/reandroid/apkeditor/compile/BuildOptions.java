@@ -19,6 +19,7 @@ import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.Options;
 import com.reandroid.apkeditor.utils.StringHelper;
 import com.reandroid.commons.command.ARGException;
+import com.sun.org.apache.xpath.internal.Arg;
 
 import java.io.File;
 
@@ -26,6 +27,7 @@ public class BuildOptions extends Options {
     public boolean validateResDir;
     public String resDirName;
     public boolean isXml;
+    public boolean noCache;
     public BuildOptions(){
     }
     @Override
@@ -36,6 +38,7 @@ public class BuildOptions extends Options {
         parseValidateResDir(args);
         parseSignaturesDir(args);
         parseType(args);
+        parseNoCache(args);
         if(TYPE_SIG.equals(type)){
             if(signaturesDirectory == null){
                 throw new ARGException("Signatures directory missing! " + ARG_sig + " path/to/signatures_dir");
@@ -51,6 +54,9 @@ public class BuildOptions extends Options {
                     "\nSignatures directory provided but missing: -t " + TYPE_SIG);
         }
         super.parse(args);
+    }
+    private void parseNoCache(String[] args) throws ARGException {
+        noCache = containsArg(ARG_no_cache, true, args);
     }
     private void parseValidateResDir(String[] args) throws ARGException {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
@@ -129,6 +135,7 @@ public class BuildOptions extends Options {
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
+                new String[]{ARG_no_cache, ARG_DESC_no_cache},
                 new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
         };
         StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
@@ -155,4 +162,7 @@ public class BuildOptions extends Options {
 
         return builder.toString();
     }
+
+    private static final String ARG_no_cache = "-no-cache";
+    private static final String ARG_DESC_no_cache = "ignore built cache .dex files";
 }

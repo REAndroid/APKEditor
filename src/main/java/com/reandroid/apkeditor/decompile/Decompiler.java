@@ -78,7 +78,7 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
         return decoder;
     }
     private SmaliDecompiler getSmaliDecompiler(TableBlock tableBlock){
-        if(!getOptions().smali){
+        if(getOptions().dex){
             return null;
         }
         SmaliDecompiler smaliDecompiler = new SmaliDecompiler(tableBlock);
