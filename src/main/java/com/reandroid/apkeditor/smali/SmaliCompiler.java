@@ -84,7 +84,7 @@ public class SmaliCompiler implements DexEncoder {
         return isModified(classesDir, dexMod);
     }
     private boolean isModified(File dir, long dexMod){
-        if(dir.isFile() && dir.lastModified() > dexMod){
+        if(dir.lastModified() > dexMod){
             return true;
         }
         if(!dir.isDirectory()){
