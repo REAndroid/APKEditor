@@ -19,11 +19,11 @@ import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
-import com.reandroid.arsc.util.HexUtil;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.arsc.value.ResValueMap;
+import com.reandroid.utils.HexUtil;
 
 import java.io.IOException;
 import java.io.Writer;

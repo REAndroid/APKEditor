@@ -20,7 +20,7 @@ import com.reandroid.apk.ApkModuleEncoder;
 import com.reandroid.apk.DexEncoder;
 import com.reandroid.archive.FileInputSource;
 import com.reandroid.archive.InputSource;
-import com.reandroid.arsc.util.StringsUtil;
+import com.reandroid.utils.StringsUtil;
 import org.jf.smali.Smali;
 import org.jf.smali.SmaliOptions;
 

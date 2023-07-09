@@ -20,7 +20,7 @@ import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
-import com.reandroid.arsc.util.HexUtil;
+import com.reandroid.utils.HexUtil;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
 import com.reandroid.arsc.value.ResValue;
@@ -302,13 +302,6 @@ public class InfoWriterXml extends InfoWriter{
             builder.append(' ');
         }
         serializer.text(builder.toString());
-    }
-    private void setRootTag(String tag){
-        KXmlSerializer serializer = this.mSerializer;
-        if(serializer != null){
-            return;
-        }
-        mRootTag = tag;
     }
     private KXmlSerializer getSerializer() throws IOException {
         KXmlSerializer serializer = this.mSerializer;

@@ -23,7 +23,7 @@ import com.reandroid.archive2.Archive;
 import com.reandroid.archive2.ArchiveEntry;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
-import com.reandroid.arsc.util.HexUtil;
+import com.reandroid.utils.HexUtil;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.ApkBundle;
@@ -108,13 +108,12 @@ public class Merger extends BaseCommand<MergerOptions> {
         }
         tmp.deleteOnExit();
         Archive archive = new Archive(file);
-        archive.extractAll(tmp, new Predicate<ArchiveEntry>() {
-            @Override
-            public boolean test(ArchiveEntry archiveEntry) {
-                return archiveEntry.getName().endsWith(".apk");
-            }
-        });
+        Predicate <ArchiveEntry> filter = archiveEntry -> archiveEntry.getName().endsWith(".apk");
+        int count = archive.extractAll(tmp, filter, this);
         archive.close();
+        if(count == 0){
+            throw new IOException("No *.apk files found on: " + file);
+        }
         return tmp;
     }
     private File toTmpDir(File file){

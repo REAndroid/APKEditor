@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ public class TypeNameMap implements Comparator<TypeNameMap.TypeName> {
         XMLElement documentElement=new XMLElement("resources");
         xmlDocument.setDocumentElement(documentElement);
         for(TypeName typeName:listTypeNames()){
-            documentElement.addChild(typeName.toXMLElement());
+            documentElement.add(typeName.toXMLElement());
         }
         return xmlDocument;
     }
@@ -59,8 +59,9 @@ public class TypeNameMap implements Comparator<TypeNameMap.TypeName> {
         if(documentElement==null){
             return;
         }
-        for(XMLElement element:documentElement.listChildElements()){
-            add(TypeName.fromXMLElement(element));
+        Iterator<? extends XMLElement> iterator = documentElement.getElements();
+        while (iterator.hasNext()){
+            add(TypeName.fromXMLElement(iterator.next()));
         }
     }
     public void add(int id, String name){

@@ -24,7 +24,7 @@ import com.reandroid.arsc.chunk.xml.ResXmlDocument;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.item.TypeString;
-import com.reandroid.arsc.util.FrameworkTable;
+import com.reandroid.arsc.model.FrameworkTable;
 import com.reandroid.arsc.value.AttributeDataFormat;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
@@ -69,8 +69,8 @@ public class TypeNameRefactor {
         if(refactoredTypeMap.count()>0){
             log.append("\n");
             XMLElement element=refactoredTypeMap.toXMLDocument().getDocumentElement();
-            element.setTagName("renamed");
-            element.setAttribute("count", refactoredTypeMap.count());
+            element.setName("renamed");
+            element.setAttribute("count", String.valueOf(refactoredTypeMap.count()));
             log.append(element.toText(2, false));
         }
         TypeNameMap remain=new TypeNameMap();
@@ -81,7 +81,7 @@ public class TypeNameRefactor {
             log.append("\n");
             XMLDocument xmlDocument=remain.toXMLDocument();
             XMLElement element=xmlDocument.getDocumentElement();
-            element.setTagName("remain");
+            element.setName("remain");
             log.append(xmlDocument.toText(2, false));
         }
         logMessage(log.toString());
