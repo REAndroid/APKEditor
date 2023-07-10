@@ -65,6 +65,9 @@ public class ResourceComment extends CommentProvider{
         if(resourceEntry.getPackageBlock().getTableBlock() != tableBlock){
             return ref;
         }
+        if("id".equals(resourceEntry.getType())){
+            return ref;
+        }
 
         Entry entry = resourceEntry.get();
         if(entry == null){
