@@ -71,7 +71,7 @@ public class TypeNameRefactor {
             XMLElement element=refactoredTypeMap.toXMLDocument().getDocumentElement();
             element.setName("renamed");
             element.setAttribute("count", String.valueOf(refactoredTypeMap.count()));
-            log.append(element.toText(2, false));
+            log.append(element.toText());
         }
         TypeNameMap remain=new TypeNameMap();
         for(Map.Entry<Integer, TypeString> entry:mTypeStrings.entrySet()){
@@ -82,7 +82,7 @@ public class TypeNameRefactor {
             XMLDocument xmlDocument=remain.toXMLDocument();
             XMLElement element=xmlDocument.getDocumentElement();
             element.setName("remain");
-            log.append(xmlDocument.toText(2, false));
+            log.append(xmlDocument.toText());
         }
         logMessage(log.toString());
     }
