@@ -18,9 +18,9 @@ package com.reandroid.apkeditor.merge;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
-import com.reandroid.archive.APKArchive;
-import com.reandroid.archive2.Archive;
-import com.reandroid.archive2.ArchiveEntry;
+import com.reandroid.archive.ZipEntryMap;
+import com.reandroid.archive.ArchiveEntry;
+import com.reandroid.archive.ArchiveFile;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.utils.HexUtil;
@@ -107,7 +107,7 @@ public class Merger extends BaseCommand<MergerOptions> {
             Util.deleteDir(tmp);
         }
         tmp.deleteOnExit();
-        Archive archive = new Archive(file);
+        ArchiveFile archive = new ArchiveFile(file);
         Predicate <ArchiveEntry> filter = archiveEntry -> archiveEntry.getName().endsWith(".apk");
         int count = archive.extractAll(tmp, filter, this);
         archive.close();
@@ -183,7 +183,7 @@ public class Merger extends BaseCommand<MergerOptions> {
         if(resourceEntry == null){
             return false;
         }
-        APKArchive apkArchive = apkModule.getApkArchive();
+        ZipEntryMap zipEntryMap = apkModule.getZipEntryMap();
         for(Entry entry : resourceEntry){
             if(entry == null){
                 continue;
@@ -195,7 +195,7 @@ public class Merger extends BaseCommand<MergerOptions> {
             String path = resValue.getValueAsString();
             logMessage("Removed from table: "+path);
             //Remove file entry
-            apkArchive.remove(path);
+            zipEntryMap.remove(path);
             // It's not safe to destroy entry, resource id might be used in dex code.
             // Better replace it with boolean value.
             entry.setNull(true);

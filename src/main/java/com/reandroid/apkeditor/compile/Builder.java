@@ -19,9 +19,10 @@ import com.reandroid.apk.*;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.smali.SmaliCompiler;
-import com.reandroid.archive2.Archive;
-import com.reandroid.archive2.block.ApkSignatureBlock;
-import com.reandroid.archive2.writer.ApkWriter;
+import com.reandroid.archive.ArchiveFile;
+import com.reandroid.archive.block.ApkSignatureBlock;
+import com.reandroid.archive.writer.ApkWriter;
+import com.reandroid.arsc.coder.xml.XmlCoder;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 
@@ -48,8 +49,8 @@ public class Builder extends BaseCommand<BuildOptions> {
     private void restoreSignatures() throws IOException {
         logMessage("Restoring signatures ...");
         BuildOptions options = getOptions();
-        Archive archive = new Archive(options.inputFile);
-        ApkWriter apkWriter = new ApkWriter(options.outputFile, archive.mapEntrySource().values());
+        ArchiveFile archive = new ArchiveFile(options.inputFile);
+        ApkWriter apkWriter = new ApkWriter(options.outputFile, archive.getInputSources());
         apkWriter.setAPKLogger(this);
         ApkSignatureBlock apkSignatureBlock = new ApkSignatureBlock();
         apkSignatureBlock.scanSplitFiles(options.signaturesDirectory);
@@ -83,13 +84,14 @@ public class Builder extends BaseCommand<BuildOptions> {
             loadedModule.validateResourcesDir();
         }
         logMessage("Writing apk...");
-        loadedModule.getApkArchive().autoSortApkFiles();
+        loadedModule.getZipEntryMap().autoSortApkFiles();
         loadedModule.writeApk(options.outputFile, null);
-        loadedModule.close();;
+        loadedModule.close();
         logMessage("Saved to: " + options.outputFile);
     }
     public void buildXml() throws IOException {
         logMessage("Scanning XML directory ...");
+        XmlCoder.getInstance().setLogger(this);
         ApkModuleXmlEncoder encoder=new ApkModuleXmlEncoder();
         encoder.setApkLogger(this);
 

@@ -16,14 +16,15 @@
 package com.reandroid.apkeditor;
 
 import com.reandroid.apk.APKLogger;
-import com.reandroid.archive.APKArchive;
+import com.reandroid.archive.ZipEntryMap;
 import com.reandroid.apk.ApkModule;
+import com.reandroid.arsc.coder.xml.XmlCoderLogger;
 import com.reandroid.commons.utils.log.Logger;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class BaseCommand<T extends Options> implements APKLogger {
+public class BaseCommand<T extends Options> implements APKLogger, XmlCoderLogger {
     private final T options;
     private String mLogTag;
     private boolean mEnableLog;
@@ -69,6 +70,21 @@ public class BaseCommand<T extends Options> implements APKLogger {
         }
         Logger.sameLine(mLogTag + msg);
     }
+    @Override
+    public void logMessage(String tag, String msg) {
+        if(!mEnableLog){
+            return;
+        }
+        Logger.sameLine(mLogTag + msg);
+    }
+
+    @Override
+    public void logVerbose(String tag, String msg) {
+        if(!mEnableLog){
+            return;
+        }
+        Logger.sameLine(mLogTag + msg);
+    }
     public void logWarn(String msg) {
         Logger.e(mLogTag + msg);
     }
@@ -78,7 +94,7 @@ public class BaseCommand<T extends Options> implements APKLogger {
         module.setApkSignatureBlock(null);
     }
     protected static void removeSignature(ApkModule module){
-        APKArchive archive = module.getApkArchive();
+        ZipEntryMap archive = module.getZipEntryMap();
         archive.removeAll(Pattern.compile("^META-INF/.+\\.(([MS]F)|(RSA))"));
         archive.remove("stamp-cert-sha256");
     }

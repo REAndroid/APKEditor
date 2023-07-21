@@ -19,9 +19,10 @@ import com.reandroid.apk.*;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.smali.SmaliDecompiler;
-import com.reandroid.archive2.Archive;
-import com.reandroid.archive2.block.ApkSignatureBlock;
+import com.reandroid.archive.ArchiveFile;
+import com.reandroid.archive.block.ApkSignatureBlock;
 import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.arsc.coder.xml.XmlCoder;
 import com.reandroid.commons.command.ARGException;
 
 import java.io.File;
@@ -72,6 +73,7 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
             ApkModuleXmlDecoder xmlDecoder = new ApkModuleXmlDecoder(apkModule);
             xmlDecoder.setKeepResPath(options.keepResPath);
             decoder = xmlDecoder;
+            XmlCoder.getInstance().setLogger(this);
         }
         decoder.sanitizeFilePaths();
         decoder.setDexDecoder(getSmaliDecompiler(apkModule.getTableBlock()));
@@ -88,7 +90,7 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
     private void dumpSignatureBlock() throws IOException {
         logMessage("Dumping signature blocks ...");
         DecompileOptions options = getOptions();
-        Archive archive = new Archive(options.inputFile);
+        ArchiveFile archive = new ArchiveFile(options.inputFile);
         ApkSignatureBlock apkSignatureBlock = archive.getApkSignatureBlock();
         if(apkSignatureBlock == null){
             logMessage("Don't have signature block");
