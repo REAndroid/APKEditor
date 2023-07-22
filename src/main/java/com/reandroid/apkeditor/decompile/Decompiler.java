@@ -69,6 +69,9 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
         if(DecompileOptions.TYPE_JSON.equals(options.type)){
             decoder = new ApkModuleJsonDecoder(apkModule, options.splitJson);
             decoder.setDexDecoder(getSmaliDecompiler(apkModule.getTableBlock()));
+        }else if(DecompileOptions.TYPE_RAW.equals(options.type)){
+            decoder = new ApkModuleRawDecoder(apkModule);
+            decoder.setDexDecoder(getSmaliDecompiler(apkModule.getTableBlock()));
         }else{
             ApkModuleXmlDecoder xmlDecoder = new ApkModuleXmlDecoder(apkModule);
             xmlDecoder.setKeepResPath(options.keepResPath);

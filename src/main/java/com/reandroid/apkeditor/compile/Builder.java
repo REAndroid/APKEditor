@@ -21,7 +21,8 @@ import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.smali.SmaliCompiler;
 import com.reandroid.archive.ArchiveFile;
 import com.reandroid.archive.block.ApkSignatureBlock;
-import com.reandroid.archive.writer.ApkWriter;
+import com.reandroid.archive.writer.ApkFileWriter;
+import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.coder.xml.XmlCoder;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
@@ -40,7 +41,9 @@ public class Builder extends BaseCommand<BuildOptions> {
             restoreSignatures();
             return;
         }
-        if(options.isXml){
+        if(options.isRaw){
+            buildRaw();
+        }else if(options.isXml){
             buildXml();
         }else {
             buildJson();
@@ -50,7 +53,7 @@ public class Builder extends BaseCommand<BuildOptions> {
         logMessage("Restoring signatures ...");
         BuildOptions options = getOptions();
         ArchiveFile archive = new ArchiveFile(options.inputFile);
-        ApkWriter apkWriter = new ApkWriter(options.outputFile, archive.getInputSources());
+        ApkFileWriter apkWriter = new ApkFileWriter(options.outputFile, archive.getInputSources());
         apkWriter.setAPKLogger(this);
         ApkSignatureBlock apkSignatureBlock = new ApkSignatureBlock();
         apkSignatureBlock.scanSplitFiles(options.signaturesDirectory);
@@ -117,13 +120,42 @@ public class Builder extends BaseCommand<BuildOptions> {
         loadedModule.close();
         logMessage("Saved to: " + options.outputFile);
     }
+    public void buildRaw() throws IOException {
+        logMessage("Scanning Raw directory ...");
+        ApkModuleRawEncoder encoder = new ApkModuleRawEncoder();
+        encoder.setApkLogger(this);
+
+        BuildOptions options = getOptions();
+
+        SmaliCompiler smaliCompiler = new SmaliCompiler(options.noCache);
+        smaliCompiler.setApkLogger(this);
+
+        encoder.setDexEncoder(smaliCompiler);
+        ApkModule loadedModule = encoder.getApkModule();
+        loadedModule.setAPKLogger(this);
+
+        loadedModule.setPreferredFramework(options.frameworkVersion);
+        if(options.frameworks != null){
+            for(File file : options.frameworks){
+                loadedModule.addExternalFramework(file);
+            }
+        }
+        encoder.scanDirectory(options.inputFile);
+        loadedModule = encoder.getApkModule();
+        logMessage("Writing apk...");
+        loadedModule.writeApk(options.outputFile, null);
+        loadedModule.close();
+        logMessage("Saved to: " + options.outputFile);
+    }
     public static void execute(String[] args) throws ARGException, IOException {
         if(Util.isHelp(args)){
             throw new ARGException(BuildOptions.getHelp());
         }
         BuildOptions option=new BuildOptions();
         option.parse(args);
-        if(isJsonInDir(option.inputFile)){
+        if(isRawInDir(option.inputFile)){
+            option.isRaw = true;
+        }else if(isJsonInDir(option.inputFile)){
             option.inputFile = getJsonInDir(option.inputFile);
         }else if (isXmlInDir(option.inputFile)){
             option.isXml=true;
@@ -143,11 +175,15 @@ public class Builder extends BaseCommand<BuildOptions> {
         }
         builder.run();
     }
-    private static boolean isXmlInDir(File dir){
-        File manifest=new File(dir, AndroidManifestBlock.FILE_NAME);
-        if(!manifest.isFile()){
-            manifest=new File(dir, AndroidManifestBlock.FILE_NAME_BIN);
+    private static boolean isRawInDir(File dir){
+        File file=new File(dir, AndroidManifestBlock.FILE_NAME_BIN);
+        if(!file.isFile()){
+            file = new File(dir, TableBlock.FILE_NAME);
         }
+        return file.isFile();
+    }
+    private static boolean isXmlInDir(File dir){
+        File manifest = new File(dir, AndroidManifestBlock.FILE_NAME);
         return manifest.isFile();
     }
     private static boolean isJsonInDir(File dir) {

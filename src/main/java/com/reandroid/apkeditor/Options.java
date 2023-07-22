@@ -77,7 +77,7 @@ public class Options {
         parseType(args, TYPE_JSON);
     }
     protected void parseType(String[] args, String def) throws ARGException {
-        String[] choices = new String[]{TYPE_JSON, TYPE_XML, TYPE_SIG};
+        String[] choices = new String[]{TYPE_JSON, TYPE_XML, TYPE_RAW, TYPE_SIG};
         this.type = parseType(ARG_type, args, choices, def);
     }
     protected void parseSignaturesDir(String[] args) throws ARGException {
@@ -238,6 +238,7 @@ public class Options {
 
     public static final String TYPE_SIG = "sig";
     public static final String TYPE_JSON = "json";
+    public static final String TYPE_RAW = "raw";
     public static final String TYPE_XML = "xml";
     public static final String TYPE_TEXT = "text";
 

@@ -188,7 +188,7 @@ public class DecompileOptions extends Options {
     private static final String ARG_split_resources="-split-json";
     private static final String ARG_DESC_split_resources="splits resources.arsc into multiple parts as per type entries (use this for large files)";
 
-    private static final String ARG_DESC_type = "Decode types: \n  1) json \n  2) xml \n  3) sig \n default=" + TYPE_XML;
+    private static final String ARG_DESC_type = "Decode types: \n  1) json \n  2) xml \n  3) raw \n  4) sig \n default=" + TYPE_XML;
 
 
     private static final String ARG_keep_res_path = "-keep-res-path";

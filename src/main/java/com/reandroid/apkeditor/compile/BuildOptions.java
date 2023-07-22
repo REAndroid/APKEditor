@@ -19,7 +19,6 @@ import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.Options;
 import com.reandroid.apkeditor.utils.StringHelper;
 import com.reandroid.commons.command.ARGException;
-import com.sun.org.apache.xpath.internal.Arg;
 
 import java.io.File;
 
@@ -27,6 +26,7 @@ public class BuildOptions extends Options {
     public boolean validateResDir;
     public String resDirName;
     public boolean isXml;
+    public boolean isRaw;
     public boolean noCache;
     public BuildOptions(){
     }
