@@ -48,6 +48,7 @@ public class SmaliDecompiler implements DexDecoder {
         File dir = toOutDir(inputSource, mainDir);
         BaksmaliOptions options = new BaksmaliOptions();
         options.localsDirective = true;
+        options.sequentialLabels = true;
         options.setCommentProvider(getComment());
         DexBackedDexFile dexFile = getInputDexFile(inputSource, options);
         Baksmali.disassembleDexFile(dexFile, dir, 1, options);
