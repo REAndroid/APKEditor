@@ -126,6 +126,13 @@ public class Main {
 
         StringHelper.printTwoColumns(builder, "  ", "  -  ", Options.PRINT_WIDTH, table);
 
+        builder.append("\n\n other options: \n");
+        table = new String[][]{
+                new String[]{" -h | -help | --help", "prints this help and exit"},
+                new String[]{"-version | --version", "prints version information of this tool and exit"}
+        };
+        StringHelper.printTwoColumns(builder, "  ", "   -   ", Options.PRINT_WIDTH, table);
+
         builder.append("\n\n run with <command> -h to get detailed help about each command\n");
 
         return builder.toString();
