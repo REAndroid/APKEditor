@@ -75,6 +75,8 @@ public class Info extends BaseCommand<InfoOptions> {
         AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
         printVersionCode(manifest);
         printVersionName(manifest);
+        printMinSdkVersion(manifest);
+        printTargetSdkVersion(manifest);
 
         printAppName(apkModule);
         printAppIcon(apkModule);
@@ -182,6 +184,20 @@ public class Info extends BaseCommand<InfoOptions> {
             return;
         }
         getInfoWriter().writeNameValue("VersionName" , manifest.getVersionName());
+    }
+    private void printMinSdkVersion(AndroidManifestBlock manifest) throws IOException {
+        InfoOptions options = getOptions();
+        if(!options.minSdkVersion || manifest == null){
+            return;
+        }
+        getInfoWriter().writeNameValue("MinSdkVersion" , manifest.getMinSdkVersion());
+    }
+    private void printTargetSdkVersion(AndroidManifestBlock manifest) throws IOException {
+        InfoOptions options = getOptions();
+        if(!options.targetSdkVersion || manifest == null){
+            return;
+        }
+        getInfoWriter().writeNameValue("TargetSdkVersion" , manifest.getTargetSdkVersion());
     }
     private void printAppName(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();
