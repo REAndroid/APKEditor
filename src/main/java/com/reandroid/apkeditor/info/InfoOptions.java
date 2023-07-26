@@ -30,6 +30,8 @@ public class InfoOptions extends Options {
     public boolean packageName = true;
     public boolean versionCode = true;
     public boolean versionName = true;
+    public boolean minSdkVersion = true;
+    public boolean targetSdkVersion = true;
     public boolean appName = true;
     public boolean appIcon = true;
     public boolean appRoundIcon = true;
@@ -64,6 +66,8 @@ public class InfoOptions extends Options {
         packageName = containsArg(ARG_package, args, packageName);
         versionCode = containsArg(ARG_version_code, args, versionCode);
         versionName = containsArg(ARG_version_name, args, versionName);
+        minSdkVersion = containsArg(ARG_min_sdk_version, args, minSdkVersion);
+        targetSdkVersion = containsArg(ARG_target_sdk_version, args, targetSdkVersion);
         appName = containsArg(ARG_app_name, args, appName);
         appIcon = containsArg(ARG_app_icon, args, appIcon);
         appRoundIcon = containsArg(ARG_app_round_icon, args, appRoundIcon);
@@ -120,6 +124,8 @@ public class InfoOptions extends Options {
             packageName = false;
             versionCode = false;
             versionName = false;
+            minSdkVersion = false;
+            targetSdkVersion = false;
             appName = false;
             appIcon = false;
             appRoundIcon = false;
@@ -164,6 +170,8 @@ public class InfoOptions extends Options {
                 new String[]{ARG_package, ARG_DESC_package},
                 new String[]{ARG_version_code, ARG_DESC_version_code},
                 new String[]{ARG_version_name, ARG_DESC_version_name},
+                new String[]{ARG_min_sdk_version, ARG_DESK_min_sdk_version},
+                new String[]{ARG_target_sdk_version, ARG_DESK_target_sdk_version},
                 new String[]{ARG_app_name, ARG_DESC_app_name},
                 new String[]{ARG_app_icon, ARG_DESC_app_icon},
                 new String[]{ARG_app_round_icon, ARG_DESC_app_round_icon},
@@ -224,6 +232,10 @@ public class InfoOptions extends Options {
     private static final String ARG_DESC_version_code = "App version code.";
     private static final String ARG_version_name = "-version-name";
     private static final String ARG_DESC_version_name = "App version name.";
+    private static final String ARG_min_sdk_version = "-min-sdk-version";
+    private static final String ARG_DESK_min_sdk_version = "Minimum SDK version";
+    private static final String ARG_target_sdk_version = "-target-sdk-version";
+    private static final String ARG_DESK_target_sdk_version = "Target SDK version";
 
     private static final String ARG_app_name = "-app-name";
     private static final String ARG_DESC_app_name = "App name. If verbose mode, prints all configurations.";
