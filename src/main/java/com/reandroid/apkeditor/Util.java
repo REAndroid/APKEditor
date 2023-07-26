@@ -35,6 +35,20 @@ public class Util {
         }
         return isHelp(args[0]);
     }
+    public static boolean isVersion(String[] args){
+        if(isEmpty(args)){
+            return false;
+        }
+        return isVersion(args[0]);
+    }
+    public static boolean isVersion(String command){
+        if(isEmpty(command)){
+            return false;
+        }
+        command = command.toLowerCase().trim();
+        return command.equals("-version")
+                ||command.equals("--version");
+    }
     public static boolean containsHelp(String[] args){
         if(isEmpty(args)){
             return false;

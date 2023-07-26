@@ -23,6 +23,7 @@ import com.reandroid.apkeditor.merge.Merger;
 import com.reandroid.apkeditor.protect.Protector;
 import com.reandroid.apkeditor.refactor.Refactor;
 import com.reandroid.apkeditor.utils.StringHelper;
+import com.reandroid.arsc.BuildInfo;
 import com.reandroid.arsc.coder.xml.XmlEncodeException;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.xmlencoder.EncodeException;
@@ -30,23 +31,31 @@ import com.reandroid.apk.xmlencoder.EncodeException;
 import java.io.IOException;
 
 public class Main {
+
     public static void main(String[] args){
         int result = execute(args);
         System.exit(result);
     }
+
     /**
      * If you are running inside java application, use this method to
      * avoid unwanted System.exit()
      *
      * Returns 0 - executed successfully
-     * Returns 1 - error or help
+     * Returns 1 - error
+     * Returns 2 - non executing commands like help, version
      *
      * */
+
     public static int execute(String[] args){
         args = Util.trimNull(args);
         if(Util.isHelp(args) || args == null){
             System.err.println(getHelp());
-            return 1;
+            return 2;
+        }
+        if(Util.isVersion(args)){
+            System.err.println(getVersion());
+            return 2;
         }
         String command = getCommand(args);
         args = Util.trimNull(args);
@@ -121,14 +130,18 @@ public class Main {
 
         return builder.toString();
     }
+    private static String getVersion(){
+        return APKEditor.getName() +
+                " version " + APKEditor.getVersion() +
+                ", " + BuildInfo.getName() +
+                " version " + BuildInfo.getVersion();
+    }
     private static String getWelcome(){
-        StringBuilder builder=new StringBuilder();
-        builder.append(APKEditor.getName());
-        builder.append(" - ").append(APKEditor.getVersion());
-        builder.append("\nUsing: ").append(APKEditor.getARSCLibInfo());
-        builder.append("\n").append(APKEditor.getRepo());
-        builder.append("\n").append(APKEditor.getDescription());
-        return builder.toString();
+        return APKEditor.getName() +
+                " - " + APKEditor.getVersion() +
+                "\nUsing: " + APKEditor.getARSCLibInfo() +
+                "\n" + APKEditor.getRepo() +
+                "\n" + APKEditor.getDescription();
     }
     private static String getCommand(String[] args){
         String cmd=args[0];
