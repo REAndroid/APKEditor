@@ -23,6 +23,7 @@ import com.reandroid.apkeditor.merge.Merger;
 import com.reandroid.apkeditor.protect.Protector;
 import com.reandroid.apkeditor.refactor.Refactor;
 import com.reandroid.apkeditor.utils.StringHelper;
+import com.reandroid.arsc.coder.xml.XmlEncodeException;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.xmlencoder.EncodeException;
 
@@ -30,34 +31,41 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args){
-        args=Util.trimNull(args);
-        if(Util.isHelp(args)){
+        int result = execute(args);
+        System.exit(result);
+    }
+    /**
+     * If you are running inside java application, use this method to
+     * avoid unwanted System.exit()
+     *
+     * Returns 0 - executed successfully
+     * Returns 1 - error or help
+     *
+     * */
+    public static int execute(String[] args){
+        args = Util.trimNull(args);
+        if(Util.isHelp(args) || args == null){
             System.err.println(getHelp());
-            return;
+            return 1;
         }
-        String command=getCommand(args);
-        args=Util.trimNull(args);
+        String command = getCommand(args);
+        args = Util.trimNull(args);
+        int result = 1;
         try {
             execute(command, args);
+            result = 0;
         } catch (ARGException ex1) {
             System.err.flush();
             System.err.println(ex1.getMessage());
-            System.exit(1);
-        }catch (EncodeException ex) {
+        }catch (EncodeException | XmlEncodeException ex) {
             System.err.flush();
             System.err.println("\nERROR:\n"+ex.getMessage());
-            System.exit(1);
         } catch (IOException ex2) {
             System.err.flush();
-            System.err.println("\nERROR:\n"+ex2.getMessage());
+            System.err.println("\nERROR:");
             ex2.printStackTrace(System.err);
-            System.exit(1);
-        }catch (Exception ex3) {
-            System.err.flush();
-            System.err.println("\nUnexpected error:\n"+ex3.getMessage());
-            ex3.printStackTrace(System.err);
-            System.exit(1);
         }
+        return result;
     }
     private static void execute(String command, String[] args) throws ARGException, IOException {
         if(Decompiler.isCommand(command)){
