@@ -135,24 +135,22 @@ public class Merger extends BaseCommand<MergerOptions> {
         }
         AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
         logMessage("Sanitizing manifest ...");
-        boolean removed = AndroidManifestHelper.removeApplicationAttribute(manifest,
-                AndroidManifestBlock.ID_extractNativeLibs);
-        if(removed){
-            logMessage("Removed: "+AndroidManifestBlock.NAME_extractNativeLibs);
-        }
-        removed = AndroidManifestHelper.removeApplicationAttribute(manifest,
-                AndroidManifestBlock.ID_isSplitRequired);
-        if(removed){
-            logMessage("Removed: "+AndroidManifestBlock.NAME_isSplitRequired);
-        }
+        AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
+                AndroidManifestBlock.ID_extractNativeLibs,
+                this, AndroidManifestBlock.NAME_extractNativeLibs);
+        AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
+                AndroidManifestBlock.ID_isSplitRequired,
+                this, AndroidManifestBlock.NAME_isSplitRequired);
         ResXmlElement application = manifest.getApplicationElement();
-        List<ResXmlElement> splitMetaDataElements=AndroidManifestHelper.listSplitRequired(application);
-        boolean splits_removed=false;
-        for(ResXmlElement meta:splitMetaDataElements){
+        List<ResXmlElement> splitMetaDataElements =
+                AndroidManifestHelper.listSplitRequired(application);
+        boolean splits_removed = false;
+        for(ResXmlElement meta : splitMetaDataElements){
             if(!splits_removed){
-                splits_removed=removeSplitsTableEntry(meta, apkModule);
+                splits_removed = removeSplitsTableEntry(meta, apkModule);
             }
-            logMessage("Removed: "+meta.toString());
+            logMessage("Removed-element : <" + meta.getName() + "> name=\""
+                    + AndroidManifestHelper.getNamedValue(meta) + "\"");
             application.removeElement(meta);
         }
         manifest.refresh();
@@ -193,7 +191,7 @@ public class Merger extends BaseCommand<MergerOptions> {
                 continue;
             }
             String path = resValue.getValueAsString();
-            logMessage("Removed from table: "+path);
+            logMessage("Removed-table-entry : "+path);
             //Remove file entry
             zipEntryMap.remove(path);
             // It's not safe to destroy entry, resource id might be used in dex code.
