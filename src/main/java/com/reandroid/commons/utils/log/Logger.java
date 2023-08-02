@@ -224,27 +224,19 @@ public abstract class Logger {
         getLogger().every2SecondSameLine(msg);
     }
 
-    String trimConsoleWidth(String msg){
-        checkConsoleWidth();
-        int width = mConsoleWidth;
-        if(msg.length() > width){
-            msg = msg.substring(0, width);
-        }
-        return msg;
-    }
-    private void checkConsoleWidth(){
+    int checkConsoleWidth(){
         if(mConsoleWidth == 0){
             updateConsoleWidth();
-            return;
+            return mConsoleWidth;
         }
         Boolean succeedOnce = ConsoleUtil.getSucceedOnce();
         if(succeedOnce != null && !succeedOnce){
-            return;
+            return mConsoleWidth;
         }
-        if(!widthCheckTime.isExpired(UPDATE_CONSOLE_INTERVAL)){
-            return;
+        if(widthCheckTime.isExpired(UPDATE_CONSOLE_INTERVAL)){
+            updateConsoleWidth();
         }
-        updateConsoleWidth();
+        return mConsoleWidth;
     }
     private void updateConsoleWidth(){
         widthCheckTime.reset();

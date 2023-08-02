@@ -7,7 +7,6 @@ public class StdLogger extends Logger{
     private final Object mLock=new Object();
     private final PrintStream printStream;
     private boolean mSameLine;
-    private int lastLineLen;
     private StdLogger() {
         super();
         this.printStream=System.err;
@@ -18,34 +17,36 @@ public class StdLogger extends Logger{
             if(line==null){
                 line="null";
             }
-            PrintStream stream=printStream;
             if(mSameLine){
-                stream.print('\n');
-                mSameLine=false;
+                writeSameLine(" ");
+                mSameLine = false;
             }
-            stream.println(line);
+            printStream.println(line);
         }
     }
     @Override
     public void writeSameLine(String line) {
         synchronized (mLock){
-            if(line==null){
-                line="null";
+            if(line == null){
+                line = "null";
             }
-            line = trimConsoleWidth(line);
-            PrintStream stream=printStream;
-            stream.print('\r');
-            if(!mSameLine){
-                mSameLine=true;
+            mSameLine = true;
+            int width = checkConsoleWidth();
+            StringBuilder builder = new StringBuilder();
+            builder.append('\r');
+            for(int i = 0; i < width; i++){
+                builder.append(' ');
             }
-            int max=lastLineLen;
-            for(int i=0;i<max;i++){
-                stream.print(' ');
+            builder.append('\r');
+            // leave space for blinking cursor;
+            width = width - 1;
+            builder.append(' ');
+            if(line.length() > width){
+                line = line.substring(0, width);
             }
-            stream.print('\r');
-            stream.print(line);
-            stream.print('\r');
-            lastLineLen=line.length();
+            builder.append(line);
+            builder.append('\r');
+            printStream.print(builder.toString());
         }
     }
     static StdLogger getInstance(){
