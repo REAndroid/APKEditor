@@ -73,7 +73,10 @@ public class SmaliCompiler implements DexEncoder {
         if(smaliOptions.jobs <= 0){
             smaliOptions.jobs = 1;
         }
-        Smali.assemble(smaliOptions, classesDir.getAbsolutePath());
+        boolean success = Smali.assemble(smaliOptions, classesDir.getAbsolutePath());
+        if(!success){
+            throw new IOException("Failed to build smali, check the logs");
+        }
         return new FileInputSource(dexCacheFile, dexCacheFile.getName());
     }
     private boolean isModified(File classesDir, File dexCacheFile){
