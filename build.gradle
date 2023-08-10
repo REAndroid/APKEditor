@@ -1,5 +1,5 @@
 
-apply plugin: 'java'
+apply plugin: 'application'
 
 group 'com.reandroid.apkeditor'
 version '1.2.8'
@@ -22,10 +22,10 @@ repositories {
 
 dependencies {
     //implementation("io.github.reandroid:ARSCLib:+")
-    compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
+    implementation(files("$rootProject.projectDir/libs/ARSCLib.jar"))
 
     // built from: https://github.com/REAndroid/smali-lib
-    compile(files("$rootProject.projectDir/libs/smali.jar"))
+    implementation(files("$rootProject.projectDir/libs/smali.jar"))
 }
 
 processResources {
@@ -42,7 +42,17 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 
-task fatJar(type: Jar) {
+application {
+    mainClass = 'com.reandroid.apkeditor.Main'
+}
+
+tasks.named('run') {
+    // run from root directory
+    // otherwise run from brut.apktool/apktool-cli
+    workingDir = file(System.getProperty('user.dir'))
+}
+
+tasks.register('fatJar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes(
