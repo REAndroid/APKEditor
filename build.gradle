@@ -47,8 +47,6 @@ application {
 }
 
 tasks.named('run') {
-    // run from root directory
-    // otherwise run from brut.apktool/apktool-cli
     workingDir = file(System.getProperty('user.dir'))
 }
 
