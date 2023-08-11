@@ -59,7 +59,7 @@ tasks.register('fatJar', Jar) {
                 'Main-Class': 'com.reandroid.apkeditor.Main'
         )
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
