@@ -20,6 +20,7 @@ import com.reandroid.apk.ApkModuleEncoder;
 import com.reandroid.apk.DexEncoder;
 import com.reandroid.archive.FileInputSource;
 import com.reandroid.archive.InputSource;
+import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.utils.StringsUtil;
 import org.jf.smali.Smali;
 import org.jf.smali.SmaliOptions;
@@ -32,6 +33,7 @@ import java.util.List;
 public class SmaliCompiler implements DexEncoder {
     private APKLogger apkLogger;
     private final boolean noCache;
+    private Integer minSdkVersion;
     public SmaliCompiler(boolean noCache){
         this.noCache = noCache;
     }
@@ -40,6 +42,10 @@ public class SmaliCompiler implements DexEncoder {
         File smaliDir = new File(mainDir, "smali");
         if(!smaliDir.isDirectory()){
             return null;
+        }
+        AndroidManifestBlock manifestBlock =  apkModuleEncoder.getApkModule().getAndroidManifestBlock();
+        if (manifestBlock != null) {
+            this.minSdkVersion = manifestBlock.getMinSdkVersion();
         }
         List<InputSource> results = new ArrayList<>();
         List<File> classesDirList = listClassesDirectories(smaliDir);
@@ -72,6 +78,9 @@ public class SmaliCompiler implements DexEncoder {
         smaliOptions.outputDexFile = dexCacheFile.getAbsolutePath();
         if(smaliOptions.jobs <= 0){
             smaliOptions.jobs = 1;
+        }
+        if (this.minSdkVersion != null) {
+            smaliOptions.apiLevel = this.minSdkVersion.intValue();
         }
         boolean success = Smali.assemble(smaliOptions, classesDir.getAbsolutePath());
         if(!success){
