@@ -34,7 +34,6 @@ import java.util.List;
 
 public class InfoWriterXml extends InfoWriter{
     private KXmlSerializer mSerializer;
-    private String mRootTag = TAG_INFO;
     private int mIndent;
     public InfoWriterXml(Writer writer) {
         super(writer);
@@ -226,16 +225,7 @@ public class InfoWriterXml extends InfoWriter{
         serializer.attribute(null, "name", first.getName());
         level = level + 2;
         for(Entry entry : entryList){
-            String config = entry.getResConfig().getQualifiers();
-            if(config.length() == 0){
-                config = "default";
-            }
-            String text = getValueAsString(entry);
-            writeIndent(serializer, level);
-            serializer.startTag(null, "item");
-            serializer.attribute(null, "config", config);
-            serializer.text(text);
-            serializer.endTag(null, "item");
+            writeEntry(entry);
         }
         level = level - 2;
         writeIndent(serializer, level);
@@ -289,7 +279,7 @@ public class InfoWriterXml extends InfoWriter{
         KXmlSerializer serializer = this.mSerializer;
         if(serializer != null){
             writeIndent(serializer, 0);
-            serializer.endTag(null, mRootTag);
+            serializer.endTag(null, TAG_INFO);
             serializer.endDocument();
             writeIndent(serializer, 0);
             serializer.flush();
@@ -312,7 +302,7 @@ public class InfoWriterXml extends InfoWriter{
         serializer.setOutput(getWriter());
         serializer.startDocument("utf-8", null);
         writeIndent(serializer, 0);
-        serializer.startTag(null, mRootTag);
+        serializer.startTag(null, TAG_INFO);
         mSerializer = serializer;
         return serializer;
     }

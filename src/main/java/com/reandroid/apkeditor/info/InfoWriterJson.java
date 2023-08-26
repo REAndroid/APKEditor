@@ -161,10 +161,7 @@ public class InfoWriterJson extends InfoWriter{
                 .array();
 
         for(Entry entry : entryList){
-            jsonWriter.object()
-                    .key("config").value(entry.getResConfig().getQualifiers())
-                    .key("value").value(getValueAsString(entry))
-                    .endObject();
+            writeEntry(entry);
         }
         jsonWriter.endArray()
                 .endObject();

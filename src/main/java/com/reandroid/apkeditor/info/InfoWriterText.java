@@ -122,7 +122,7 @@ public class InfoWriterText extends InfoWriter{
         Writer writer = getWriter();
         ResValueMapArray mapArray = entry.getResValueMapArray();
         writer.write(" size=");
-        writer.write(Integer.toString(mapArray.childesCount()));
+        writer.write(Integer.toString(mapArray.getCount()));
         writer.write(" parent=");
         writer.write(HexUtil.toHex8(((ResTableMapEntry)entry.getTableEntry()).getParentId()));
         writer.write("\n");
@@ -187,16 +187,9 @@ public class InfoWriterText extends InfoWriter{
         int index = 0;
         for(Entry entry : entryList){
             index++;
-            String config = entry.getResConfig().getQualifiers();
-            if(config.length() == 0){
-                config = "default";
-            }
             writer.write(ARRAY_TAB);
-            writer.write(config);
-            writer.write("  \"");
-            String text = getValueAsString(entry);
-            writer.write(text);
-            writer.write("\"\n");
+            writeEntry(entry);
+            writer.write("\n");
             if((index % 3) == 0){
                 writer.flush();
             }
