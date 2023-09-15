@@ -23,7 +23,7 @@ import com.reandroid.apkeditor.merge.Merger;
 import com.reandroid.apkeditor.protect.Protector;
 import com.reandroid.apkeditor.refactor.Refactor;
 import com.reandroid.apkeditor.utils.StringHelper;
-import com.reandroid.arsc.BuildInfo;
+import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.coder.xml.XmlEncodeException;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.xmlencoder.EncodeException;
@@ -140,8 +140,8 @@ public class Main {
     private static String getVersion(){
         return APKEditor.getName() +
                 " version " + APKEditor.getVersion() +
-                ", " + BuildInfo.getName() +
-                " version " + BuildInfo.getVersion();
+                ", " + ARSCLib.getName() +
+                " version " + ARSCLib.getVersion();
     }
     private static String getWelcome(){
         return APKEditor.getName() +

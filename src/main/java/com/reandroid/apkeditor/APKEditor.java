@@ -15,7 +15,7 @@
   */
 package com.reandroid.apkeditor;
 
-import com.reandroid.arsc.BuildInfo;
+import com.reandroid.arsc.ARSCLib;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.Properties;
 public class APKEditor {
     private static Properties sProperties;
     public static String getARSCLibInfo(){
-        return BuildInfo.getName()+"-"+BuildInfo.getVersion();
+        return ARSCLib.getName() + "-" + ARSCLib.getVersion();
     }
     public static String getDescription(){
         return getProperties().getProperty("app.description", "---");
