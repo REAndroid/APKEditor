@@ -227,6 +227,8 @@ public class Options {
     protected static final String ARG_DESC_force="force delete output path";
     protected static final String ARG_cleanMeta = "-clean-meta";
     protected static final String ARG_DESC_cleanMeta = "cleans META-INF directory along with signature block";
+    protected static final String ARG_keepExtractNativeLibs = "-keep-extractnativelibs";
+    protected static final String ARG_DESC_keepExtractNativeLibs = "keeps android:ExtractNativeLibs during manifest sanitation";
 
     protected static final String ARG_sig = "-sig";
     protected static final String ARG_DESC_sig = "signatures directory path";

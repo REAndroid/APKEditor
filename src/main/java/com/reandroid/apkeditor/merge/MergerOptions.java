@@ -25,6 +25,7 @@ import java.io.File;
 public class MergerOptions extends Options {
     public boolean validateResDir;
     public boolean cleanMeta;
+    public boolean keepExtractNativeLibs;
     public String resDirName;
     public MergerOptions(){
         super();
@@ -36,6 +37,7 @@ public class MergerOptions extends Options {
         parseResDirName(args);
         parseValidateResDir(args);
         parseCleanMeta(args);
+        parseKeepExtractNativeLibs(args);
         super.parse(args);
     }
     private void parseValidateResDir(String[] args) throws ARGException {
@@ -54,6 +56,9 @@ public class MergerOptions extends Options {
             file=getOutputApkFromInput(inputFile);
         }
         this.outputFile=file;
+    }
+    private void parseKeepExtractNativeLibs(String[] args) throws ARGException {
+        this.keepExtractNativeLibs=containsArg(ARG_keepExtractNativeLibs, false, args);
     }
     private File getOutputApkFromInput(File file){
         String name = file.getName();
@@ -96,6 +101,9 @@ public class MergerOptions extends Options {
         if(cleanMeta){
             builder.append("\n Keep meta: true");
         }
+        if(keepExtractNativeLibs){
+            builder.append("\n Keep android:extractNativeLibs: true");
+        }
         builder.append("\n ---------------------------- ");
         return builder.toString();
     }
@@ -112,7 +120,8 @@ public class MergerOptions extends Options {
         builder.append("\nFlags:\n");
         table=new String[][]{
                 new String[]{ARG_force, ARG_DESC_force},
-                new String[]{ARG_cleanMeta, ARG_DESC_cleanMeta}
+                new String[]{ARG_cleanMeta, ARG_DESC_cleanMeta},
+                new String[]{ARG_keepExtractNativeLibs, ARG_DESC_keepExtractNativeLibs}
         };
         StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         String jar = APKEditor.getJarName();

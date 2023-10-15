@@ -80,7 +80,7 @@ public class Merger extends BaseCommand<MergerOptions> {
             logMessage("Clearing META-INF ...");
             clearMeta(mergedModule);
         }
-        sanitizeManifest(mergedModule);
+        sanitizeManifest(mergedModule, options.keepExtractNativeLibs);
         Util.addApkEditorInfo(mergedModule, getClass().getSimpleName());
         String message = mergedModule.refreshTable();
         if(message != null){
@@ -129,15 +129,17 @@ public class Merger extends BaseCommand<MergerOptions> {
         tmp = Util.ensureUniqueFile(tmp);
         return tmp;
     }
-    private void sanitizeManifest(ApkModule apkModule) {
+    private void sanitizeManifest(ApkModule apkModule, boolean keepExtractNativeLibs) {
         if(!apkModule.hasAndroidManifestBlock()){
             return;
         }
         AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
         logMessage("Sanitizing manifest ...");
-        AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                AndroidManifestBlock.ID_extractNativeLibs,
-                this, AndroidManifestBlock.NAME_extractNativeLibs);
+        if (!keepExtractNativeLibs) {
+             AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
+                    AndroidManifestBlock.ID_extractNativeLibs,
+                    this, AndroidManifestBlock.NAME_extractNativeLibs);
+        }
         AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
                 AndroidManifestBlock.ID_isSplitRequired,
                 this, AndroidManifestBlock.NAME_isSplitRequired);
