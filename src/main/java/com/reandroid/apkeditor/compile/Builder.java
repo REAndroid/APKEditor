@@ -19,13 +19,13 @@ import com.reandroid.apk.*;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.smali.SmaliCompiler;
+import com.reandroid.app.AndroidManifest;
 import com.reandroid.archive.ArchiveFile;
 import com.reandroid.archive.block.ApkSignatureBlock;
 import com.reandroid.archive.writer.ApkFileWriter;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.coder.xml.XmlCoder;
 import com.reandroid.commons.command.ARGException;
-import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 
 import java.io.File;
 import java.io.IOException;
@@ -176,14 +176,14 @@ public class Builder extends BaseCommand<BuildOptions> {
         builder.run();
     }
     private static boolean isRawInDir(File dir){
-        File file=new File(dir, AndroidManifestBlock.FILE_NAME_BIN);
+        File file=new File(dir, AndroidManifest.FILE_NAME_BIN);
         if(!file.isFile()){
             file = new File(dir, TableBlock.FILE_NAME);
         }
         return file.isFile();
     }
     private static boolean isXmlInDir(File dir){
-        File manifest = new File(dir, AndroidManifestBlock.FILE_NAME);
+        File manifest = new File(dir, AndroidManifest.FILE_NAME);
         return manifest.isFile();
     }
     private static boolean isJsonInDir(File dir) {
@@ -220,11 +220,7 @@ public class Builder extends BaseCommand<BuildOptions> {
         if(!dir.isDirectory()){
             return false;
         }
-        File manifest=new File(dir,AndroidManifestBlock.FILE_NAME+".json");
-        if(manifest.isFile()){
-            return true;
-        }
-        File file=new File(dir, "AndroidManifest.xml.json");
+        File file = new File(dir, AndroidManifest.FILE_NAME_JSON);
         return file.isFile();
     }
     public static boolean isCommand(String command){

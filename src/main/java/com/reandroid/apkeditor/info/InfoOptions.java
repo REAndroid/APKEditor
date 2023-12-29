@@ -41,6 +41,7 @@ public class InfoOptions extends Options {
     public final List<String> resList;
     public boolean resources = false;
     public final List<String> typeFilterList;
+    public boolean dex = false;
     public InfoOptions(){
         super();
         this.resList = new ArrayList<>();
@@ -75,6 +76,7 @@ public class InfoOptions extends Options {
         appClass = containsArg(ARG_app_class, args, appClass);
         activities = containsArg(ARG_activities, args, activities);
         resources = containsArg(ARG_resources, args, false);
+        dex = containsArg(ARG_dex, args, false);
 
 
 
@@ -132,6 +134,7 @@ public class InfoOptions extends Options {
             permissions = false;
             activities = false;
             appClass = false;
+            dex = false;
         }
     }
     private void parseInput(String[] args) throws ARGException {
@@ -179,6 +182,8 @@ public class InfoOptions extends Options {
                 new String[]{ARG_permissions, ARG_DESC_permissions},
                 new String[]{ARG_activities, ARG_DESC_activities},
                 new String[]{ARG_resources, ARG_DESC_resources},
+                new String[]{"  ", "  "},
+                new String[]{ARG_dex, ARG_DESC_dex},
                 new String[]{"  ", "  "},
                 new String[]{ARG_ALL_help, ARG_DESC_help}
         };
@@ -265,6 +270,9 @@ public class InfoOptions extends Options {
     private static final String ARG_DESC_filter_type = "Prints only the specified resource type names" +
             "\n  *This applies only when flag '-resources' used." +
             "\n  *Can be multiple";
+
+    private static final String ARG_dex = "-dex";
+    private static final String ARG_DESC_dex = "Prints dex information";
 
 
     private static final String[] availableTypes = new String[]{TYPE_TEXT, TYPE_JSON, TYPE_XML};

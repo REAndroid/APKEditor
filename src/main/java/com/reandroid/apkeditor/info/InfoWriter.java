@@ -19,6 +19,8 @@ import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
+import com.reandroid.dex.model.DexDirectory;
+import com.reandroid.dex.model.DexFile;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.arsc.value.*;
 
@@ -40,6 +42,12 @@ public abstract class InfoWriter implements Closeable {
             writeResources(resourceEntry, writeEntries);
         }
     }
+    public void writeDexInfo(DexDirectory dexDirectory) throws IOException {
+        for(DexFile dexFile : dexDirectory){
+            writeDexInfo(dexFile, true);
+        }
+    }
+    public abstract void writeDexInfo(DexFile dexFile, boolean writeSectionInfo) throws IOException;
     public abstract void writeResources(ResourceEntry resourceEntry, boolean writeEntries) throws IOException;
     public abstract void writePackageNames(Collection<PackageBlock> packageBlocks) throws IOException;
     public abstract void writeEntries(String name, List<Entry> entryList) throws IOException;

@@ -43,9 +43,12 @@ public class SmaliCompiler implements DexEncoder {
         if(!smaliDir.isDirectory()){
             return null;
         }
-        AndroidManifestBlock manifestBlock =  apkModuleEncoder.getApkModule().getAndroidManifestBlock();
+        AndroidManifestBlock manifestBlock =  apkModuleEncoder.getApkModule().getAndroidManifest();
         if (manifestBlock != null) {
             this.minSdkVersion = manifestBlock.getMinSdkVersion();
+        }
+        if(minSdkVersion == null){
+            minSdkVersion = 30;
         }
         List<InputSource> results = new ArrayList<>();
         List<File> classesDirList = listClassesDirectories(smaliDir);

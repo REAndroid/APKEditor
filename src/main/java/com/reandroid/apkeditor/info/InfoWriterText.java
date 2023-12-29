@@ -23,6 +23,10 @@ import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.arsc.value.ResValueMap;
+import com.reandroid.dex.model.DexFile;
+import com.reandroid.dex.sections.MapItem;
+import com.reandroid.dex.sections.MapList;
+import com.reandroid.dex.sections.Marker;
 import com.reandroid.utils.HexUtil;
 
 import java.io.IOException;
@@ -36,6 +40,33 @@ public class InfoWriterText extends InfoWriter{
         super(writer);
     }
 
+
+    @Override
+    public void writeDexInfo(DexFile dexFile, boolean writeSectionInfo) throws IOException {
+        Writer writer = getWriter();
+        writer.write("\n");
+        writeNameValue("Name", dexFile.getFileName());
+        writeNameValue("Version", dexFile.getVersion());
+        List<Marker> markersList = dexFile.getMarkers();
+        if(markersList.size() != 0){
+            writer.write("Markers:");
+            for(Marker marker : markersList){
+                writer.write("\n");
+                writer.write(ARRAY_TAB);
+                writer.write(marker.toString());
+            }
+        }
+        writer.write("\n");
+        MapList mapList = dexFile.getDexLayout().getMapList();
+        writer.write("Sections:");
+        for(MapItem mapItem : mapList){
+            writer.write("\n");
+            writer.write(ARRAY_TAB);
+            writer.write(mapItem.toString());
+        }
+        writer.write("\n");
+        writer.flush();
+    }
     @Override
     public void writeResources(PackageBlock packageBlock, List<String> typeFilters, boolean writeEntries) throws IOException {
         Writer writer = getWriter();
@@ -138,7 +169,7 @@ public class InfoWriterText extends InfoWriter{
             writer.write(name);
             writer.write("(");
         }
-        writer.write(HexUtil.toHex8(resValueMap.getNameResourceID()));
+        writer.write(HexUtil.toHex8(resValueMap.getNameId()));
         if(name != null){
             writer.write(")");
         }

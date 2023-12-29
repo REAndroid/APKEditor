@@ -23,6 +23,8 @@ import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.arsc.value.ResValueMap;
+import com.reandroid.dex.model.DexFile;
+import com.reandroid.dex.sections.Marker;
 import com.reandroid.json.JSONWriter;
 
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.util.List;
 
 public class InfoWriterJson extends InfoWriter{
     private final JSONWriter mJsonWriter;
+
     public InfoWriterJson(Writer writer) {
         super(writer);
         JSONWriter jsonWriter = new JSONWriter(writer);
@@ -40,6 +43,18 @@ public class InfoWriterJson extends InfoWriter{
         this.mJsonWriter = jsonWriter;
     }
 
+    @Override
+    public void writeDexInfo(DexFile dexFile, boolean writeSectionInfo) throws IOException {
+        JSONWriter jsonWriter = mJsonWriter.object()
+                .key("name").value(dexFile.getFileName())
+                .key("version").value(dexFile.getVersion())
+                .key("markers").array();
+        List<Marker> markersList = dexFile.getMarkers();
+        for(Marker marker : markersList){
+            jsonWriter.value(marker.getJsonObject());
+        }
+        jsonWriter.endArray().endObject();
+    }
     @Override
     public void writeResources(PackageBlock packageBlock, List<String> typeFilters, boolean writeEntries) throws IOException {
         packageBlock.sortTypes();
@@ -126,7 +141,7 @@ public class InfoWriterJson extends InfoWriter{
     private void writeValueMap(ResValueMap resValueMap){
         mJsonWriter.object()
                 .key("name").value(resValueMap.decodeName())
-                .key("id").value(resValueMap.getNameResourceID())
+                .key("id").value(resValueMap.getNameId())
                 .key("value").value(getValueAsString(resValueMap))
                 .endObject();
     }

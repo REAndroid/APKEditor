@@ -16,6 +16,7 @@
 package com.reandroid.apkeditor.common;
 
 import com.reandroid.apk.APKLogger;
+import com.reandroid.app.AndroidManifest;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
@@ -34,7 +35,7 @@ public class AndroidManifestHelper {
             return EmptyList.of();
         }
         return CollectionUtil.toList(parentElement.getElements(element -> {
-            if(!element.equalsName(AndroidManifestBlock.TAG_meta_data)){
+            if(!element.equalsName(AndroidManifest.TAG_meta_data)){
                 return false;
             }
             ResXmlAttribute nameAttribute = CollectionUtil.getFirst(element
@@ -65,7 +66,7 @@ public class AndroidManifestHelper {
         }
         int removed = manifestElement.removeAttributesWithId(resourceId);
         ResXmlElement applicationElement = manifestElement.getElementByTagName(
-                AndroidManifestBlock.TAG_application);
+                AndroidManifest.TAG_application);
         if(removed > 1){
             if(logger != null){
                 logger.logMessage("Duplicate attributes on <manifest> removed: "
@@ -109,8 +110,8 @@ public class AndroidManifestHelper {
         return attribute.decodeValue();
     }
     static boolean isNameResourceId(ResXmlAttribute attribute){
-        int resourceId = attribute.getNameResourceID();
-        return resourceId == AndroidManifestBlock.ID_name;
+        int resourceId = attribute.getNameId();
+        return resourceId == AndroidManifest.ID_name;
     }
     static final Predicate<ResXmlAttribute> NAME_FILTER = attribute -> {
         if(!isNameResourceId(attribute)){

@@ -72,7 +72,7 @@ public class Protector extends BaseCommand<ProtectorOptions> {
             return;
         }
         logMessage("Confusing AndroidManifest ...");
-        AndroidManifestBlock manifestBlock = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifestBlock = apkModule.getAndroidManifest();
         manifestBlock.setAttributesUnitSize(24, true);
         manifestBlock.refresh();
     }

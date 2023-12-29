@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.merge;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
+import com.reandroid.app.AndroidManifest;
 import com.reandroid.archive.ZipEntryMap;
 import com.reandroid.archive.ArchiveEntry;
 import com.reandroid.archive.ArchiveFile;
@@ -130,17 +131,17 @@ public class Merger extends BaseCommand<MergerOptions> {
         return tmp;
     }
     private void sanitizeManifest(ApkModule apkModule) {
-        if(!apkModule.hasAndroidManifestBlock()){
+        if(!apkModule.hasAndroidManifest()){
             return;
         }
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         logMessage("Sanitizing manifest ...");
         AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                AndroidManifestBlock.ID_extractNativeLibs,
-                this, AndroidManifestBlock.NAME_extractNativeLibs);
+                AndroidManifest.ID_extractNativeLibs,
+                this, AndroidManifest.NAME_extractNativeLibs);
         AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
-                AndroidManifestBlock.ID_isSplitRequired,
-                this, AndroidManifestBlock.NAME_isSplitRequired);
+                AndroidManifest.ID_isSplitRequired,
+                this, AndroidManifest.NAME_isSplitRequired);
         ResXmlElement application = manifest.getApplicationElement();
         List<ResXmlElement> splitMetaDataElements =
                 AndroidManifestHelper.listSplitRequired(application);
@@ -156,7 +157,7 @@ public class Merger extends BaseCommand<MergerOptions> {
         manifest.refresh();
     }
     private boolean removeSplitsTableEntry(ResXmlElement metaElement, ApkModule apkModule) {
-        ResXmlAttribute nameAttribute = metaElement.searchAttributeByResourceId(AndroidManifestBlock.ID_name);
+        ResXmlAttribute nameAttribute = metaElement.searchAttributeByResourceId(AndroidManifest.ID_name);
         if(nameAttribute == null){
             return false;
         }
@@ -164,10 +165,10 @@ public class Merger extends BaseCommand<MergerOptions> {
             return false;
         }
         ResXmlAttribute valueAttribute=metaElement.searchAttributeByResourceId(
-                AndroidManifestBlock.ID_value);
+                AndroidManifest.ID_value);
         if(valueAttribute==null){
             valueAttribute=metaElement.searchAttributeByResourceId(
-                    AndroidManifestBlock.ID_resource);
+                    AndroidManifest.ID_resource);
         }
         if(valueAttribute == null
                 || valueAttribute.getValueType() != ValueType.REFERENCE){

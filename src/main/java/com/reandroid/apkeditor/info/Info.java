@@ -27,6 +27,7 @@ import com.reandroid.arsc.coder.EncodeResult;
 import com.reandroid.arsc.coder.ReferenceString;
 import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.model.ResourceEntry;
+import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.arsc.value.AttributeDataFormat;
 import com.reandroid.arsc.value.Entry;
@@ -72,7 +73,7 @@ public class Info extends BaseCommand<InfoOptions> {
         printSourceFile();
 
         printPackage(apkModule);
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         printVersionCode(manifest);
         printVersionName(manifest);
         printMinSdkVersion(manifest);
@@ -88,6 +89,7 @@ public class Info extends BaseCommand<InfoOptions> {
         printResList(apkModule);
 
         printResources(apkModule);
+        printDex(apkModule);
     }
     private void printSourceFile() throws IOException {
         InfoOptions options = getOptions();
@@ -113,6 +115,15 @@ public class Info extends BaseCommand<InfoOptions> {
         for(PackageBlock packageBlock : tableBlock.listPackages()){
             infoWriter.writeResources(packageBlock, options.typeFilterList, writeEntries);
         }
+    }
+    private void printDex(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        if(!options.dex){
+            return;
+        }
+        InfoWriter infoWriter = getInfoWriter();
+        DexDirectory dexDirectory = DexDirectory.readStrings(apkModule.getZipEntryMap());
+        infoWriter.writeDexInfo(dexDirectory);
     }
     private void printResList(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();
@@ -160,7 +171,7 @@ public class Info extends BaseCommand<InfoOptions> {
         if(!options.packageName){
             return;
         }
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         if(manifest != null){
             getInfoWriter().writeNameValue("package" , manifest.getPackageName());
         }
@@ -204,7 +215,7 @@ public class Info extends BaseCommand<InfoOptions> {
         if(!options.appName){
             return;
         }
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         ResXmlElement application = manifest.getApplicationElement();
         ResXmlAttribute attributeLabel = application
                 .searchAttributeByResourceId(AndroidManifestBlock.ID_label);
@@ -223,7 +234,7 @@ public class Info extends BaseCommand<InfoOptions> {
         if(!options.appIcon){
             return;
         }
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         ResXmlElement application = manifest.getApplicationElement();
         ResXmlAttribute attribute = application
                 .searchAttributeByResourceId(AndroidManifestBlock.ID_icon);
@@ -242,7 +253,7 @@ public class Info extends BaseCommand<InfoOptions> {
         if(!options.appRoundIcon){
             return;
         }
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         ResXmlElement application = manifest.getApplicationElement();
         int id_roundIcon = 0x0101052c;
         ResXmlAttribute attribute = application
@@ -262,7 +273,7 @@ public class Info extends BaseCommand<InfoOptions> {
         if(!options.permissions || !options.verbose){
             return;
         }
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         if(manifest == null){
             return;
         }
@@ -280,7 +291,7 @@ public class Info extends BaseCommand<InfoOptions> {
         if(!options.activities){
             return;
         }
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         if(manifest == null){
             return;
         }
@@ -309,7 +320,7 @@ public class Info extends BaseCommand<InfoOptions> {
         if(!options.appClass){
             return;
         }
-        AndroidManifestBlock manifest = apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         if(manifest == null){
             return;
         }

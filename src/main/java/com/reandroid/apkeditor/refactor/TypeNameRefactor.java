@@ -54,7 +54,7 @@ public class TypeNameRefactor {
         logMessage("Refactoring types ...");
         loadTypeStrings(apkModule.getTableBlock());
         logMessage("Refactoring from AndroidManifest ...");
-        AndroidManifestBlock manifestBlock=apkModule.getAndroidManifestBlock();
+        AndroidManifestBlock manifestBlock=apkModule.getAndroidManifest();
         scanXml(manifestBlock, 0);
         scanResFiles();
         if(!isFinished()){
@@ -71,7 +71,7 @@ public class TypeNameRefactor {
             XMLElement element=refactoredTypeMap.toXMLDocument().getDocumentElement();
             element.setName("renamed");
             element.setAttribute("count", String.valueOf(refactoredTypeMap.count()));
-            log.append(element.toText());
+            log.append(element.getDebugText());
         }
         TypeNameMap remain=new TypeNameMap();
         for(Map.Entry<Integer, TypeString> entry:mTypeStrings.entrySet()){
@@ -82,7 +82,7 @@ public class TypeNameRefactor {
             XMLDocument xmlDocument=remain.toXMLDocument();
             XMLElement element=xmlDocument.getDocumentElement();
             element.setName("remain");
-            log.append(xmlDocument.toText());
+            log.append(xmlDocument.getDebugText());
         }
         logMessage(log.toString());
     }
@@ -393,7 +393,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        return rename(attribute.getNameResourceID(), name);
+        return rename(attribute.getNameId(), name);
     }
     private boolean checkColor(ResXmlAttribute attribute){
         String name="color";
@@ -404,7 +404,7 @@ public class TypeNameRefactor {
             return false;
         }
         int textColor=0x01010098;
-        int nameId=attribute.getNameResourceID();
+        int nameId=attribute.getNameId();
         if(nameId!=textColor){
             return false;
         }
@@ -428,7 +428,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        int nameId=attribute.getNameResourceID();
+        int nameId=attribute.getNameId();
         if(nameId == 0){
             return false;
         }
@@ -448,7 +448,7 @@ public class TypeNameRefactor {
         }
         int layout_width=0x010100f4;
         int layout_height=0x010100f5;
-        int nameId=attribute.getNameResourceID();
+        int nameId=attribute.getNameId();
         if(nameId!=layout_width && nameId!=layout_height){
             return false;
         }
@@ -463,7 +463,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        if(attribute.getNameResourceID()!=AndroidManifestBlock.ID_id){
+        if(attribute.getNameId()!=AndroidManifestBlock.ID_id){
             return false;
         }
         if(attribute.getValueType() != ValueType.REFERENCE){
@@ -477,7 +477,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        if(attribute.getNameResourceID()!=AndroidManifestBlock.ID_theme){
+        if(attribute.getNameId()!=AndroidManifestBlock.ID_theme){
             return false;
         }
         if(attribute.getValueType() != ValueType.REFERENCE){
@@ -491,7 +491,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        if(attribute.getNameResourceID()!=AndroidManifestBlock.ID_label){
+        if(attribute.getNameId()!=AndroidManifestBlock.ID_label){
             return false;
         }
         if(attribute.getValueType() != ValueType.REFERENCE){
