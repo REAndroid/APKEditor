@@ -136,6 +136,10 @@ public class Merger extends BaseCommand<MergerOptions> {
         }
         AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         logMessage("Sanitizing manifest ...");
+        AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
+            AndroidManifest.NAME_requiredSplitTypes, this);
+        AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
+            AndroidManifest.NAME_splitTypes, this);
         AndroidManifestHelper.removeAttributeFromManifestAndApplication(manifest,
                 AndroidManifest.ID_extractNativeLibs,
                 this, AndroidManifest.NAME_extractNativeLibs);
