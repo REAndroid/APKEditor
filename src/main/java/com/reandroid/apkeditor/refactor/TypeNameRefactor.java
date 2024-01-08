@@ -16,6 +16,7 @@
 package com.reandroid.apkeditor.refactor;
 
 import com.reandroid.apk.*;
+import com.reandroid.app.AndroidManifest;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
@@ -463,7 +464,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        if(attribute.getNameId()!=AndroidManifestBlock.ID_id){
+        if(attribute.getNameId()!=AndroidManifest.ID_id){
             return false;
         }
         if(attribute.getValueType() != ValueType.REFERENCE){
@@ -477,7 +478,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        if(attribute.getNameId()!=AndroidManifestBlock.ID_theme){
+        if(attribute.getNameId() != AndroidManifest.ID_theme){
             return false;
         }
         if(attribute.getValueType() != ValueType.REFERENCE){
@@ -491,7 +492,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        if(attribute.getNameId()!=AndroidManifestBlock.ID_label){
+        if(attribute.getNameId() != AndroidManifest.ID_label){
             return false;
         }
         if(attribute.getValueType() != ValueType.REFERENCE){

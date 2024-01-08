@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.info;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
+import com.reandroid.app.AndroidManifest;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
@@ -218,7 +219,7 @@ public class Info extends BaseCommand<InfoOptions> {
         AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         ResXmlElement application = manifest.getApplicationElement();
         ResXmlAttribute attributeLabel = application
-                .searchAttributeByResourceId(AndroidManifestBlock.ID_label);
+                .searchAttributeByResourceId(AndroidManifest.ID_label);
         if(attributeLabel == null){
             return;
         }
@@ -237,7 +238,7 @@ public class Info extends BaseCommand<InfoOptions> {
         AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         ResXmlElement application = manifest.getApplicationElement();
         ResXmlAttribute attribute = application
-                .searchAttributeByResourceId(AndroidManifestBlock.ID_icon);
+                .searchAttributeByResourceId(AndroidManifest.ID_icon);
         if(attribute == null){
             return;
         }
@@ -282,7 +283,7 @@ public class Info extends BaseCommand<InfoOptions> {
             return;
         }
         //printLine("Uses permission (" + usesPermissions.size() + ")");
-        String tag = AndroidManifestBlock.TAG_uses_permission;
+        String tag = AndroidManifest.TAG_uses_permission;
         InfoWriter infoWriter = getInfoWriter();
         infoWriter.writeArray(tag, usesPermissions.toArray(new String[0]));
     }
@@ -335,7 +336,7 @@ public class Info extends BaseCommand<InfoOptions> {
     }
     private String getValueOfName(ResXmlElement element){
         ResXmlAttribute attribute = element
-                .searchAttributeByResourceId(AndroidManifestBlock.ID_name);
+                .searchAttributeByResourceId(AndroidManifest.ID_name);
         if(attribute == null){
             return null;
         }
