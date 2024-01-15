@@ -16,6 +16,7 @@
 package com.reandroid.apkeditor.common;
 
 import com.reandroid.apk.APKLogger;
+import com.reandroid.apk.ApkUtil;
 import com.reandroid.app.AndroidManifest;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
@@ -46,6 +47,15 @@ public class AndroidManifestHelper {
             String value = nameAttribute.getValueAsString();
             if(value == null){
                 return false;
+            }
+            if (value.equals("com.android.dynamic.apk.fused.modules")){
+                ResXmlAttribute attribute = element.searchAttributeByResourceId(AndroidManifest.ID_value);
+                    if (attribute != null){
+                        String attributeValue = attribute.getValueAsString();
+                        if (attributeValue != null && attributeValue.equals(ApkUtil.DEF_MODULE_NAME)) {
+                            return true;
+                        }
+                    }
             }
             return value.startsWith("com.android.vending.")
                     || value.startsWith("com.android.stamp.");
