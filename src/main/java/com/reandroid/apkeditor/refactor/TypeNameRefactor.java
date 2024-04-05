@@ -97,7 +97,7 @@ public class TypeNameRefactor {
         }
     }
     private void scanPackageEntries(PackageBlock packageBlock){
-        Iterator<ResourceEntry> itr = packageBlock.getResources();
+        Iterator<ResourceEntry> itr = packageBlock.iterator();
         while (itr.hasNext() && !isFinished()){
             ResourceEntry resourceEntry = itr.next();
             checkEntryGroup(resourceEntry);
@@ -140,7 +140,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        if(resValueBag.getValue().childesCount()<2){
+        if(resValueBag.getValue().size()<2){
             return false;
         }
         if(!ArrayBag.isArray(resValueBag.getParentEntry())){
@@ -155,7 +155,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        if(resValueBag.getValue().childesCount()<2){
+        if(resValueBag.getValue().size()<2){
             return false;
         }
         if(!PluralsBag.isPlurals(resValueBag.getParentEntry())){
@@ -221,7 +221,7 @@ public class TypeNameRefactor {
                 return;
             }
         }
-        List<ResXmlAttribute> attributeList = listAttributes(xmlBlock.getResXmlElement());
+        List<ResXmlAttribute> attributeList = listAttributes(xmlBlock.getDocumentElement());
         for(ResXmlAttribute attribute:attributeList){
             scanAttribute(attribute, isManifest);
         }
@@ -260,7 +260,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlDocument.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getDocumentElement();
         if(root==null){
             return false;
         }
@@ -278,7 +278,7 @@ public class TypeNameRefactor {
         if(!hasRefactoredName("animator")){
             return false;
         }
-        ResXmlElement root=resXmlDocument.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getDocumentElement();
         if(root==null){
             return false;
         }
@@ -296,7 +296,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlDocument.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getDocumentElement();
         if(root==null){
             return false;
         }
@@ -310,7 +310,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlDocument.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getDocumentElement();
         if(root==null){
             return false;
         }
@@ -327,7 +327,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlDocument.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getDocumentElement();
         if(root==null){
             return false;
         }
@@ -356,7 +356,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlDocument.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getDocumentElement();
         if(root==null){
             return false;
         }
@@ -380,7 +380,7 @@ public class TypeNameRefactor {
         if(hasRefactoredName(name)){
             return false;
         }
-        ResXmlElement root=resXmlDocument.getResXmlElement();
+        ResXmlElement root=resXmlDocument.getDocumentElement();
         if(root==null){
             return false;
         }

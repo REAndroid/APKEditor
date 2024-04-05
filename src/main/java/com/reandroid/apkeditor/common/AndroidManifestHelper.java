@@ -90,7 +90,7 @@ public class AndroidManifestHelper {
             return;
         }
         int removed = manifestElement.removeAttributesWithId(resourceId);
-        ResXmlElement applicationElement = manifestElement.getElementByTagName(
+        ResXmlElement applicationElement = manifestElement.getElement(
                 AndroidManifest.TAG_application);
         if(removed > 1){
             if(logger != null){

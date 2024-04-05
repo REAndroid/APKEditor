@@ -129,7 +129,7 @@ public class InfoWriterJson extends InfoWriter{
         ResValueMapArray mapArray = entry.getResValueMapArray();
         JSONWriter jsonWriter = mJsonWriter.object()
                 .key(NAME_QUALIFIERS).value(entry.getResConfig().getQualifiers())
-                .key("size").value(mapArray.childesCount())
+                .key("size").value(mapArray.size())
                 .key("parent").value(((ResTableMapEntry)entry.getTableEntry()).getParentId())
                 .key(TAG_BAG).array();
         for(ResValueMap resValueMap : mapArray.getChildes()){
