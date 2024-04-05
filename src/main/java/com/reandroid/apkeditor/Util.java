@@ -184,7 +184,7 @@ public class Util {
             TableBlock tableBlock = apkModule.getTableBlock();
             String str = loadApkEditorProperties(tableBlock);
             properties = loadApkEditorProperties(str);
-        } catch (Exception exception) {
+        } catch (Exception ignored) {
         }
         if(properties == null){
             return null;
@@ -200,7 +200,7 @@ public class Util {
             return null;
         }
         TableStringPool stringPool = tableBlock.getTableStringPool();
-        int count = stringPool.countStrings();
+        int count = stringPool.size();
         TableString tableString = stringPool.get(count-1);
         return loadApkEditorProperties(tableString);
     }
@@ -237,7 +237,7 @@ public class Util {
             return;
         }
         TableStringPool stringPool = tableBlock.getTableStringPool();
-        int count = stringPool.countStrings();
+        int count = stringPool.size();
         if(count==0){
             return;
         }
