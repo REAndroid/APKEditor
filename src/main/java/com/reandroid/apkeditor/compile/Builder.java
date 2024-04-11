@@ -126,6 +126,10 @@ public class Builder extends BaseCommand<BuildOptions> {
         encoder.setApkLogger(this);
 
         BuildOptions options = getOptions();
+        if(!options.validateResDir && options.resDirName == null) {
+            encoder.setKeepOriginal(true);
+            logMessage("Keep original binaries");
+        }
 
         SmaliCompiler smaliCompiler = new SmaliCompiler(options.noCache);
         smaliCompiler.setApkLogger(this);
