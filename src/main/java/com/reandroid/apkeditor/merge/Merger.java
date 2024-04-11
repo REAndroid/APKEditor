@@ -35,6 +35,7 @@ import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ValueType;
+import com.reandroid.utils.StringsUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,8 +98,25 @@ public class Merger extends BaseCommand<MergerOptions> {
         mergedModule.close();
         if(extracted){
             Util.deleteDir(dir);
+            confirmDirectoryDeleted(dir);
+            Util.deleteDir(dir);
+            confirmDirectoryDeleted(dir);
         }
         logMessage("Saved to: " + options.outputFile);
+    }
+    private void confirmDirectoryDeleted(File dir){
+        if(!dir.exists()){
+            logMessage("Directory not exist: " + dir.getAbsolutePath());
+            return;
+        }
+        logMessage("Directory exists: " + dir.getAbsolutePath());
+        File[] files = dir.listFiles();
+        if(files == null){
+            logMessage("files == null");
+            return;
+        }
+        String message = "files.length = " + files.length + StringsUtil.join(files, "\n");
+        logMessage(message);
     }
     private File extractFile(File file) throws IOException {
         File tmp = toTmpDir(file);
