@@ -91,6 +91,7 @@ public class Info extends BaseCommand<InfoOptions> {
 
         printResources(apkModule);
         printDex(apkModule);
+        printSignatures(apkModule);
     }
     private void printSourceFile() throws IOException {
         InfoOptions options = getOptions();
@@ -125,6 +126,14 @@ public class Info extends BaseCommand<InfoOptions> {
         InfoWriter infoWriter = getInfoWriter();
         DexDirectory dexDirectory = DexDirectory.readStrings(apkModule.getZipEntryMap());
         infoWriter.writeDexInfo(dexDirectory);
+    }
+    private void printSignatures(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        if(!options.signatures && !options.signatures_base64){
+            return;
+        }
+        InfoWriter infoWriter = getInfoWriter();
+        infoWriter.writeSignatureInfo(apkModule.getApkSignatureBlock(), options.signatures_base64);
     }
     private void printResList(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();

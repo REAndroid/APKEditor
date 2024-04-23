@@ -15,6 +15,8 @@
  */
 package com.reandroid.apkeditor.info;
 
+import com.reandroid.archive.block.ApkSignatureBlock;
+import com.reandroid.archive.block.CertificateBlock;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.container.SpecTypePair;
@@ -23,6 +25,7 @@ import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.arsc.value.*;
+import com.reandroid.utils.collection.CollectionUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -35,6 +38,13 @@ public abstract class InfoWriter implements Closeable {
         this.writer = writer;
     }
 
+    public void writeSignatureInfo(ApkSignatureBlock signatureBlock, boolean base64) throws IOException {
+        if(signatureBlock == null){
+            writeNameValue("certificates", "null");
+        }else {
+            writeCertificates(CollectionUtil.toList(signatureBlock.getCertificates()), base64);
+        }
+    }
     public void writeResources(PackageBlock packageBlock, List<String> typeFilters, boolean writeEntries) throws IOException {
         Iterator<ResourceEntry> itr = packageBlock.iterator();
         while (itr.hasNext()){
@@ -47,6 +57,8 @@ public abstract class InfoWriter implements Closeable {
             writeDexInfo(dexFile, true);
         }
     }
+
+    public abstract void writeCertificates(List<CertificateBlock> certificateList, boolean base64) throws IOException;
     public abstract void writeDexInfo(DexFile dexFile, boolean writeSectionInfo) throws IOException;
     public abstract void writeResources(ResourceEntry resourceEntry, boolean writeEntries) throws IOException;
     public abstract void writePackageNames(Collection<PackageBlock> packageBlocks) throws IOException;
@@ -97,6 +109,9 @@ public abstract class InfoWriter implements Closeable {
             return HexUtil.toHex8("@0x", value.getData());
         }
         return HexUtil.toHex8("0x", value.getData());
+    }
+    static String toBase64(byte[] bytes) {
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
     static final String TAG_RES_PACKAGES = "resource-packages";

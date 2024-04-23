@@ -15,6 +15,7 @@
  */
 package com.reandroid.apkeditor.info;
 
+import com.reandroid.archive.block.CertificateBlock;
 import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.container.SpecTypePair;
@@ -25,6 +26,7 @@ import com.reandroid.arsc.value.ResValue;
 import com.reandroid.arsc.value.ResValueMap;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.dex.sections.Marker;
+import com.reandroid.json.JSONObject;
 import com.reandroid.json.JSONWriter;
 
 import java.io.IOException;
@@ -41,6 +43,20 @@ public class InfoWriterJson extends InfoWriter{
         JSONWriter jsonWriter = new JSONWriter(writer);
         jsonWriter = jsonWriter.array();
         this.mJsonWriter = jsonWriter;
+    }
+
+    @Override
+    public void writeCertificates(List<CertificateBlock> certificateList, boolean base64) throws IOException {
+        JSONWriter jsonWriter = mJsonWriter.object()
+                .key("certificates").array();
+        for(CertificateBlock certificateBlock : certificateList){
+            JSONObject jsonObject = certificateBlock.toJson();
+            if(base64){
+                jsonObject.put("base64", toBase64(certificateBlock.getCertificateBytes()));
+            }
+            jsonWriter.value(jsonObject);
+        }
+        jsonWriter.endArray().endObject();
     }
 
     @Override

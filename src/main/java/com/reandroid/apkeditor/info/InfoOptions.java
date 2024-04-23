@@ -42,11 +42,15 @@ public class InfoOptions extends Options {
     public boolean resources = false;
     public final List<String> typeFilterList;
     public boolean dex = false;
+    public boolean signatures = false;
+    public boolean signatures_base64 = false;
+
     public InfoOptions(){
         super();
         this.resList = new ArrayList<>();
         this.typeFilterList = new ArrayList<>();
     }
+
     @Override
     public void parse(String[] args) throws ARGException {
         parseInput(args);
@@ -77,6 +81,8 @@ public class InfoOptions extends Options {
         activities = containsArg(ARG_activities, args, activities);
         resources = containsArg(ARG_resources, args, false);
         dex = containsArg(ARG_dex, args, false);
+        signatures = containsArg(ARG_signatures, args, false);
+        signatures_base64 = containsArg(ARG_signatures_base64, args, false);
 
 
 
@@ -184,6 +190,8 @@ public class InfoOptions extends Options {
                 new String[]{ARG_resources, ARG_DESC_resources},
                 new String[]{"  ", "  "},
                 new String[]{ARG_dex, ARG_DESC_dex},
+                new String[]{ARG_signatures, ARG_DESC_signatures},
+                new String[]{ARG_signatures_base64, ARG_DESC_signatures_base64},
                 new String[]{"  ", "  "},
                 new String[]{ARG_ALL_help, ARG_DESC_help}
         };
@@ -273,6 +281,12 @@ public class InfoOptions extends Options {
 
     private static final String ARG_dex = "-dex";
     private static final String ARG_DESC_dex = "Prints dex information";
+
+    private static final String ARG_signatures = "-signatures";
+    private static final String ARG_DESC_signatures = "Prints signature information";
+
+    private static final String ARG_signatures_base64 = "-signatures-base64";
+    private static final String ARG_DESC_signatures_base64 = "Prints signature information with base64 certificates";
 
 
     private static final String[] availableTypes = new String[]{TYPE_TEXT, TYPE_JSON, TYPE_XML};

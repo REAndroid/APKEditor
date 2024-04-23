@@ -15,10 +15,12 @@
  */
 package com.reandroid.apkeditor.info;
 
+import com.reandroid.archive.block.CertificateBlock;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.dex.sections.MapItem;
 import com.reandroid.dex.sections.MapList;
 import com.reandroid.dex.sections.Marker;
+import com.reandroid.utils.collection.ComputeList;
 import com.reandroid.xml.kxml2.KXmlSerializer;
 import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
@@ -45,6 +47,17 @@ public class InfoWriterXml extends InfoWriter{
         super(writer);
     }
 
+    @Override
+    public void writeCertificates(List<CertificateBlock> certificateList, boolean base64) throws IOException {
+        List<String> infoList = new ComputeList<>(certificateList, certificateBlock -> {
+            String value = certificateBlock.printCertificate();
+            if(base64) {
+                value = value + "\n" + toBase64(certificateBlock.getCertificateBytes());
+            }
+            return value;
+        });
+        writeArray("certificates", infoList.toArray());
+    }
     @Override
     public void writeDexInfo(DexFile dexFile, boolean writeSectionInfo) throws IOException {
         KXmlSerializer serializer = getSerializer();

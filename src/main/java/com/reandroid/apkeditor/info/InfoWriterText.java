@@ -15,6 +15,7 @@
  */
 package com.reandroid.apkeditor.info;
 
+import com.reandroid.archive.block.CertificateBlock;
 import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.container.SpecTypePair;
@@ -28,6 +29,7 @@ import com.reandroid.dex.sections.MapItem;
 import com.reandroid.dex.sections.MapList;
 import com.reandroid.dex.sections.Marker;
 import com.reandroid.utils.HexUtil;
+import com.reandroid.utils.StringsUtil;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -35,12 +37,28 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class InfoWriterText extends InfoWriter{
+public class InfoWriterText extends InfoWriter {
+
     public InfoWriterText(Writer writer) {
         super(writer);
     }
 
-
+    @Override
+    public void writeCertificates(List<CertificateBlock> certificateList, boolean base64) throws IOException {
+        Writer writer = getWriter();
+        writer.write("\n");
+        writeNameValue("Certificates", certificateList.size());
+        for(CertificateBlock certificateBlock : certificateList) {
+            writeWithTab(writer, ARRAY_TAB, certificateBlock.printCertificate());
+            if(base64) {
+                writer.write(ARRAY_TAB);
+                writer.write("Base64: ");
+                writer.write(toBase64(certificateBlock.getCertificateBytes()));
+                writer.write("\n");
+            }
+        }
+        flush();
+    }
     @Override
     public void writeDexInfo(DexFile dexFile, boolean writeSectionInfo) throws IOException {
         Writer writer = getWriter();
@@ -276,6 +294,15 @@ public class InfoWriterText extends InfoWriter{
         writer.flush();
     }
 
+
+    private void writeWithTab(Writer writer, String tab, String value) throws IOException {
+        String[] splits = StringsUtil.split(value, '\n');
+        for(String line : splits){
+            writer.write(tab);
+            writer.write(line.trim());
+            writer.write("\n");
+        }
+    }
     private static int getDecimalPlaces(int max){
         int i = 0;
         while (max != 0){
