@@ -22,6 +22,7 @@ import com.reandroid.archive.FileInputSource;
 import com.reandroid.archive.InputSource;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.utils.StringsUtil;
+import org.jf.dexlib2.extra.DexMarker;
 import org.jf.smali.Smali;
 import org.jf.smali.SmaliOptions;
 
@@ -79,6 +80,10 @@ public class SmaliCompiler implements DexEncoder {
             dir.mkdirs();
         }
         smaliOptions.outputDexFile = dexCacheFile.getAbsolutePath();
+        File marker = new File(classesDir, DexMarker.FILE_NAME);
+        if(marker.isFile()){
+            smaliOptions.markersListFile = marker.getAbsolutePath();
+        }
         if(smaliOptions.jobs <= 0){
             smaliOptions.jobs = 1;
         }

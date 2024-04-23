@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.smali;
 import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.DexDecoder;
 import com.reandroid.apk.DexFileInputSource;
+import com.reandroid.apkeditor.decompile.DecompileOptions;
 import com.reandroid.arsc.chunk.TableBlock;
 import org.jf.baksmali.Baksmali;
 import org.jf.baksmali.BaksmaliOptions;
@@ -30,10 +31,16 @@ import java.io.IOException;
 
 public class SmaliDecompiler implements DexDecoder {
     private final TableBlock tableBlock;
+    private final DecompileOptions decompileOptions;
     private ResourceComment mComment;
     private APKLogger apkLogger;
-    public SmaliDecompiler(TableBlock tableBlock){
+    public SmaliDecompiler(TableBlock tableBlock, DecompileOptions decompileOptions){
         this.tableBlock = tableBlock;
+        this.decompileOptions = decompileOptions;
+    }
+    @Deprecated
+    public SmaliDecompiler(TableBlock tableBlock){
+        this(tableBlock, new DecompileOptions());
     }
     @Override
     public boolean decodeDex(DexFileInputSource inputSource, File mainDir) throws IOException {
@@ -50,6 +57,8 @@ public class SmaliDecompiler implements DexDecoder {
         options.localsDirective = true;
         options.sequentialLabels = true;
         options.skipDuplicateLineNumbers = true;
+        options.debugInfo = !decompileOptions.noDexDebug;
+        options.dumpMarkers = decompileOptions.dexMarkers;
         options.setCommentProvider(getComment());
         DexBackedDexFile dexFile = getInputDexFile(inputSource, options);
         Baksmali.disassembleDexFile(dexFile, dir, 1, options);

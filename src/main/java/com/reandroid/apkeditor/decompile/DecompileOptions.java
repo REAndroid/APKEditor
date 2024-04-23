@@ -28,6 +28,9 @@ public class DecompileOptions extends Options {
     public String resDirName;
     public boolean keepResPath;
     public boolean dex;
+    public boolean noDexDebug;
+    public boolean dexMarkers;
+
     public DecompileOptions(){
         type=TYPE_XML;
     }
@@ -37,6 +40,8 @@ public class DecompileOptions extends Options {
         parseType(args, type);
         parseOutput(args);
         parseSplitResources(args);
+        parseNoDexDebug(args);
+        parseDexMarkers(args);
         parseDex(args);
         parseKeepResPath(args);
         parseResDirName(args);
@@ -47,19 +52,25 @@ public class DecompileOptions extends Options {
         }
         super.parse(args);
     }
-    private void parseKeepResPath(String[] args) throws ARGException {
+    private void parseKeepResPath(String[] args) {
         keepResPath = containsArg(ARG_keep_res_path, true, args);
     }
-    private void parseValidateResDir(String[] args) throws ARGException {
+    private void parseValidateResDir(String[] args) {
         validateResDir=containsArg(ARG_validate_res_dir, true, args);
     }
     private void parseResDirName(String[] args) throws ARGException {
         this.resDirName=parseArgValue(ARG_resDir, true, args);
     }
-    private void parseSplitResources(String[] args) throws ARGException {
+    private void parseSplitResources(String[] args) {
         splitJson=containsArg(ARG_split_resources, true, args);
     }
-    private void parseDex(String[] args) throws ARGException {
+    private void parseNoDexDebug(String[] args) {
+        noDexDebug = containsArg(ARG_no_dex_debug, true, args);
+    }
+    private void parseDexMarkers(String[] args) {
+        dexMarkers = containsArg(ARG_dex_markers, true, args);
+    }
+    private void parseDex(String[] args) {
         dex = containsArg(ARG_dex, true, args);
     }
     private void parseOutput(String[] args) throws ARGException {
@@ -155,7 +166,9 @@ public class DecompileOptions extends Options {
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_keep_res_path, ARG_DESC_keep_res_path},
                 new String[]{ARG_split_resources, ARG_DESC_split_resources},
-                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir}
+                new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir},
+                new String[]{ARG_no_dex_debug, ARG_DESC_no_dex_debug},
+                new String[]{ARG_dex_markers, ARG_DESC_dex_markers}
         };
         StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         String jar = APKEditor.getJarName();
@@ -199,5 +212,10 @@ public class DecompileOptions extends Options {
     private static final String ARG_dex = "-dex";
     private static final String ARG_DESC_dex = "Copy raw dex files / skip smali";
 
+    private static final String ARG_no_dex_debug = "-no-dex-debug";
+    private static final String ARG_DESC_no_dex_debug = "Drops all debug info from smali/dex";
+
+    private static final String ARG_dex_markers = "-dex-markers";
+    private static final String ARG_DESC_dex_markers = "Dumps dex markers (applies only when smali mode)";
 
 }
