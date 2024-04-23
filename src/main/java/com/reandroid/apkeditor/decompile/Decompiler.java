@@ -86,7 +86,7 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
         if(getOptions().dex){
             return null;
         }
-        SmaliDecompiler smaliDecompiler = new SmaliDecompiler(tableBlock);
+        SmaliDecompiler smaliDecompiler = new SmaliDecompiler(tableBlock, !getOptions().debugInfo);
         smaliDecompiler.setApkLogger(this);
         return smaliDecompiler;
     }

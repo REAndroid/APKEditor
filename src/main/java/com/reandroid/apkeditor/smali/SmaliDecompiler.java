@@ -30,10 +30,12 @@ import java.io.IOException;
 
 public class SmaliDecompiler implements DexDecoder {
     private final TableBlock tableBlock;
+    private final boolean debugInfo;
     private ResourceComment mComment;
     private APKLogger apkLogger;
-    public SmaliDecompiler(TableBlock tableBlock){
+    public SmaliDecompiler(TableBlock tableBlock, boolean debugInfo){
         this.tableBlock = tableBlock;
+        this.debugInfo = debugInfo;
     }
     @Override
     public boolean decodeDex(DexFileInputSource inputSource, File mainDir) throws IOException {
@@ -50,6 +52,7 @@ public class SmaliDecompiler implements DexDecoder {
         options.localsDirective = true;
         options.sequentialLabels = true;
         options.skipDuplicateLineNumbers = true;
+        options.debugInfo = debugInfo;
         options.setCommentProvider(getComment());
         DexBackedDexFile dexFile = getInputDexFile(inputSource, options);
         Baksmali.disassembleDexFile(dexFile, dir, 1, options);

@@ -28,6 +28,7 @@ public class DecompileOptions extends Options {
     public String resDirName;
     public boolean keepResPath;
     public boolean dex;
+    public boolean debugInfo;
     public DecompileOptions(){
         type=TYPE_XML;
     }
@@ -38,6 +39,7 @@ public class DecompileOptions extends Options {
         parseOutput(args);
         parseSplitResources(args);
         parseDex(args);
+        parseDebugInfo(args);
         parseKeepResPath(args);
         parseResDirName(args);
         parseValidateResDir(args);
@@ -61,6 +63,9 @@ public class DecompileOptions extends Options {
     }
     private void parseDex(String[] args) throws ARGException {
         dex = containsArg(ARG_dex, true, args);
+    }
+    private void parseDebugInfo(String[] args) throws ARGException {
+        debugInfo = containsArg(ARG_debug_info, true, args);
     }
     private void parseOutput(String[] args) throws ARGException {
         this.outputFile=null;
@@ -151,6 +156,7 @@ public class DecompileOptions extends Options {
         StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         builder.append("\nFlags:\n");
         table=new String[][]{
+                new String[]{ARG_debug_info, ARG_DESC_debug_info},
                 new String[]{ARG_dex, ARG_DESC_dex},
                 new String[]{ARG_force, ARG_DESC_force},
                 new String[]{ARG_keep_res_path, ARG_DESC_keep_res_path},
@@ -198,6 +204,9 @@ public class DecompileOptions extends Options {
 
     private static final String ARG_dex = "-dex";
     private static final String ARG_DESC_dex = "Copy raw dex files / skip smali";
+
+    private static final String ARG_debug_info = "-debug-info";
+    private static final String ARG_DESC_debug_info = "Exclude debug information in smali";
 
 
 }
