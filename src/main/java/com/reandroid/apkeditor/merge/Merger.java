@@ -158,7 +158,7 @@ public class Merger extends BaseCommand<MergerOptions> {
             }
             logMessage("Removed-element : <" + meta.getName() + "> name=\""
                     + AndroidManifestHelper.getNamedValue(meta) + "\"");
-            application.removeElement(meta);
+            application.remove(meta);
         }
         manifest.refresh();
     }
