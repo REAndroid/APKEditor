@@ -18,10 +18,17 @@ package com.reandroid.apkeditor.smali;
 import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkModuleEncoder;
 import com.reandroid.apk.DexEncoder;
+import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.archive.FileInputSource;
 import com.reandroid.archive.InputSource;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
+import com.reandroid.dex.model.DexFile;
+import com.reandroid.dex.sections.Marker;
+import com.reandroid.dex.sections.SectionType;
+import com.reandroid.dex.smali.SmaliReader;
 import com.reandroid.utils.StringsUtil;
+import com.reandroid.utils.io.FileIterator;
+import com.reandroid.utils.io.IOUtil;
 import org.jf.dexlib2.extra.DexMarker;
 import org.jf.smali.Smali;
 import org.jf.smali.SmaliOptions;
@@ -73,6 +80,12 @@ public class SmaliCompiler implements DexEncoder {
         }
     }
     private InputSource build(String progress, File classesDir, File dexCacheFile) throws IOException {
+        if(APKEditor.isExperimental()) {
+            return buildExperimental(progress, classesDir, dexCacheFile);
+        }
+        return buildJesusFreke(progress, classesDir, dexCacheFile);
+    }
+    private InputSource buildJesusFreke(String progress, File classesDir, File dexCacheFile) throws IOException {
         logMessage(progress + "Smali: " + dexCacheFile.getName());
         SmaliOptions smaliOptions = new SmaliOptions();
         File dir = dexCacheFile.getParentFile();
@@ -88,7 +101,7 @@ public class SmaliCompiler implements DexEncoder {
             smaliOptions.jobs = 1;
         }
         if (this.minSdkVersion != null) {
-            smaliOptions.apiLevel = this.minSdkVersion.intValue();
+            smaliOptions.apiLevel = this.minSdkVersion;
         }
         boolean success = Smali.assemble(smaliOptions, classesDir.getAbsolutePath());
         if(!success){
@@ -96,6 +109,48 @@ public class SmaliCompiler implements DexEncoder {
         }
         return new FileInputSource(dexCacheFile, dexCacheFile.getName());
     }
+    private InputSource buildExperimental(String progress, File classesDir, File dexCacheFile) throws IOException {
+        logMessage(progress + "Smali: " + dexCacheFile.getName());
+        DexFile dexFile = DexFile.createDefault();
+        FileIterator fileIterator = new FileIterator(classesDir,
+                FileIterator.getExtensionFilter(".smali"));
+        while (fileIterator.hasNext()) {
+            File file = fileIterator.next();
+            try {
+                dexFile.fromSmali(SmaliReader.of(file));
+            }catch (Exception e) {
+                throw new IOException("Error at: " + file, e);
+            }
+        }
+        dexFile.refresh();
+        readMarkers(dexFile, classesDir);
+        int version = 0;
+        if (this.minSdkVersion != null) {
+            version = minSdkVersion;
+        }
+        version = apiToDexVersion(version);
+        dexFile.setVersion(version);
+        dexFile.clearEmptySections();
+        dexFile.sortSection(SectionType.getR8Order());
+        dexFile.refreshFull();
+        dexFile.write(dexCacheFile);
+        dexFile.close();
+        return new FileInputSource(dexCacheFile, dexCacheFile.getName());
+    }
+    private void readMarkers(DexFile dexFile, File classesDir) throws IOException {
+        File markersFile = new File(classesDir, DexMarker.FILE_NAME);
+        if(markersFile.isFile()){
+            logMessage("Reading markers ...");
+            String[] content = StringsUtil.split(IOUtil.readUtf8(markersFile), '\n');
+            for(String markerString : content) {
+                Marker marker = Marker.parse(markerString);
+                if(marker != null) {
+                    dexFile.addMarker(marker);
+                }
+            }
+        }
+    }
+
     private boolean isModified(File classesDir, File dexCacheFile){
         if(noCache || !dexCacheFile.isFile()){
             return true;
@@ -155,4 +210,16 @@ public class SmaliCompiler implements DexEncoder {
         }
     }
 
+    public static int apiToDexVersion(int api) {
+        if (api <= 23) {
+            return 35;
+        }
+        if (api <= 25) {
+            return 37;
+        }
+        if (api <= 27) {
+            return 38;
+        }
+        return 39;
+    }
 }

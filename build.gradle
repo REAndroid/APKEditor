@@ -53,3 +53,8 @@ task fatJar(type: Jar) {
     with jar
 }
 
+task betaJar() {
+    version = "${version}-beta"
+    finalizedBy(fatJar)
+}
+

@@ -60,6 +60,9 @@ public class APKEditor {
         }
         return getName()+".jar";
     }
+    public static boolean isExperimental() {
+        return APKEditor.getVersion().contains("beta");
+    }
 
     public static final String PATH_properties = "/apkeditor.properties";
 
