@@ -35,7 +35,7 @@ public class InfoOptions extends Options {
     public boolean appName = true;
     public boolean appIcon = true;
     public boolean appRoundIcon = true;
-    public boolean permissions = true;
+    public boolean permissions = false;
     public boolean appClass = true;
     public boolean activities = true;
     public final List<String> resList;

@@ -29,6 +29,7 @@ import com.reandroid.arsc.coder.ReferenceString;
 import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.dex.model.DexDirectory;
+import com.reandroid.utils.CompareUtil;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.arsc.value.AttributeDataFormat;
 import com.reandroid.arsc.value.Entry;
@@ -280,7 +281,7 @@ public class Info extends BaseCommand<InfoOptions> {
     }
     private void printUsesPermissions(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();
-        if(!options.permissions || !options.verbose){
+        if(!options.permissions && !options.verbose){
             return;
         }
         AndroidManifestBlock manifest = apkModule.getAndroidManifest();
@@ -291,6 +292,7 @@ public class Info extends BaseCommand<InfoOptions> {
         if(usesPermissions.size() == 0){
             return;
         }
+        usesPermissions.sort(CompareUtil.getComparableComparator());
         //printLine("Uses permission (" + usesPermissions.size() + ")");
         String tag = AndroidManifest.TAG_uses_permission;
         InfoWriter infoWriter = getInfoWriter();
