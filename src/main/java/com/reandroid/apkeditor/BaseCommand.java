@@ -18,6 +18,7 @@ package com.reandroid.apkeditor;
 import com.reandroid.apk.APKLogger;
 import com.reandroid.archive.ZipEntryMap;
 import com.reandroid.apk.ApkModule;
+import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.coder.xml.XmlCoderLogger;
 import com.reandroid.commons.utils.log.Logger;
 
@@ -32,6 +33,7 @@ public class BaseCommand<T extends Options> implements APKLogger, XmlCoderLogger
         this.options = options;
         this.mLogTag = logTag;
         this.mEnableLog = true;
+        logVersion();
     }
     public void run() throws IOException{
 
@@ -87,6 +89,10 @@ public class BaseCommand<T extends Options> implements APKLogger, XmlCoderLogger
     }
     public void logWarn(String msg) {
         Logger.e(mLogTag + msg);
+    }
+
+    private void logVersion() {
+        Logger.i("Using: " + APKEditor.getName() + " version " + APKEditor.getVersion() + ", " + ARSCLib.getName() + " version " + ARSCLib.getVersion());
     }
 
     protected static void clearMeta(ApkModule module){
