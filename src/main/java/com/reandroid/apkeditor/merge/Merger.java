@@ -222,6 +222,7 @@ public class Merger extends BaseCommand<MergerOptions> {
         }
         Util.deleteEmptyDirectories(outFile);
         Merger merger = new Merger(option);
+        merger.logVersion();
         if(outFile.exists()){
             if(!option.force){
                 throw new ARGException("Path already exists: " + outFile);

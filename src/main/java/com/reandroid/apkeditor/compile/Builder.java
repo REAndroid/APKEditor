@@ -169,6 +169,7 @@ public class Builder extends BaseCommand<BuildOptions> {
         File outDir = option.outputFile;
         Util.deleteEmptyDirectories(outDir);
         Builder builder = new Builder(option);
+        builder.logVersion();
         builder.logMessage("Building ...\n" + option.toString());
         if(outDir.exists()){
             if(!option.force){

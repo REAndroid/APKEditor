@@ -439,6 +439,7 @@ public class Info extends BaseCommand<InfoOptions> {
         InfoOptions option = new InfoOptions();
         option.parse(args);
         Info info = new Info(option);
+        info.logVersion();
         info.run();
     }
 

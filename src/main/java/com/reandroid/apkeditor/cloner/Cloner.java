@@ -38,6 +38,7 @@ public class Cloner extends BaseCommand<ClonerOptions> {
         ClonerOptions option = new ClonerOptions();
         option.parse(args);
         Cloner cloner = new Cloner(option);
+        cloner.logVersion();
         cloner.run();
     }
 

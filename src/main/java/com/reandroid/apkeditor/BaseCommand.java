@@ -33,7 +33,6 @@ public class BaseCommand<T extends Options> implements APKLogger, XmlCoderLogger
         this.options = options;
         this.mLogTag = logTag;
         this.mEnableLog = true;
-        logVersion();
     }
     public void run() throws IOException{
 
@@ -91,8 +90,8 @@ public class BaseCommand<T extends Options> implements APKLogger, XmlCoderLogger
         Logger.e(mLogTag + msg);
     }
 
-    private void logVersion() {
-        Logger.i("Using: " + APKEditor.getName() + " version " + APKEditor.getVersion() + ", " + ARSCLib.getName() + " version " + ARSCLib.getVersion());
+    public void logVersion() {
+        logMessage("Using: " + APKEditor.getName() + " version " + APKEditor.getVersion() + ", " + ARSCLib.getName() + " version " + ARSCLib.getVersion());
     }
 
     protected static void clearMeta(ApkModule module){

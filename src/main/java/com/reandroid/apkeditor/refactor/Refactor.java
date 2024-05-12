@@ -82,6 +82,7 @@ public class Refactor extends BaseCommand<RefactorOptions> {
         File outFile=option.outputFile;
         Util.deleteEmptyDirectories(outFile);
         Refactor refactor = new Refactor(option);
+        refactor.logVersion();
         if(outFile.exists()){
             if(!option.force){
                 throw new ARGException("Path already exists: "+outFile);

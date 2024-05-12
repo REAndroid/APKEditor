@@ -146,6 +146,7 @@ public class Protector extends BaseCommand<ProtectorOptions> {
         File outFile = option.outputFile;
         Util.deleteEmptyDirectories(outFile);
         Protector protector = new Protector(option);
+        protector.logVersion();
         if(outFile.exists()){
             if(!option.force){
                 throw new ARGException("Path already exists: "+outFile);

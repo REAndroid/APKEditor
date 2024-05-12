@@ -116,6 +116,7 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
         }
         Util.deleteEmptyDirectories(outDir);
         Decompiler decompiler = new Decompiler(option);
+        decompiler.logVersion();
         decompiler.logMessage("Decompiling ...\n" + option);
         if(outDir.exists()){
             if(!option.force){
