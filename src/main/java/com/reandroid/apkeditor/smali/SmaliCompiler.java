@@ -214,11 +214,24 @@ public class SmaliCompiler implements DexEncoder {
         if (api <= 23) {
             return 35;
         }
-        if (api <= 25) {
-            return 37;
-        }
-        if (api <= 27) {
-            return 38;
+        switch (api) {
+            case 24:
+            case 25:
+                return 37;
+            case 26:
+            case 27:
+                return 38;
+            case 28:
+                return 39;
+            case 29:
+            case 30:
+            case 31:
+            case 32:
+            case 33:
+            case 34:
+                return 40;
+            case 35:
+                return 41;
         }
         return 39;
     }

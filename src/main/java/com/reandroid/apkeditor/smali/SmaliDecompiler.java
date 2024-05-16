@@ -22,10 +22,17 @@ import com.reandroid.apk.DexFileInputSource;
 import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.decompile.DecompileOptions;
 import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.dex.common.AnnotationVisibility;
+import com.reandroid.dex.data.AnnotationItem;
+import com.reandroid.dex.key.TypeKey;
+import com.reandroid.dex.model.DexClassRepository;
 import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.dex.model.DexFile;
+import com.reandroid.dex.sections.SectionType;
 import com.reandroid.dex.smali.SmaliWriter;
 import com.reandroid.dex.smali.SmaliWriterSetting;
+import com.reandroid.utils.CompareUtil;
+import com.reandroid.utils.collection.ArrayCollection;
 import org.jf.baksmali.Baksmali;
 import org.jf.baksmali.BaksmaliOptions;
 import org.jf.dexlib2.Opcodes;
@@ -34,7 +41,10 @@ import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class SmaliDecompiler implements DexDecoder {
     private final TableBlock tableBlock;
@@ -67,6 +77,12 @@ public class SmaliDecompiler implements DexDecoder {
         }
         logMessage("Loading full dex ...");
         DexDirectory directory = DexDirectory.fromZip(apkModule.getZipEntryMap());
+        if(decompileOptions.noDexDebug) {
+            logMessage("Clean debug info ...");
+            clearDebug_DirtyMethod(directory);
+            directory.refresh();
+        }
+        directory.refresh();
         File smali = toSmaliRoot(mainDirectory);
         SmaliWriterSetting setting = new SmaliWriterSetting();
         setting.setResourceIdComment(tableBlock.pickOne());
@@ -102,6 +118,11 @@ public class SmaliDecompiler implements DexDecoder {
     private void disassembleDexFileExperimental(DexFileInputSource inputSource, File mainDir) throws IOException {
         DexFile dexFile = DexFile.read(inputSource.openStream());
         dexFile.setSimpleName(inputSource.getAlias());
+        if(decompileOptions.noDexDebug) {
+            logMessage("Clean debug info ...");
+            clearDebug_DirtyMethod(dexFile);
+            dexFile.refresh();
+        }
         SmaliWriterSetting setting = new SmaliWriterSetting();
         setting.setResourceIdComment(tableBlock.pickOne());
         setting.addClassComments(dexFile);
@@ -110,6 +131,38 @@ public class SmaliDecompiler implements DexDecoder {
         smaliWriter.setWriterSetting(setting);
         dexFile.writeSmali(smaliWriter, toSmaliRoot(mainDir));
         dexFile.close();
+    }
+    private void clearDebug_DirtyMethod(DexClassRepository repository) {
+        repository.clearDebug();
+        Set<TypeKey> removeSet = new HashSet<>();
+        Iterator<AnnotationItem> iterator = repository.getItems(SectionType.ANNOTATION_ITEM);
+        while (iterator.hasNext()) {
+            AnnotationItem annotationItem = iterator.next();
+            TypeKey typeKey = annotationItem.getTypeKey();
+            if(annotationItem.getVisibility() == AnnotationVisibility.BUILD ||
+                    removeAnnotation(typeKey)) {
+                removeSet.add(typeKey);
+            }
+        }
+        List<TypeKey> removedList = new ArrayCollection<>(removeSet);
+        removedList.sort(CompareUtil.getComparableComparator());
+        for(TypeKey typeKey : removedList) {
+            logMessage("   Removed @: " + typeKey);
+            repository.removeAnnotations(typeKey);
+        }
+    }
+    private boolean removeAnnotation(TypeKey typeKey) {
+        String name = typeKey.getTypeName();
+        if(name.startsWith("Lkotlin")) {
+            return true;
+        }
+        if(name.startsWith("Ljava/")) {
+            return true;
+        }
+        if(name.startsWith("Ljavax/")) {
+            return true;
+        }
+        return name.contains("Null");
     }
     private void writeDexCache(DexFileInputSource inputSource, File mainDir) throws IOException {
         File cache = new File(mainDir, SmaliUtil.CACHE_DIR);

@@ -30,6 +30,7 @@ import com.reandroid.dex.sections.MapList;
 import com.reandroid.dex.sections.Marker;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.utils.StringsUtil;
+import com.reandroid.utils.collection.CollectionUtil;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -65,7 +66,7 @@ public class InfoWriterText extends InfoWriter {
         writer.write("\n");
         writeNameValue("Name", dexFile.getFileName());
         writeNameValue("Version", dexFile.getVersion());
-        List<Marker> markersList = dexFile.getMarkers();
+        List<Marker> markersList = CollectionUtil.toList(dexFile.getMarkers());
         if(markersList.size() != 0){
             writer.write("Markers:");
             for(Marker marker : markersList){

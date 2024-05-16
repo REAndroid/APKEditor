@@ -20,6 +20,7 @@ import com.reandroid.dex.model.DexFile;
 import com.reandroid.dex.sections.MapItem;
 import com.reandroid.dex.sections.MapList;
 import com.reandroid.dex.sections.Marker;
+import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.ComputeList;
 import com.reandroid.xml.kxml2.KXmlSerializer;
 import com.reandroid.arsc.array.ResValueMapArray;
@@ -69,7 +70,7 @@ public class InfoWriterXml extends InfoWriter{
         serializer.startTag(null, "dex");
         serializer.attribute(null, "name", dexFile.getFileName());
         serializer.attribute(null, "version", Integer.toString(dexFile.getVersion()));
-        List<Marker> markersList = dexFile.getMarkers();
+        List<Marker> markersList = CollectionUtil.toList(dexFile.getMarkers());
         writeArray("markers", markersList.toArray());
 
         MapList mapList = dexFile.getDexLayout().getMapList();

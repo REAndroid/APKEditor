@@ -28,6 +28,7 @@ import com.reandroid.dex.model.DexFile;
 import com.reandroid.dex.sections.Marker;
 import com.reandroid.json.JSONObject;
 import com.reandroid.json.JSONWriter;
+import com.reandroid.utils.collection.CollectionUtil;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -65,7 +66,7 @@ public class InfoWriterJson extends InfoWriter{
                 .key("name").value(dexFile.getFileName())
                 .key("version").value(dexFile.getVersion())
                 .key("markers").array();
-        List<Marker> markersList = dexFile.getMarkers();
+        List<Marker> markersList = CollectionUtil.toList(dexFile.getMarkers());
         for(Marker marker : markersList){
             jsonWriter.value(marker.getJsonObject());
         }
