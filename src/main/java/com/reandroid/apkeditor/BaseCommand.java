@@ -100,7 +100,7 @@ public class BaseCommand<T extends Options> implements APKLogger, XmlCoderLogger
     }
     protected static void removeSignature(ApkModule module){
         ZipEntryMap archive = module.getZipEntryMap();
-        archive.removeAll(Pattern.compile("^META-INF/.+\\.(([MS]F)|(RSA))"));
+        archive.removeIf(Pattern.compile("^META-INF/.+\\.(([MS]F)|(RSA))"));
         archive.remove("stamp-cert-sha256");
     }
 }

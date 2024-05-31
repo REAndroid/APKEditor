@@ -36,6 +36,7 @@ import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.arsc.value.ValueType;
 import com.reandroid.commons.command.ARGException;
+import com.reandroid.utils.collection.CollectionUtil;
 
 import java.io.*;
 import java.util.*;
@@ -191,7 +192,7 @@ public class Info extends BaseCommand<InfoOptions> {
         }
         TableBlock tableBlock = apkModule.getTableBlock();
         InfoWriter infoWriter = getInfoWriter();
-        infoWriter.writePackageNames(tableBlock.listPackages());
+        infoWriter.writePackageNames(CollectionUtil.collect(tableBlock.iterator()));
     }
     private void printVersionCode(AndroidManifestBlock manifest) throws IOException {
         InfoOptions options = getOptions();

@@ -33,6 +33,7 @@ import com.reandroid.arsc.value.ValueType;
 import com.reandroid.arsc.value.array.ArrayBag;
 import com.reandroid.arsc.value.attribute.AttributeBag;
 import com.reandroid.arsc.value.plurals.PluralsBag;
+import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.xml.XMLDocument;
 import com.reandroid.xml.XMLElement;
 
@@ -182,7 +183,7 @@ public class TypeNameRefactor {
         mTypeStrings=new HashMap<>();
         for(PackageBlock packageBlock:tableBlock.listPackages()){
             int pkgId=packageBlock.getId();
-            for(TypeString typeString:packageBlock.getTypeStringPool().listStrings()){
+            for(TypeString typeString:packageBlock.getTypeStringPool()){
                 int pkgTypeId = (pkgId<<24) | ((0xff & typeString.getId())<<16);
                 mTypeStrings.put(pkgTypeId, typeString);
             }
@@ -221,7 +222,7 @@ public class TypeNameRefactor {
                 return;
             }
         }
-        List<ResXmlAttribute> attributeList = listAttributes(xmlBlock.getDocumentElement());
+        List<ResXmlAttribute> attributeList = CollectionUtil.toList(xmlBlock.recursiveAttributes());
         for(ResXmlAttribute attribute:attributeList){
             scanAttribute(attribute, isManifest);
         }
@@ -602,16 +603,6 @@ public class TypeNameRefactor {
     }
     private void removeTypeString(int resourceId){
         mTypeStrings.remove(resourceId&0xffff0000);
-    }
-    private List<ResXmlAttribute> listAttributes(ResXmlElement element){
-        if(element==null){
-            return new ArrayList<>();
-        }
-        List<ResXmlAttribute> results = new ArrayList<>(element.listAttributes());
-        for(ResXmlElement child:element.listElements()){
-            results.addAll(listAttributes(child));
-        }
-        return results;
     }
     private void logMessage(String msg){
         APKLogger logger=apkLogger;
