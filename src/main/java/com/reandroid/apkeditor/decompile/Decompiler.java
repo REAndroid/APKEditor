@@ -16,6 +16,7 @@
 package com.reandroid.apkeditor.decompile;
 
 import com.reandroid.apk.*;
+import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.BaseCommand;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.smali.SmaliDecompiler;
@@ -23,7 +24,11 @@ import com.reandroid.archive.ArchiveFile;
 import com.reandroid.archive.block.ApkSignatureBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.coder.xml.XmlCoder;
+import com.reandroid.common.DiagnosticMessage;
+import com.reandroid.common.DiagnosticsReporter;
 import com.reandroid.commons.command.ARGException;
+import com.reandroid.dex.model.DexDirectory;
+import com.reandroid.graph.ApkBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,9 +63,62 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
             apkModule.validateResourcesDir();
         }
         logMessage("Decompiling to " + options.type + " ...");
+
+        runFullApkRebuildExperimental(apkModule);
+
         ApkModuleDecoder decoder = getApkModuleDecoder(apkModule);
         decoder.decode(options.outputFile);
         logMessage("Saved to: "+options.outputFile);
+    }
+    private void runFullApkRebuildExperimental(ApkModule apkModule) throws IOException {
+        if(!APKEditor.isExperimental()) {
+            return;
+        }
+        if(!canLoadFullDex(apkModule)) {
+            return;
+        }
+        DexDirectory directory = DexDirectory.fromZip(apkModule.getZipEntryMap());
+        DiagnosticsReporter reporter = new DiagnosticsReporter() {
+            @Override
+            public void report(DiagnosticMessage diagnosticMessage) {
+                logMessage(diagnosticMessage.toString());
+            }
+            @Override
+            public boolean isVerboseEnabled() {
+                return false;
+            }
+            @Override
+            public boolean isDebugEnabled() {
+                return false;
+            }
+        };
+        logMessage("Rebuilding apk with new resource id generation ...");
+        ApkBuilder builder = new ApkBuilder(apkModule, directory);
+        builder.setReporter(reporter);
+        builder.build();
+        logMessage("Refreshing and merging ...");
+        directory.refresh();
+
+        // Cleans duplicate strings, codes, section entries ...
+        directory.shrink();
+
+        // Combines dex files to minimum possible number
+        directory.merge();
+
+        directory.refreshFull();
+        directory.save();
+        apkModule.putTag(DexDirectory.class, directory);
+    }
+    private boolean canLoadFullDex(ApkModule apkModule) {
+        int CLASSES_LIMIT = 5;
+        int size = apkModule.listDexFiles().size();
+        logMessage("Total dex files: " + size);
+        if(size > CLASSES_LIMIT) {
+            logMessage("Huge classes your memory might not handle it, decoding separately without advanced features." +
+                    " You can disable this restrictions by increasing \"CLASSES_LIMIT\" variable here on source code");
+            return false;
+        }
+        return true;
     }
     private ApkModuleDecoder getApkModuleDecoder(ApkModule apkModule){
 

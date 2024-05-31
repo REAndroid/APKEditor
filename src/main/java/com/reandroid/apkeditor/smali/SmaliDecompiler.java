@@ -22,16 +22,22 @@ import com.reandroid.apk.DexFileInputSource;
 import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.decompile.DecompileOptions;
 import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.common.DiagnosticsReporter;
 import com.reandroid.dex.common.AnnotationVisibility;
 import com.reandroid.dex.data.AnnotationItem;
+import com.reandroid.dex.key.MethodKey;
 import com.reandroid.dex.key.TypeKey;
+import com.reandroid.dex.model.DexClass;
 import com.reandroid.dex.model.DexClassRepository;
 import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.dex.model.DexFile;
+import com.reandroid.dex.refactor.RenameTypes;
 import com.reandroid.dex.sections.SectionType;
 import com.reandroid.dex.smali.SmaliWriter;
 import com.reandroid.dex.smali.SmaliWriterSetting;
+import com.reandroid.graph.ApkBuilder;
 import com.reandroid.utils.CompareUtil;
+import com.reandroid.utils.StringsUtil;
 import com.reandroid.utils.collection.ArrayCollection;
 import org.jf.baksmali.Baksmali;
 import org.jf.baksmali.BaksmaliOptions;
@@ -71,18 +77,26 @@ public class SmaliDecompiler implements DexDecoder {
     }
     @Override
     public void decodeDex(ApkModule apkModule, File mainDirectory) throws IOException {
-        if(!canLoadFullDex(apkModule) || !APKEditor.isExperimental()) {
+        if(!APKEditor.isExperimental()) {
             DexDecoder.super.decodeDex(apkModule, mainDirectory);
             return;
         }
-        logMessage("Loading full dex ...");
-        DexDirectory directory = DexDirectory.fromZip(apkModule.getZipEntryMap());
+        DexDirectory directory = (DexDirectory) apkModule.getTag(DexDirectory.class);
+        if(directory == null) {
+            if(!canLoadFullDex(apkModule)) {
+                DexDecoder.super.decodeDex(apkModule, mainDirectory);
+                return;
+            }
+            logMessage("Loading full dex ...");
+            directory = DexDirectory.fromZip(apkModule.getZipEntryMap());
+        }
         if(decompileOptions.noDexDebug) {
             logMessage("Clean debug info ...");
             clearDebug_DirtyMethod(directory);
             directory.refresh();
         }
-        directory.refresh();
+
+        logMessage("Dumping smali ...");
         File smali = toSmaliRoot(mainDirectory);
         SmaliWriterSetting setting = new SmaliWriterSetting();
         setting.setResourceIdComment(tableBlock.pickOne());
@@ -100,7 +114,15 @@ public class SmaliDecompiler implements DexDecoder {
         }
     }
     private boolean canLoadFullDex(ApkModule apkModule) {
-        return apkModule.listDexFiles().size() < 5;
+        int CLASSES_LIMIT = 5;
+        int size = apkModule.listDexFiles().size();
+        logMessage("Total dex files: " + size);
+        if(size > CLASSES_LIMIT) {
+            logMessage("Huge classes your memory might not handle it, decoding separately without advanced features." +
+                    " You can disable this restrictions by increasing \"CLASSES_LIMIT\" variable here on source code");
+            return false;
+        }
+        return true;
     }
 
     private void disassembleJesusFreke(DexFileInputSource inputSource, File mainDir) throws IOException {
@@ -160,6 +182,9 @@ public class SmaliDecompiler implements DexDecoder {
             return true;
         }
         if(name.startsWith("Ljavax/")) {
+            return true;
+        }
+        if(name.contains("SourceDebugExtension")) {
             return true;
         }
         return name.contains("Null");

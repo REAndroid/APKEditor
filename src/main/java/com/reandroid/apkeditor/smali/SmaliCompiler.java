@@ -132,6 +132,7 @@ public class SmaliCompiler implements DexEncoder {
         dexFile.setVersion(version);
         dexFile.clearEmptySections();
         dexFile.sortSection(SectionType.getR8Order());
+        dexFile.shrink();
         dexFile.refreshFull();
         dexFile.write(dexCacheFile);
         dexFile.close();
