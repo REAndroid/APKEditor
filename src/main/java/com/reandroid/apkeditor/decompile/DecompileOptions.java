@@ -31,6 +31,9 @@ public class DecompileOptions extends Options {
     public boolean noDexDebug;
     public boolean dexMarkers;
 
+    public File keepClassListFile;
+    public File keepResourceNameListFile;
+
     public DecompileOptions(){
         type=TYPE_XML;
     }
@@ -50,6 +53,8 @@ public class DecompileOptions extends Options {
         if(signaturesDirectory == null && type == null){
             type = TYPE_XML;
         }
+        parseKeepClassList(args);
+        parseKeepResourceNameList(args);
         super.parse(args);
     }
     private void parseKeepResPath(String[] args) {
@@ -104,6 +109,34 @@ public class DecompileOptions extends Options {
             throw new ARGException("No such file: "+file);
         }
         this.inputFile=file;
+    }
+    private void parseKeepClassList(String[] args) throws ARGException {
+        if(!APKEditor.isExperimental()) {
+            return;
+        }
+        this.keepClassListFile = null;
+        File file = parseFile(ARG_keep_classes, args);
+        if(file == null){
+            return;
+        }
+        if(!file.isFile()){
+            throw new ARGException("No such file: "+file);
+        }
+        this.keepClassListFile = file;
+    }
+    private void parseKeepResourceNameList(String[] args) throws ARGException {
+        if(!APKEditor.isExperimental()) {
+            return;
+        }
+        this.keepResourceNameListFile = null;
+        File file = parseFile(ARG_keep_resources, args);
+        if(file == null){
+            return;
+        }
+        if(!file.isFile()){
+            throw new ARGException("No such file: "+file);
+        }
+        this.keepResourceNameListFile = file;
     }
 
     @Override
@@ -168,7 +201,9 @@ public class DecompileOptions extends Options {
                 new String[]{ARG_split_resources, ARG_DESC_split_resources},
                 new String[]{ARG_validate_res_dir, ARG_DESC_validate_res_dir},
                 new String[]{ARG_no_dex_debug, ARG_DESC_no_dex_debug},
-                new String[]{ARG_dex_markers, ARG_DESC_dex_markers}
+                new String[]{ARG_dex_markers, ARG_DESC_dex_markers},
+                new String[]{ARG_keep_classes, ARG_DESC_keep_classes},
+                new String[]{ARG_keep_resources, ARG_DESC_keep_resources}
         };
         StringHelper.printTwoColumns(builder, "   ", Options.PRINT_WIDTH, table);
         String jar = APKEditor.getJarName();
@@ -217,5 +252,11 @@ public class DecompileOptions extends Options {
 
     private static final String ARG_dex_markers = "-dex-markers";
     private static final String ARG_DESC_dex_markers = "Dumps dex markers (applies only when smali mode)";
+
+    private static final String ARG_keep_classes = "-keep-classes";
+    private static final String ARG_DESC_keep_classes = "(Beta) File containing list of class names to keep, Names should be in dalvik format.";
+
+    private static final String ARG_keep_resources = "-keep-resources";
+    private static final String ARG_DESC_keep_resources = "(Beta) File containing list of resources names to keep, Names should be in reference name format. e.g: @string/app_name";
 
 }

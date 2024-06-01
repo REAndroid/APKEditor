@@ -28,6 +28,7 @@ import com.reandroid.common.DiagnosticMessage;
 import com.reandroid.common.DiagnosticsReporter;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.dex.model.DexDirectory;
+import com.reandroid.graph.ApkBuildOption;
 import com.reandroid.graph.ApkBuilder;
 
 import java.io.File;
@@ -81,21 +82,44 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
         DiagnosticsReporter reporter = new DiagnosticsReporter() {
             @Override
             public void report(DiagnosticMessage diagnosticMessage) {
-                logMessage(diagnosticMessage.toString());
+                DiagnosticMessage.Type type = diagnosticMessage.type();
+                String log = diagnosticMessage.toString();
+                if(type == DiagnosticMessage.Type.DEBUG) {
+                    logVerbose(log);
+                }else {
+                    logMessage(log);
+                }
             }
             @Override
             public boolean isVerboseEnabled() {
-                return false;
+                return true;
             }
             @Override
             public boolean isDebugEnabled() {
-                return false;
+                return true;
             }
         };
         logMessage("Rebuilding apk with new resource id generation ...");
         ApkBuilder builder = new ApkBuilder(apkModule, directory);
         builder.setReporter(reporter);
-        builder.build();
+        ApkBuildOption apkBuildOption = builder.getBuildOption();
+
+        File keepClassListFile = getOptions().keepClassListFile;
+        if(keepClassListFile != null) {
+            apkBuildOption.readKeepClassesList(keepClassListFile);
+        }
+        File keepResourceNameListFile = getOptions().keepResourceNameListFile;
+        if(keepResourceNameListFile != null) {
+            apkBuildOption.readKeepResourceNameList(keepResourceNameListFile);
+        }
+
+        // TODO: set values from user command args
+        apkBuildOption.setMinifyClasses(true);
+        apkBuildOption.setMinifyMethods(false);
+        apkBuildOption.setMinifyFields(true);
+        apkBuildOption.setMinifyResources(true);
+
+        builder.apply();
         logMessage("Refreshing and merging ...");
         directory.refresh();
 
