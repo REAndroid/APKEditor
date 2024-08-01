@@ -138,6 +138,18 @@ public class Merger extends BaseCommand<MergerOptions> {
         }
         AndroidManifestBlock manifest = apkModule.getAndroidManifest();
         logMessage("Sanitizing manifest ...");
+
+        // FIXME: declare ID_requiredSplitTypes & ID_splitTypes at AndroidManifest
+        int ID_requiredSplitTypes = 0x0101064e;
+        int ID_splitTypes = 0x0101064f;
+
+        AndroidManifestHelper.removeAttributeFromManifestById(manifest,
+                ID_requiredSplitTypes, this);
+        AndroidManifestHelper.removeAttributeFromManifestById(manifest,
+                ID_splitTypes, this);
+        AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
+                AndroidManifest.NAME_splitTypes, this);
+
         AndroidManifestHelper.removeAttributeFromManifestByName(manifest,
             AndroidManifest.NAME_requiredSplitTypes, this);
         AndroidManifestHelper.removeAttributeFromManifestByName(manifest,

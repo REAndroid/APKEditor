@@ -76,6 +76,21 @@ public class AndroidManifestHelper {
                 logger.logMessage("Removed-attribute : " + resourceName);
         }
     }
+    public static void removeAttributeFromManifestById(AndroidManifestBlock androidManifestBlock,
+                                                         int resourceId, APKLogger logger){
+        ResXmlElement manifestElement = androidManifestBlock.getManifestElement();
+        if(manifestElement == null){
+            if(logger != null){
+                logger.logMessage("WARN: AndroidManifest don't have <manifest>");
+            }
+            return;
+        }
+        int removed = manifestElement.removeAttributesWithId(resourceId);
+        if (removed > 0 && logger != null) {
+            logger.logMessage("Removed-attribute : " + HexUtil.toHex8("@0x", resourceId));
+        }
+    }
+
 
     public static void removeAttributeFromManifestAndApplication(AndroidManifestBlock androidManifestBlock,
                                                                  int resourceId, APKLogger logger, String nameForLogging){
