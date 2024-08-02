@@ -98,7 +98,7 @@ public class TypeNameRefactor {
         }
     }
     private void scanPackageEntries(PackageBlock packageBlock){
-        Iterator<ResourceEntry> itr = packageBlock.iterator();
+        Iterator<ResourceEntry> itr = packageBlock.getResources();
         while (itr.hasNext() && !isFinished()){
             ResourceEntry resourceEntry = itr.next();
             checkEntryGroup(resourceEntry);

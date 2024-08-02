@@ -46,7 +46,7 @@ public abstract class InfoWriter implements Closeable {
         }
     }
     public void writeResources(PackageBlock packageBlock, List<String> typeFilters, boolean writeEntries) throws IOException {
-        Iterator<ResourceEntry> itr = packageBlock.iterator();
+        Iterator<ResourceEntry> itr = packageBlock.getResources();
         while (itr.hasNext()){
             ResourceEntry resourceEntry = itr.next();
             writeResources(resourceEntry, writeEntries);
