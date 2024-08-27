@@ -38,6 +38,7 @@ import com.reandroid.arsc.value.ValueType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -104,6 +105,7 @@ public class Merger extends BaseCommand<MergerOptions> {
         }
         tmp.deleteOnExit();
         ArchiveFile archive = new ArchiveFile(file);
+        fixFilePermissions(archive);
         Predicate <ArchiveEntry> filter = archiveEntry -> archiveEntry.getName().endsWith(".apk");
         int count = archive.extractAll(tmp, filter, this);
         archive.close();
@@ -111,6 +113,15 @@ public class Merger extends BaseCommand<MergerOptions> {
             throw new IOException("No *.apk files found on: " + file);
         }
         return tmp;
+    }
+    private void fixFilePermissions(ArchiveFile archive) {
+        int rw_all = 438; // equivalent to chmod 666
+        Iterator<ArchiveEntry> iterator = archive.iterator();
+        while (iterator.hasNext()) {
+            ArchiveEntry entry = iterator.next();
+            entry.getCentralEntryHeader()
+                    .getFilePermissions().permissions(rw_all);
+        }
     }
     private File toTmpDir(File file){
         String name = file.getName();
