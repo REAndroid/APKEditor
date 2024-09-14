@@ -27,6 +27,7 @@ import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.coder.xml.XmlEncodeException;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.xmlencoder.EncodeException;
+import com.reandroid.jcommand.exceptions.CommandException;
 
 import java.io.IOException;
 
@@ -63,6 +64,9 @@ public class Main {
         try {
             execute(command, args);
             result = 0;
+        } catch (CommandException ex1) {
+            System.err.flush();
+            System.err.println(ex1.getMessage(ResourceStrings.INSTANCE));
         } catch (ARGException ex1) {
             System.err.flush();
             System.err.println(ex1.getMessage());

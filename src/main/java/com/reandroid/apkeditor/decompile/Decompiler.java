@@ -43,7 +43,7 @@ public class Decompiler extends BaseCommand<DecompileOptions> {
         DecompileOptions options = getOptions();
         logMessage("Loading ...");
         ApkModule apkModule=ApkModule.loadApkFile(this,
-                options.inputFile, options.frameworks);
+                options.inputFile, options.getFrameworks());
         apkModule.setPreferredFramework(options.frameworkVersion);
         if(options.signaturesDirectory != null){
             dumpSignatureBlock();

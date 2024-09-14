@@ -16,41 +16,91 @@
 package com.reandroid.apkeditor;
 
 import com.reandroid.commons.command.ARGException;
+import com.reandroid.jcommand.CommandHelpBuilder;
+import com.reandroid.jcommand.CommandParser;
+import com.reandroid.jcommand.annotations.OptionArg;
+import com.reandroid.jcommand.exceptions.CommandException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Options {
+
+    @OptionArg(name = "-i", description = "input_path")
     public File inputFile;
+    @OptionArg(name = "-o", description = "output_path")
     public File outputFile;
+    @OptionArg(name = "-f", flag = true, description = "force_delete")
     public boolean force;
-    public File signaturesDirectory;
     public String type;
-    public Integer frameworkVersion;
-    public File[] frameworks;
+    @OptionArg(name = "-h", alternates = {"-help", "--help"}, description = "help_description", flag = true)
+    public boolean help = false;
+
     public Options(){
     }
+
+    public String getHelpString() {
+        return new CommandHelpBuilder(this.getClass(), ResourceStrings.INSTANCE).build();
+    }
     public void parse(String[] args) throws ARGException {
-        parseForce(args);
-        parseFrameworkVersion(args);
-        parseFrameworks(args);
-        checkUnknownOptions(args);
+        CommandParser.parse(this, args);
+        if (!help) {
+            validateValues();
+        }
+    }
+    public void validateValues() {
+        validateInput(true, false);
+        validateOutput(true);
+    }
+    public void validateInput(boolean isFile, boolean isDirectory) {
+        File file = this.inputFile;
+        if (file == null) {
+            throw new CommandException("missing_input_file");
+        }
+        validateInputFile(file, isFile, isDirectory);
+    }
+    public void validateInputFile(File file, boolean isFile, boolean isDirectory) {
+        if (isFile) {
+            if(file.isFile()) {
+                return;
+            }
+            if(!isDirectory) {
+                throw new CommandException("no_such_file", file);
+            }
+        }
+        if (isDirectory) {
+            if(file.isDirectory()) {
+                return;
+            }
+            throw new CommandException("no_such_directory", file);
+        }
+        if (!file.exists()) {
+            throw new CommandException("no_such_file_or_directory", file);
+        }
     }
 
-    protected void parseFrameworks(String[] args) throws ARGException {
-        frameworks = null;
-        File file = parseFramework(args);
-        if(file == null){
+    public void validateOutput(boolean isFile) {
+        File file = this.outputFile;
+        if (file == null) {
+            file = generateOutputFromInput(this.inputFile);
+            this.outputFile = file;
+        }
+        if (file == null || !file.exists()) {
             return;
         }
-        List<File> fileList = new ArrayList<>();
-        while (file != null){
-            fileList.add(file);
-            file = parseFramework(args);
+        if (isFile != file.isFile()) {
+            if (file.isFile()) {
+                throw new CommandException("path_is_file_expect_directory", file);
+            }
+            throw new CommandException("path_is_directory_expect_file", file);
         }
-        frameworks = fileList.toArray(new File[0]);
+        if(!force) {
+            throw new CommandException("path_already_exists", file);
+        }
     }
+    public File generateOutputFromInput(File input) {
+        return null;
+    }
+
     private File parseFramework(String[] args) throws ARGException {
         String path = parseArgValue(ARG_framework, args);
         if(path == null){
@@ -62,29 +112,12 @@ public class Options {
         }
         return file;
     }
-    protected void parseFrameworkVersion(String[] args) throws ARGException {
-        String version = parseArgValue(ARG_framework_version, args);
-        if(version == null){
-            return;
-        }
-        try {
-            this.frameworkVersion = Integer.parseInt(version);
-        }catch (NumberFormatException ex){
-            throw new ARGException("Invalid number value for: " + ARG_framework_version );
-        }
-    }
     protected void parseType(String[] args) throws ARGException {
         parseType(args, TYPE_JSON);
     }
     protected void parseType(String[] args, String def) throws ARGException {
         String[] choices = new String[]{TYPE_JSON, TYPE_XML, TYPE_RAW, TYPE_SIG};
         this.type = parseType(ARG_type, args, choices, def);
-    }
-    protected void parseSignaturesDir(String[] args) throws ARGException {
-        this.signaturesDirectory = parseFile(ARG_sig, args);
-    }
-    private void parseForce(String[] args) throws ARGException {
-        force=containsArg(ARG_force, true, args);
     }
     protected void checkUnknownOptions(String[] args) throws ARGException {
         args=Util.trimNull(args);
@@ -210,7 +243,13 @@ public class Options {
         return def;
     }
 
-    public static final int PRINT_WIDTH = 75;
+    public static String getHelp(Class<?> optionClass){
+        CommandHelpBuilder builder = new CommandHelpBuilder(optionClass, ResourceStrings.INSTANCE);
+        builder.setMaxWidth(Options.PRINT_WIDTH);
+        return builder.build();
+    }
+
+    public static final int PRINT_WIDTH = 80;
 
     protected static final String ARG_ALL_help = "-h|-help";
     protected static final String ARG_DESC_help = "Prints this help";

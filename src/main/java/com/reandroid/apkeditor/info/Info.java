@@ -53,7 +53,7 @@ public class Info extends BaseCommand<InfoOptions> {
         setEnableLog(options.outputFile != null);
         logMessage("Loading: " + options.inputFile);
         ApkModule apkModule = ApkModule.loadApkFile(this, options.inputFile,
-                options.frameworks);
+                options.getFrameworks());
         String msg = Util.isProtected(apkModule);
         if(msg != null){
             logWarn(msg);
