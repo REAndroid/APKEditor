@@ -26,6 +26,9 @@ dependencies {
 
     // built from: https://github.com/REAndroid/smali-lib
     compile(files("$rootProject.projectDir/libs/smali.jar"))
+
+    // built from: https://github.com/REAndroid/JCommand
+    compile(files("$rootProject.projectDir/libs/JCommand.jar"))
 }
 
 processResources {

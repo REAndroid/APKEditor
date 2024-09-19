@@ -16,6 +16,8 @@
 package com.reandroid.apkeditor;
 
 import com.reandroid.apk.ApkModule;
+import com.reandroid.archive.InputSource;
+import com.reandroid.archive.ZipEntryMap;
 import com.reandroid.arsc.array.StringArray;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.item.IntegerItem;
@@ -25,8 +27,10 @@ import com.reandroid.arsc.pool.TableStringPool;
 import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 public class Util {
     public static boolean isHelp(String[] args){
@@ -178,22 +182,14 @@ public class Util {
     }
     // This is to respect someone's protection from editing,
     // if you reach here be ethical do not patch it for distribution.
-    public static String isProtected(ApkModule apkModule){
-        Properties properties = null;
-        try {
-            TableBlock tableBlock = apkModule.getTableBlock();
-            String str = loadApkEditorProperties(tableBlock);
-            properties = loadApkEditorProperties(str);
-        } catch (Exception ignored) {
+    public static String isProtected(ApkModule apkModule) {
+        ZipEntryMap zipEntryMap = apkModule.getZipEntryMap();
+        Iterator<InputSource> iterator = zipEntryMap.iteratorWithPath(
+                path -> (path.startsWith("classes.dex/") ||  path.startsWith("AndroidManifest.xml/")));
+        if(iterator.hasNext()) {
+            return EDIT_TYPE_PROTECTED;
         }
-        if(properties == null){
-            return null;
-        }
-        String protect = properties.getProperty("EDIT_TYPE", null);
-        if(protect==null || !protect.contains(EDIT_TYPE_PROTECTED)){
-            return null;
-        }
-        return protect;
+        return null;
     }
     private static String loadApkEditorProperties(TableBlock tableBlock){
         if(tableBlock == null){

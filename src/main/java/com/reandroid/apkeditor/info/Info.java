@@ -16,7 +16,7 @@
 package com.reandroid.apkeditor.info;
 
 import com.reandroid.apk.ApkModule;
-import com.reandroid.apkeditor.BaseCommand;
+import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.app.AndroidManifest;
 import com.reandroid.arsc.chunk.PackageBlock;
@@ -35,25 +35,25 @@ import com.reandroid.arsc.value.AttributeDataFormat;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.arsc.value.ValueType;
-import com.reandroid.commons.command.ARGException;
 import com.reandroid.utils.collection.CollectionUtil;
 
 import java.io.*;
 import java.util.*;
 
-public class Info extends BaseCommand<InfoOptions> {
+public class Info extends CommandExecutor<InfoOptions> {
     private InfoWriter mInfoWriter;
     public Info(InfoOptions options){
         super(options, "[INFO] ");
         super.setEnableLog(options.outputFile != null);
     }
     @Override
-    public void run() throws IOException{
+    public void runCommand() throws IOException{
         InfoOptions options = getOptions();
         setEnableLog(options.outputFile != null);
+        delete(options.outputFile);
         logMessage("Loading: " + options.inputFile);
         ApkModule apkModule = ApkModule.loadApkFile(this, options.inputFile,
-                options.frameworks);
+                options.getFrameworks());
         String msg = Util.isProtected(apkModule);
         if(msg != null){
             logWarn(msg);
@@ -433,17 +433,6 @@ public class Info extends BaseCommand<InfoOptions> {
         }
     }
 
-    public static void execute(String[] args) throws ARGException, IOException {
-        if(Util.isHelp(args)){
-            throw new ARGException(InfoOptions.getHelp());
-        }
-        InfoOptions option = new InfoOptions();
-        option.parse(args);
-        Info info = new Info(option);
-        info.logVersion();
-        info.run();
-    }
-
     private static List<Entry> sortEntries(Collection<Entry> entryCollection) {
         ArrayList<Entry> results;
         if(entryCollection instanceof ArrayList){
@@ -460,16 +449,4 @@ public class Info extends BaseCommand<InfoOptions> {
         results.sort(cmp);
         return results;
     }
-
-    public static boolean isCommand(String command){
-        if(Util.isEmpty(command)){
-            return false;
-        }
-        command=command.toLowerCase().trim();
-        return command.equals(ARG_SHORT);
-    }
-
-    public static final String ARG_SHORT = "info";
-    public static final String DESCRIPTION = "Prints information of apk";
-
 }

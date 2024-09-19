@@ -1,4 +1,4 @@
- /*
+/*
   *  Copyright (C) 2022 github.com/REAndroid
   *
   *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +16,13 @@
 package com.reandroid.apkeditor.protect;
 
 import com.reandroid.apkeditor.APKEditor;
-import com.reandroid.apkeditor.BaseCommand;
+import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.chunk.UnknownChunk;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.item.ByteArray;
 import com.reandroid.arsc.item.FixedLengthString;
-import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.*;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
@@ -31,19 +30,18 @@ import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResConfig;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
 
-public class Protector extends BaseCommand<ProtectorOptions> {
+public class Protector extends CommandExecutor<ProtectorOptions> {
     public Protector(ProtectorOptions options){
         super(options, "[PROTECT] ");
     }
 
     @Override
-    public void run() throws IOException {
-        logMessage("Loading apk ...");
+    public void runCommand() throws IOException {
         ProtectorOptions options = getOptions();
+        delete(options.outputFile);
         ApkModule module = ApkModule.loadApkFile(this, options.inputFile);
         module.setLoadDefaultFramework(false);
         String protect = Util.isProtected(module);
@@ -137,35 +135,4 @@ public class Protector extends BaseCommand<ProtectorOptions> {
             i++;
         }
     }
-    public static void execute(String[] args) throws ARGException, IOException {
-        if(Util.isHelp(args)){
-            throw new ARGException(ProtectorOptions.getHelp());
-        }
-        ProtectorOptions option = new ProtectorOptions();
-        option.parse(args);
-        File outFile = option.outputFile;
-        Util.deleteEmptyDirectories(outFile);
-        Protector protector = new Protector(option);
-        protector.logVersion();
-        if(outFile.exists()){
-            if(!option.force){
-                throw new ARGException("Path already exists: "+outFile);
-            }
-            protector.logMessage("Deleting: " + outFile);
-            Util.deleteDir(outFile);
-        }
-        protector.logMessage("Protecting ...\n" + option);
-        protector.run();
-    }
-
-    public static boolean isCommand(String command){
-        if(Util.isEmpty(command)){
-            return false;
-        }
-        command=command.toLowerCase().trim();
-        return command.equals(ARG_SHORT) || command.equals(ARG_LONG);
-    }
-    public static final String ARG_SHORT="p";
-    public static final String ARG_LONG="protect";
-    public static final String DESCRIPTION="Protects/Obfuscates apk resource";
 }
