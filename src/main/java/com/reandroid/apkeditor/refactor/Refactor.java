@@ -15,23 +15,22 @@
  */
 package com.reandroid.apkeditor.refactor;
 
-import com.reandroid.apkeditor.BaseCommand;
+import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.arsc.chunk.TableBlock;
-import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.ApkModule;
 
-import java.io.File;
 import java.io.IOException;
 
-public class Refactor extends BaseCommand<RefactorOptions> {
+public class Refactor extends CommandExecutor<RefactorOptions> {
     public Refactor(RefactorOptions options){
         super(options, "[REFACTOR] ");
     }
     @Override
-    public void run() throws IOException {
+    public void runCommand() throws IOException {
         RefactorOptions options = getOptions();
-        logMessage("Loading apk: "+options.inputFile);
+        delete(options.outputFile);
+        logMessage("Loading apk: " + options.inputFile);
         ApkModule module = ApkModule.loadApkFile(this, options.inputFile);
         if(!module.hasTableBlock()){
             throw new IOException("Don't have " + TableBlock.FILE_NAME);
@@ -73,34 +72,4 @@ public class Refactor extends BaseCommand<RefactorOptions> {
         module.writeApk(options.outputFile);
         logMessage("Saved to: "+options.outputFile);
     }
-    public static void execute(String[] args) throws ARGException, IOException {
-        if(Util.isHelp(args)){
-            throw new ARGException(RefactorOptions.getHelp());
-        }
-        RefactorOptions option = new RefactorOptions();
-        option.parse(args);
-        File outFile=option.outputFile;
-        Util.deleteEmptyDirectories(outFile);
-        Refactor refactor = new Refactor(option);
-        refactor.logVersion();
-        if(outFile.exists()){
-            if(!option.force){
-                throw new ARGException("Path already exists: "+outFile);
-            }
-            refactor.logMessage("Deleting: "+outFile);
-            Util.deleteDir(outFile);
-        }
-        refactor.logMessage("Refactoring ...\n"+option);
-        refactor.run();
-    }
-    public static boolean isCommand(String command){
-        if(Util.isEmpty(command)){
-            return false;
-        }
-        command=command.toLowerCase().trim();
-        return command.equals(ARG_SHORT) || command.equals(ARG_LONG);
-    }
-    public static final String ARG_SHORT="x";
-    public static final String ARG_LONG="refactor";
-    public static final String DESCRIPTION="Refactors obfuscated resource names";
 }

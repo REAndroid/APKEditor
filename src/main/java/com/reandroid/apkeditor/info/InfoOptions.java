@@ -15,7 +15,6 @@
  */
 package com.reandroid.apkeditor.info;
 
-import com.reandroid.apkeditor.Options;
 import com.reandroid.apkeditor.OptionsWithFramework;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.commons.command.ARGException;
@@ -88,6 +87,11 @@ public class InfoOptions extends OptionsWithFramework {
     }
 
     @Override
+    public Info newCommandExecutor() {
+        return new Info(this);
+    }
+
+    @Override
     public void validateInput(boolean isFile, boolean isDirectory) {
         super.validateInput(true, false);
     }
@@ -135,9 +139,5 @@ public class InfoOptions extends OptionsWithFramework {
             appClass = false;
             dex = false;
         }
-    }
-
-    public static String getHelp(){
-        return Options.getHelp(InfoOptions.class);
     }
 }

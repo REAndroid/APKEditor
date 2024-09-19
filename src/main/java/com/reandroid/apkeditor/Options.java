@@ -15,13 +15,17 @@
   */
 package com.reandroid.apkeditor;
 
+import com.reandroid.arsc.ARSCLib;
 import com.reandroid.commons.command.ARGException;
 import com.reandroid.jcommand.CommandHelpBuilder;
-import com.reandroid.jcommand.CommandParser;
+import com.reandroid.jcommand.OptionStringBuilder;
+import com.reandroid.jcommand.SubCommandHelpBuilder;
+import com.reandroid.jcommand.SubCommandParser;
 import com.reandroid.jcommand.annotations.OptionArg;
 import com.reandroid.jcommand.exceptions.CommandException;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Options {
 
@@ -35,15 +39,34 @@ public class Options {
     @OptionArg(name = "-h", alternates = {"-help", "--help"}, description = "help_description", flag = true)
     public boolean help = false;
 
-    public Options(){
+    private boolean mValidated;
+
+    public Options() {
     }
 
-    public String getHelpString() {
-        return new CommandHelpBuilder(this.getClass(), ResourceStrings.INSTANCE).build();
+    public String getHelp() {
+        SubCommandHelpBuilder builder = new SubCommandHelpBuilder(ResourceStrings.INSTANCE, this.getClass());
+        builder.setMaxWidth(Options.PRINT_WIDTH);
+        builder.setColumnSeparator("   ");
+        return builder.build();
     }
     public void parse(String[] args) throws ARGException {
-        CommandParser.parse(this, args);
+        SubCommandParser.parse(this, args);
         if (!help) {
+            validateValues();
+        }
+    }
+    public void runCommand() throws IOException {
+        CommandExecutor<?> executor = newCommandExecutor();
+        executor.logMessage(this.toString());
+        executor.runCommand();
+    }
+    public CommandExecutor<?> newCommandExecutor() {
+        throw new RuntimeException("Method not implemented");
+    }
+    public void validate() {
+        if (!help && !mValidated) {
+            mValidated = true;
             validateValues();
         }
     }
@@ -100,186 +123,44 @@ public class Options {
     public File generateOutputFromInput(File input) {
         return null;
     }
-
-    private File parseFramework(String[] args) throws ARGException {
-        String path = parseArgValue(ARG_framework, args);
-        if(path == null){
-            return null;
+    public File generateOutputFromInput(File file, String suffix) {
+        String name = file.getName();
+        if (file.isFile()) {
+            int i = name.lastIndexOf('.');
+            if(i > 0){
+                name = name.substring(0, i);
+            }
         }
-        File file = new File(path);
-        if(!file.isFile()){
-            throw new ARGException("No such file: " + path);
+        name = name + suffix;
+        File dir = file.getParentFile();
+        if (dir == null) {
+            return new File(name);
         }
-        return file;
-    }
-    protected void parseType(String[] args) throws ARGException {
-        parseType(args, TYPE_JSON);
-    }
-    protected void parseType(String[] args, String def) throws ARGException {
-        String[] choices = new String[]{TYPE_JSON, TYPE_XML, TYPE_RAW, TYPE_SIG};
-        this.type = parseType(ARG_type, args, choices, def);
-    }
-    protected void checkUnknownOptions(String[] args) throws ARGException {
-        args=Util.trimNull(args);
-        if(Util.isEmpty(args)){
-            return;
-        }
-        throw new ARGException("Unknown option: "+args[0]);
+        return new File(dir, name);
     }
 
-    protected String parseType(String argSwitch, String[] args, String[] availableTypes, String def) throws ARGException {
-        String type = parseArgValue(argSwitch, args);
-        if(type == null){
-            return def;
-        }
-        type = type.trim();
-        String typeLower = type.toLowerCase();
-        for(String choice : availableTypes){
-            if(typeLower.equals(choice)){
-                return typeLower;
-            }
-        }
-        StringBuilder builder = new StringBuilder();
-        builder.append("Unknown type: '");
-        builder.append(type);
-        builder.append("' , must be one of {");
-        for(int i = 0; i < availableTypes.length; i++){
-            if(i != 0){
-                builder.append(", ");
-            }
-            builder.append(availableTypes[i]);
-        }
-        builder.append("}");
-        throw new ARGException(builder.toString());
-    }
-    protected String parseArgValue(String argSwitch, String[] args) throws ARGException {
-        return parseArgValue(argSwitch, true, args);
-    }
-    protected String parseArgValue(String argSwitch, boolean ignore_case, String[] args) throws ARGException {
-        if(ignore_case){
-            argSwitch=argSwitch.toLowerCase();
-        }
-        int max=args.length;
-        for(int i=0;i<max;i++){
-            String s=args[i];
-            if(s==null){
-                continue;
-            }
-            s=s.trim();
-            String tmpArg=s;
-            if(ignore_case){
-                tmpArg=tmpArg.toLowerCase();
-            }
-            if(tmpArg.equals(argSwitch)){
-                int i2=i+1;
-                if(i2>=max){
-                    throw new ARGException("Missing value near: \""+s+"\"");
-                }
-                String value=args[i2];
-                if(Util.isEmpty(value)){
-                    throw new ARGException("Missing value near: \""+s+"\"");
-                }
-                value=value.trim();
-                args[i]=null;
-                args[i2]=null;
-                return value;
-            }
-        }
-        return null;
-    }
-    protected File parseFile(String argSwitch, String[] args) throws ARGException {
-        int max=args.length;
-        for(int i=0;i<max;i++){
-            String s=args[i];
-            if(s==null){
-                continue;
-            }
-            s=s.trim();
-            if(s.equals(argSwitch)){
-                int i2=i+1;
-                if(i2>=max){
-                    throw new ARGException("Missing path near: \""+argSwitch+"\"");
-                }
-                String path=args[i2];
-                if(Util.isEmpty(path)){
-                    throw new ARGException("Missing path near: \""+argSwitch+"\"");
-                }
-                path=path.trim();
-                args[i]=null;
-                args[i2]=null;
-                return new File(path);
-            }
-        }
-        return null;
-    }
-    protected boolean containsArg(String argSwitch, String[] args) {
-        return containsArg(argSwitch, true, args, false);
-    }
-    protected boolean containsArg(String argSwitch, String[] args, boolean def) {
-        return containsArg(argSwitch, true, args, def);
-    }
-    protected boolean containsArg(String argSwitch, boolean ignore_case, String[] args){
-        return containsArg(argSwitch, ignore_case, args, false);
-    }
-    protected boolean containsArg(String argSwitch, boolean ignore_case, String[] args, boolean def) {
-        if(ignore_case){
-            argSwitch=argSwitch.toLowerCase();
-        }
-        int max=args.length;
-        for(int i=0;i<max;i++){
-            String s=args[i];
-            if(s==null){
-                continue;
-            }
-            s=s.trim();
-            if(ignore_case){
-                s=s.toLowerCase();
-            }
-            if(s.equals(argSwitch)){
-                args[i]=null;
-                return true;
-            }
-        }
-        return def;
+    @Override
+    public String toString() {
+        OptionStringBuilder builder = new OptionStringBuilder(this);
+        builder.setMaxWidth(Options.PRINT_WIDTH);
+        builder.setTab2("      ");
+        return "Using: " + APKEditor.getName() + " version " + APKEditor.getVersion() +
+                ", " + ARSCLib.getName() + " version " + ARSCLib.getVersion() +
+                "\n" + builder.buildTable();
     }
 
     public static String getHelp(Class<?> optionClass){
-        CommandHelpBuilder builder = new CommandHelpBuilder(optionClass, ResourceStrings.INSTANCE);
+        CommandHelpBuilder builder = new CommandHelpBuilder(ResourceStrings.INSTANCE, optionClass);
         builder.setMaxWidth(Options.PRINT_WIDTH);
         return builder.build();
     }
 
     public static final int PRINT_WIDTH = 80;
 
-    protected static final String ARG_ALL_help = "-h|-help";
-    protected static final String ARG_DESC_help = "Prints this help";
-
-    protected static final String ARG_output="-o";
-    protected static final String ARG_DESC_output="output path";
-    protected static final String ARG_input="-i";
-    protected static final String ARG_DESC_input="input path";
-    protected static final String ARG_resDir="-res-dir";
-    protected static final String ARG_DESC_resDir="sets resource files root dir name\n(eg. for obfuscation to move files from 'res/*' to 'r/*' or vice versa)";
-    protected static final String ARG_validate_res_dir="-vrd";
-    protected static final String ARG_DESC_validate_res_dir="validate resources dir name\n(eg. if a drawable resource file path is 'res/abc.png' then\nit will be moved to 'res/drawable/abc.png')";
-    protected static final String ARG_force="-f";
-    protected static final String ARG_DESC_force="force delete output path";
-    protected static final String ARG_cleanMeta = "-clean-meta";
-    protected static final String ARG_DESC_cleanMeta = "cleans META-INF directory along with signature block";
-
-    protected static final String ARG_sig = "-sig";
-    protected static final String ARG_DESC_sig = "signatures directory path";
-    protected static final String ARG_framework_version = "-framework-version";
-    protected static final String ARG_DESC_framework_version = "preferred framework version number";
-    protected static final String ARG_framework = "-framework";
-    protected static final String ARG_DESC_framework = "path of framework file (can be multiple)";
-    public static final String ARG_type = "-t";
 
     public static final String TYPE_SIG = "sig";
     public static final String TYPE_JSON = "json";
     public static final String TYPE_RAW = "raw";
     public static final String TYPE_XML = "xml";
     public static final String TYPE_TEXT = "text";
-
-    protected static final String LINE = "    ------------------------------------------------------------------------";
 }

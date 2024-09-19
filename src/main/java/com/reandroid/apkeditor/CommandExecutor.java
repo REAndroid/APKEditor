@@ -22,20 +22,41 @@ import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.coder.xml.XmlCoderLogger;
 import com.reandroid.commons.utils.log.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-public class BaseCommand<T extends Options> implements APKLogger, XmlCoderLogger {
+public class CommandExecutor<T extends Options> implements APKLogger, XmlCoderLogger {
+
     private final T options;
     private String mLogTag;
     private boolean mEnableLog;
-    public BaseCommand(T options, String logTag){
+
+    public CommandExecutor(T options, String logTag){
         this.options = options;
         this.mLogTag = logTag;
         this.mEnableLog = true;
     }
-    public void run() throws IOException{
-
+    /**
+     * use run()
+     * */
+    @Deprecated
+    public void run() throws IOException {
+        runCommand();
+    }
+    public void runCommand() throws IOException {
+        throw new RuntimeException("Method not implemented");
+    }
+    protected void delete(File file) {
+        if(file == null || !file.exists()) {
+            return;
+        }
+        logMessage("Delete: " + file);
+        if(file.isFile()) {
+            file.delete();
+        } else if(file.isDirectory()) {
+            Util.deleteDir(file);
+        }
     }
     protected T getOptions() {
         return options;

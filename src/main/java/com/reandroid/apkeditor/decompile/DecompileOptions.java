@@ -15,7 +15,6 @@
   */
 package com.reandroid.apkeditor.decompile;
 
-import com.reandroid.apkeditor.Options;
 import com.reandroid.apkeditor.OptionsWithFramework;
 import com.reandroid.jcommand.annotations.ChoiceArg;
 import com.reandroid.jcommand.annotations.CommandOptions;
@@ -69,10 +68,12 @@ public class DecompileOptions extends OptionsWithFramework {
     @OptionArg(name = "-dex-markers", flag = true, description = "dump_dex_markers")
     public boolean dexMarkers;
 
-    public File keepClassListFile;
-    public File keepResourceNameListFile;
-
     public DecompileOptions() {
+    }
+
+    @Override
+    public Decompiler newCommandExecutor() {
+        return new Decompiler(this);
     }
 
     @Override
@@ -86,60 +87,7 @@ public class DecompileOptions extends OptionsWithFramework {
 
     @Override
     public File generateOutputFromInput(File input) {
-        String name = input.getName();
-        int i = name.lastIndexOf('.');
-        if(i > 0){
-            name = name.substring(0, i);
-        }
-        name = name + "_decompile_" + type;
-        File dir = input.getParentFile();
-        if(dir == null) {
-            return new File(name);
-        }
-        return new File(dir, name);
+        return generateOutputFromInput(input, "_decompile_" + type);
     }
 
-    @Override
-    public String toString(){
-        StringBuilder builder=new StringBuilder();
-        builder.append("   Input: ").append(inputFile);
-        File out;
-        if(signaturesDirectory != null){
-            out = signaturesDirectory;
-        }else {
-            out = outputFile;
-        }
-        builder.append("\n Output: ").append(out);
-        if(resDirName!=null){
-            builder.append("\nres dir: ").append(resDirName);
-        }
-        if(validateResDir){
-            builder.append("\n Validate res dir name: true");
-        }
-        if(force){
-            builder.append("\n Force: true");
-        }
-        if(keepResPath){
-            builder.append("\n Keep res path: true");
-        }
-        if(frameworkVersion != null){
-            builder.append("\nFramework version: ").append(frameworkVersion);
-        }
-        builder.append("\n Type: ").append(type);
-        if(!TYPE_XML.equals(type) && signaturesDirectory == null){
-            builder.append("\n Split: ").append(splitJson);
-        }
-        if(frameworks.size() != 0){
-            builder.append("\nFrameworks:");
-            for(File file : frameworks){
-                builder.append("\n           ");
-                builder.append(file);
-            }
-        }
-        builder.append("\n ---------------------------- ");
-        return builder.toString();
-    }
-    public static String getHelp(){
-        return Options.getHelp(DecompileOptions.class);
-    }
 }

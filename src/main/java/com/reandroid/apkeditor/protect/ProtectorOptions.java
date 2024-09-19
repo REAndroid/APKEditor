@@ -16,7 +16,6 @@
 package com.reandroid.apkeditor.protect;
 
 import com.reandroid.apkeditor.Options;
-import com.reandroid.commons.command.ARGException;
 import com.reandroid.jcommand.annotations.CommandOptions;
 import com.reandroid.jcommand.annotations.OptionArg;
 
@@ -39,6 +38,11 @@ public class ProtectorOptions extends Options {
     }
 
     @Override
+    public Protector newCommandExecutor() {
+        return new Protector(this);
+    }
+
+    @Override
     public void validateInput(boolean isFile, boolean isDirectory) {
         super.validateInput(true, false);
     }
@@ -49,45 +53,7 @@ public class ProtectorOptions extends Options {
     }
 
     @Override
-    public File generateOutputFromInput(File file){
-        String name = file.getName();
-        int i = name.lastIndexOf('.');
-        if(i>0){
-            name = name.substring(0, i);
-        }
-        name=name + "_protected.apk";
-        File dir = file.getParentFile();
-        if(dir == null){
-            return new File(name);
-        }
-        return new File(dir, name);
+    public File generateOutputFromInput(File input) {
+        return generateOutputFromInput(input, "_protected.apk");
     }
-    private void parseInput(String[] args) throws ARGException {
-        this.inputFile=null;
-        File file=parseFile(ARG_input, args);
-        if(file==null){
-            throw new ARGException("Missing input file");
-        }
-        if(!file.isFile()){
-            throw new ARGException("No such file: "+file);
-        }
-        this.inputFile=file;
-    }
-    @Override
-    public String toString(){
-        StringBuilder builder=new StringBuilder();
-        builder.append("   Input: ").append(inputFile);
-        builder.append("\n Output: ").append(outputFile);
-        if(force){
-            builder.append("\n Force: true");
-        }
-        builder.append("\n ---------------------------- ");
-        return builder.toString();
-    }
-    public static String getHelp(){
-        return Options.getHelp(ProtectorOptions.class);
-    }
-
-    protected static final String ARG_skipManifest = "-skip-manifest";
-    protected static final String ARG_DESC_skipManifest = "skips/ignores manifest";
 }

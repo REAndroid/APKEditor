@@ -16,36 +16,35 @@
 package com.reandroid.apkeditor.compile;
 
 import com.reandroid.apk.*;
-import com.reandroid.apkeditor.BaseCommand;
-import com.reandroid.apkeditor.Util;
+import com.reandroid.apkeditor.CommandExecutor;
+import com.reandroid.apkeditor.Options;
 import com.reandroid.apkeditor.smali.SmaliCompiler;
-import com.reandroid.app.AndroidManifest;
 import com.reandroid.archive.ArchiveFile;
 import com.reandroid.archive.block.ApkSignatureBlock;
 import com.reandroid.archive.writer.ApkFileWriter;
-import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.coder.xml.XmlCoder;
-import com.reandroid.commons.command.ARGException;
 
 import java.io.File;
 import java.io.IOException;
 
-public class Builder extends BaseCommand<BuildOptions> {
+public class Builder extends CommandExecutor<BuildOptions> {
+
     public Builder(BuildOptions options){
         super(options, "[BUILD] ");
     }
+
     @Override
-    public void run() throws IOException {
+    public void runCommand() throws IOException {
         BuildOptions options = getOptions();
-        if(options.signaturesDirectory != null && options.inputFile.isFile()){
+        delete(options.outputFile);
+        String type = options.type;
+        if (Options.TYPE_SIG.equals(type)) {
             restoreSignatures();
-            return;
-        }
-        if(options.isRaw){
+        } else if(Options.TYPE_RAW.equals(type)) {
             buildRaw();
-        }else if(options.isXml){
+        } else if(Options.TYPE_XML.equals(type)) {
             buildXml();
-        }else {
+        } else if(Options.TYPE_JSON.equals(type)) {
             buildJson();
         }
     }
@@ -94,7 +93,7 @@ public class Builder extends BaseCommand<BuildOptions> {
     }
     public void buildXml() throws IOException {
         logMessage("Scanning XML directory ...");
-        XmlCoder.getInstance().setLogger(this);
+        XmlCoder.getInstance().getSetting().setLogger(this);
         ApkModuleXmlEncoder encoder=new ApkModuleXmlEncoder();
         encoder.setApkLogger(this);
 
@@ -108,10 +107,8 @@ public class Builder extends BaseCommand<BuildOptions> {
         loadedModule.setAPKLogger(this);
 
         loadedModule.setPreferredFramework(options.frameworkVersion);
-        if(options.frameworks != null){
-            for(File file : options.frameworks){
-                loadedModule.addExternalFramework(file);
-            }
+        for (File file : options.frameworks) {
+            loadedModule.addExternalFramework(file);
         }
         encoder.scanDirectory(options.inputFile);
         loadedModule = encoder.getApkModule();
@@ -139,10 +136,8 @@ public class Builder extends BaseCommand<BuildOptions> {
         loadedModule.setAPKLogger(this);
 
         loadedModule.setPreferredFramework(options.frameworkVersion);
-        if(options.frameworks != null){
-            for(File file : options.frameworks){
-                loadedModule.addExternalFramework(file);
-            }
+        for(File file : options.frameworks){
+            loadedModule.addExternalFramework(file);
         }
         encoder.scanDirectory(options.inputFile);
         loadedModule = encoder.getApkModule();
@@ -151,91 +146,4 @@ public class Builder extends BaseCommand<BuildOptions> {
         loadedModule.close();
         logMessage("Saved to: " + options.outputFile);
     }
-    public static void execute(String[] args) throws ARGException, IOException {
-        if(Util.isHelp(args)){
-            throw new ARGException(BuildOptions.getHelp());
-        }
-        BuildOptions option=new BuildOptions();
-        option.parse(args);
-        if(isRawInDir(option.inputFile)){
-            option.isRaw = true;
-        }else if(isJsonInDir(option.inputFile)){
-            option.inputFile = getJsonInDir(option.inputFile);
-        }else if (isXmlInDir(option.inputFile)){
-            option.isXml=true;
-        }else if(option.signaturesDirectory == null){
-            throw new ARGException("Not xml/json directory: "+option.inputFile);
-        }
-        File outDir = option.outputFile;
-        Util.deleteEmptyDirectories(outDir);
-        Builder builder = new Builder(option);
-        builder.logVersion();
-        builder.logMessage("Building ...\n" + option.toString());
-        if(outDir.exists()){
-            if(!option.force){
-                throw new ARGException("Path already exists: "+outDir);
-            }
-            builder.logMessage("Deleting: " + outDir);
-            Util.deleteDir(outDir);
-        }
-        builder.run();
-    }
-    private static boolean isRawInDir(File dir){
-        File file=new File(dir, AndroidManifest.FILE_NAME_BIN);
-        if(!file.isFile()){
-            file = new File(dir, TableBlock.FILE_NAME);
-        }
-        return file.isFile();
-    }
-    private static boolean isXmlInDir(File dir){
-        File manifest = new File(dir, AndroidManifest.FILE_NAME);
-        return manifest.isFile();
-    }
-    private static boolean isJsonInDir(File dir) {
-        if(isModuleDir(dir)){
-            return true;
-        }
-        File[] files=dir.listFiles();
-        if(files==null){
-            return false;
-        }
-        for(File file:files){
-            if(isModuleDir(file)){
-                return true;
-            }
-        }
-        return false;
-    }
-    private static File getJsonInDir(File dir) throws ARGException {
-        if(isModuleDir(dir)){
-            return dir;
-        }
-        File[] files=dir.listFiles();
-        if(files==null){
-            throw new ARGException("Empty directory: "+dir);
-        }
-        for(File file:files){
-            if(isModuleDir(file)){
-                return file;
-            }
-        }
-        throw new ARGException("Invalid directory: "+dir+", missing file \"uncompressed-files.json\"");
-    }
-    private static boolean isModuleDir(File dir){
-        if(!dir.isDirectory()){
-            return false;
-        }
-        File file = new File(dir, AndroidManifest.FILE_NAME_JSON);
-        return file.isFile();
-    }
-    public static boolean isCommand(String command){
-        if(Util.isEmpty(command)){
-            return false;
-        }
-        command=command.toLowerCase().trim();
-        return command.equals(ARG_SHORT) || command.equals(ARG_LONG);
-    }
-    public static final String ARG_SHORT="b";
-    public static final String ARG_LONG="build";
-    public static final String DESCRIPTION="Builds android binary from json/xml";
 }

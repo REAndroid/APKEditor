@@ -15,25 +15,45 @@
  */
 package com.reandroid.apkeditor;
 
-import com.reandroid.apkeditor.cloner.Cloner;
-import com.reandroid.apkeditor.compile.Builder;
-import com.reandroid.apkeditor.decompile.Decompiler;
-import com.reandroid.apkeditor.info.Info;
-import com.reandroid.apkeditor.merge.Merger;
-import com.reandroid.apkeditor.protect.Protector;
-import com.reandroid.apkeditor.refactor.Refactor;
-import com.reandroid.apkeditor.utils.StringHelper;
+import com.reandroid.apk.xmlencoder.EncodeException;
+import com.reandroid.apkeditor.compile.BuildOptions;
+import com.reandroid.apkeditor.decompile.DecompileOptions;
+import com.reandroid.apkeditor.info.InfoOptions;
+import com.reandroid.apkeditor.merge.MergerOptions;
+import com.reandroid.apkeditor.protect.ProtectorOptions;
+import com.reandroid.apkeditor.refactor.RefactorOptions;
 import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.coder.xml.XmlEncodeException;
-import com.reandroid.commons.command.ARGException;
-import com.reandroid.apk.xmlencoder.EncodeException;
+import com.reandroid.jcommand.CommandHelpBuilder;
+import com.reandroid.jcommand.CommandParser;
+import com.reandroid.jcommand.annotations.MainCommand;
+import com.reandroid.jcommand.annotations.OnOptionSelected;
+import com.reandroid.jcommand.annotations.OtherOption;
 import com.reandroid.jcommand.exceptions.CommandException;
 
-import java.io.IOException;
 
+@SuppressWarnings("unused")
+@MainCommand(
+        headers = {"title_app_name_and_version", "title_app_repo", "title_app_description"},
+        options = {
+                DecompileOptions.class,
+                BuildOptions.class,
+                MergerOptions.class,
+                RefactorOptions.class,
+                ProtectorOptions.class,
+                InfoOptions.class
+        }
+)
 public class Main {
 
-    public static void main(String[] args){
+    private boolean mEmptyOption;
+    private Options mOptions;
+    private int mExitCode;
+
+    private Main() {
+
+    }
+    public static void main(String[] args) {
         int result = execute(args);
         System.exit(result);
     }
@@ -47,116 +67,85 @@ public class Main {
      * Returns 2 - non executing commands like help, version
      *
      * */
-
-    public static int execute(String[] args){
-        args = Util.trimNull(args);
-        if(Util.isHelp(args) || args == null){
-            System.err.println(getHelp());
-            return 2;
-        }
-        if(Util.isVersion(args)){
-            System.err.println(getVersion());
-            return 2;
-        }
-        String command = getCommand(args);
-        args = Util.trimNull(args);
-        int result = 1;
-        try {
-            execute(command, args);
-            result = 0;
-        } catch (CommandException ex1) {
-            System.err.flush();
-            System.err.println(ex1.getMessage(ResourceStrings.INSTANCE));
-        } catch (ARGException ex1) {
-            System.err.flush();
-            System.err.println(ex1.getMessage());
-        }catch (EncodeException | XmlEncodeException ex) {
-            System.err.flush();
-            System.err.println("\nERROR:\n"+ex.getMessage());
-        } catch (IOException ex2) {
-            System.err.flush();
-            System.err.println("\nERROR:");
-            ex2.printStackTrace(System.err);
-        }
-        return result;
+    public static int execute(String[] args) {
+        Main main = new Main();
+        return main.run(args);
     }
-    private static void execute(String command, String[] args) throws ARGException, IOException {
-        if(Decompiler.isCommand(command)){
-            Decompiler.execute(args);
-            return;
-        }
-        if(Builder.isCommand(command)){
-            Builder.execute(args);
-            return;
-        }
-        if(Merger.isCommand(command)){
-            Merger.execute(args);
-            return;
-        }
-        if(Refactor.isCommand(command)){
-            Refactor.execute(args);
-            return;
-        }
-        if(Protector.isCommand(command)){
-            Protector.execute(args);
-            return;
-        }
-        if(Cloner.isCommand(command)){
-            Cloner.execute(args);
-            return;
-        }
-        if(Info.isCommand(command)){
-            Info.execute(args);
-            return;
-        }
-        throw new ARGException("Unknown command: "+command);
+
+    @OtherOption(
+            names = {"-h", "-help"},
+            description = "Displays this help and exit"
+    )
+    void onMainHelp() {
+        mExitCode = 2;
+        CommandHelpBuilder builder = new CommandHelpBuilder(
+                ResourceStrings.INSTANCE, Main.class);
+        builder.setFooters("", "help_main_footer", "<command> -h", "");
+        System.err.println(builder.build());
     }
-    private static String getHelp(){
-        StringBuilder builder=new StringBuilder();
-        builder.append(getWelcome());
-        builder.append("\nUsage: \n");
-        builder.append(" java -jar ").append(APKEditor.getJarName());
-        builder.append(" <command> <args>");
-        builder.append("\n commands: \n");
-        String[][] table = new String[][]{
-                new String[]{"  1)  " + Decompiler.ARG_SHORT + " | " + Decompiler.ARG_LONG, Decompiler.DESCRIPTION},
-                new String[]{"  2)  " + Builder.ARG_SHORT + " | " + Builder.ARG_LONG, Builder.DESCRIPTION},
-                new String[]{"  3)  " + Merger.ARG_SHORT + " | " + Merger.ARG_LONG, Merger.DESCRIPTION},
-                new String[]{"  4)  " + Refactor.ARG_SHORT + " | " + Refactor.ARG_LONG, Refactor.DESCRIPTION},
-                new String[]{"  5)  " + Protector.ARG_SHORT + " | " + Protector.ARG_LONG, Protector.DESCRIPTION},
-                //new String[]{"  6)  " + Cloner.ARG_SHORT + " | " + Cloner.ARG_LONG, Cloner.DESCRIPTION},
-                new String[]{"  6)  " + Info.ARG_SHORT, Info.DESCRIPTION}
-        };
-
-        StringHelper.printTwoColumns(builder, "  ", "  -  ", Options.PRINT_WIDTH, table);
-
-        builder.append("\n\n other options: \n");
-        table = new String[][]{
-                new String[]{" -h | -help | --help", "prints this help and exit"},
-                new String[]{"-version | --version", "prints version information of this tool and exit"}
-        };
-        StringHelper.printTwoColumns(builder, "  ", "   -   ", Options.PRINT_WIDTH, table);
-
-        builder.append("\n\n run with <command> -h to get detailed help about each command\n");
-
-        return builder.toString();
-    }
-    private static String getVersion(){
-        return APKEditor.getName() +
+    @OtherOption(
+            names = {"-v", "-version"},
+            description = "Displays version"
+    )
+    void onPrintVersion() {
+        mExitCode = 2;
+        System.err.println(APKEditor.getName() +
                 " version " + APKEditor.getVersion() +
                 ", " + ARSCLib.getName() +
-                " version " + ARSCLib.getVersion();
+                " version " + ARSCLib.getVersion());
     }
-    private static String getWelcome(){
-        return APKEditor.getName() +
-                " - " + APKEditor.getVersion() +
-                "\nUsing: " + APKEditor.getARSCLibInfo() +
-                "\n" + APKEditor.getRepo() +
-                "\n" + APKEditor.getDescription();
+    @OnOptionSelected
+    void onOption(Object option, boolean emptyArgs) {
+        this.mOptions = (Options) option;
+        this.mEmptyOption = emptyArgs;
     }
-    private static String getCommand(String[] args){
-        String cmd=args[0];
-        args[0]=null;
-        return cmd;
+
+    private int run(String[] args) {
+        mOptions = null;
+        mEmptyOption = false;
+        mExitCode = 2;
+        CommandParser parser = new CommandParser(Main.class);
+        try {
+            parser.parse(this, args);
+        } catch (CommandException e) {
+            System.err.flush();
+            System.err.println(e.getMessage(ResourceStrings.INSTANCE));
+            return mExitCode;
+        }
+        if(mOptions == null) {
+            return mExitCode;
+        }
+        if(mEmptyOption) {
+            System.err.println(ResourceStrings.INSTANCE.getString(
+                    "empty_command_option_exception"));
+            return mExitCode;
+        }
+        try {
+            mOptions.validate();
+        } catch (CommandException e) {
+            System.err.flush();
+            System.err.println(e.getMessage(ResourceStrings.INSTANCE));
+            return mExitCode;
+        }
+        if(mOptions.help) {
+            System.err.println(mOptions.getHelp());
+            return mExitCode;
+        }
+        mExitCode = 1;
+        try {
+            mOptions.runCommand();
+            mExitCode = 0;
+        }  catch (CommandException ex1) {
+            System.err.flush();
+            System.err.println(ex1.getMessage(ResourceStrings.INSTANCE));
+        } catch (EncodeException | XmlEncodeException ex) {
+            System.err.flush();
+            System.err.println("\nERROR:\n" + ex.getMessage());
+        } catch (Exception exception) {
+            System.err.flush();
+            System.err.println("\nERROR:");
+            exception.printStackTrace(System.err);
+        }
+        return mExitCode;
     }
 }

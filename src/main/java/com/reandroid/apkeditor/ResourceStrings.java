@@ -176,8 +176,13 @@ public class ResourceStrings implements CommandStringResource {
         if(properties == null) {
             properties = loadProperties(DEFAULT_CONFIG);
             this.defaultProperties = properties;
+            initializeDefaultProperties(properties);
         }
         return properties;
+    }
+    private void initializeDefaultProperties(Properties properties) {
+        properties.put("title_app_name_and_version", APKEditor.getName() + " - " + APKEditor.getVersion());
+        properties.put("title_app_repo", APKEditor.getRepo());
     }
     private Properties loadProperties(String config) {
         Properties properties = new Properties();

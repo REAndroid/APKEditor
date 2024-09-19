@@ -15,8 +15,9 @@
   */
 package com.reandroid.apkeditor.compile;
 
-import com.reandroid.apkeditor.Options;
 import com.reandroid.apkeditor.OptionsWithFramework;
+import com.reandroid.app.AndroidManifest;
+import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.jcommand.annotations.ChoiceArg;
 import com.reandroid.jcommand.annotations.CommandOptions;
 import com.reandroid.jcommand.annotations.OptionArg;
@@ -45,7 +46,7 @@ public class BuildOptions extends OptionsWithFramework {
                     TYPE_RAW, TYPE_SIG
             },
             description = "build_types")
-    public String type = TYPE_XML;
+    public String type;
 
     @OptionArg(name = "-vrd", description = "validate_resources_dir", flag = true)
     public boolean validateResDir;
@@ -56,17 +57,42 @@ public class BuildOptions extends OptionsWithFramework {
     @OptionArg(name = "-no-cache", description = "build_no_cache", flag = true)
     public boolean noCache;
 
-    public boolean isXml;
-    public boolean isRaw;
-
     public BuildOptions() {
+        super();
+    }
+
+    @Override
+    public Builder newCommandExecutor() {
+        return new Builder(this);
     }
 
     @Override
     public void validateInput(boolean isFile, boolean isDirectory) {
         isFile = TYPE_SIG.equals(type);
         super.validateInput(isFile, !isFile);
+        evaluateInputDirectoryType();
         validateSignaturesDirectory();
+    }
+
+    private void evaluateInputDirectoryType() {
+        String type = this.type;
+        if (type != null) {
+            return;
+        }
+        File file = inputFile;
+        if(isRawInputDirectory(file)) {
+            type = TYPE_RAW;
+        } else if(isJsonInputDirectory(file)) {
+            type = TYPE_JSON;
+            this.inputFile = getJsonInDir(this.inputFile);
+        } else if (isXmlInputDirectory(file)) {
+            type = TYPE_XML;
+        } else if(signaturesDirectory != null){
+            type = TYPE_SIG;
+        } else {
+            throw new CommandException("unknown_build_directory", file);
+        }
+        this.type = type;
     }
 
     @Override
@@ -85,45 +111,57 @@ public class BuildOptions extends OptionsWithFramework {
             throw new CommandException("invalid_sig_parameter_combination");
         }
     }
-
     @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("   Input: ").append(inputFile);
-        builder.append("\n Output: ").append(outputFile);
-        if(resDirName!=null){
-            builder.append("\nres dir: ").append(resDirName);
+    public File generateOutputFromInput(File file) {
+        return generateOutputFromInput(file, "_out.apk");
+    }
+
+    private static boolean isRawInputDirectory(File dir){
+        File file=new File(dir, AndroidManifest.FILE_NAME_BIN);
+        if(!file.isFile()) {
+            file = new File(dir, TableBlock.FILE_NAME);
         }
-        if(validateResDir){
-            builder.append("\n Validate res dir name: true");
+        return file.isFile();
+    }
+    private static boolean isXmlInputDirectory(File dir) {
+        File manifest = new File(dir, AndroidManifest.FILE_NAME);
+        return manifest.isFile();
+    }
+    private static boolean isJsonInputDirectory(File dir) {
+        if (isModuleDir(dir)) {
+            return true;
         }
-        if(force){
-            builder.append("\n Force: true");
+        File[] files = dir.listFiles();
+        if(files == null) {
+            return false;
         }
-        if(frameworkVersion != null){
-            builder.append("\nFramework version: ").append(frameworkVersion);
-        }
-        if(frameworks.size() != 0){
-            builder.append("\nFrameworks:");
-            for(File file : frameworks){
-                builder.append("\n           ");
-                builder.append(file);
+        for(File file:files) {
+            if(isModuleDir(file)){
+                return true;
             }
         }
-        builder.append("\n ---------------------------- ");
-        return builder.toString();
+        return false;
     }
-
-    public File generateOutputFromInput(File file){
-        String name = file.getName();
-        name = name + "_out.apk";
-        File dir = file.getParentFile();
-        if(dir == null){
-            return new File(name);
+    private static boolean isModuleDir(File dir){
+        if(!dir.isDirectory()){
+            return false;
         }
-        return new File(dir, name);
+        File file = new File(dir, AndroidManifest.FILE_NAME_JSON);
+        return file.isFile();
     }
-    public static String getHelp(){
-        return Options.getHelp(BuildOptions.class);
+    private static File getJsonInDir(File dir) {
+        if(isModuleDir(dir)){
+            return dir;
+        }
+        File[] files = dir.listFiles();
+        if(files == null || files.length == 0){
+            throw new CommandException("Empty directory: %s", dir);
+        }
+        for(File file:files){
+            if(isModuleDir(file)){
+                return file;
+            }
+        }
+        throw new CommandException("Invalid directory: '%s', missing file \"uncompressed-files.json\"", dir);
     }
 }

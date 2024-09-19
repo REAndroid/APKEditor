@@ -15,7 +15,7 @@
  */
 package com.reandroid.apkeditor.merge;
 
-import com.reandroid.apkeditor.BaseCommand;
+import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.common.AndroidManifestHelper;
 import com.reandroid.app.AndroidManifest;
@@ -26,7 +26,6 @@ import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.arsc.value.ResValue;
-import com.reandroid.commons.command.ARGException;
 import com.reandroid.apk.ApkBundle;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.arsc.chunk.TableBlock;
@@ -40,16 +39,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 
-public class Merger extends BaseCommand<MergerOptions> {
+public class Merger extends CommandExecutor<MergerOptions> {
+
     public Merger(MergerOptions options){
         super(options, "[MERGE] ");
     }
+
     @Override
-    public void run() throws IOException {
+    public void runCommand() throws IOException {
         MergerOptions options = getOptions();
+        delete(options.outputFile);
         File dir = options.inputFile;
         boolean extracted = false;
         if(dir.isFile()){
@@ -57,28 +58,28 @@ public class Merger extends BaseCommand<MergerOptions> {
             extracted = true;
         }
         logMessage("Searching apk files ...");
-        ApkBundle bundle=new ApkBundle();
+        ApkBundle bundle = new ApkBundle();
         bundle.setAPKLogger(this);
         bundle.loadApkDirectory(dir, extracted);
-        logMessage("Found modules: "+bundle.getApkModuleList().size());
+        logMessage("Found modules: " + bundle.getApkModuleList().size());
         for(ApkModule apkModule:bundle.getApkModuleList()){
             String protect = Util.isProtected(apkModule);
-            if(protect!=null){
+            if(protect != null){
                 logMessage(options.inputFile.getAbsolutePath());
                 logMessage(protect);
                 return;
             }
         }
-        ApkModule mergedModule=bundle.mergeModules();
-        if(options.resDirName!=null){
-            logMessage("Renaming resources root dir: "+options.resDirName);
+        ApkModule mergedModule = bundle.mergeModules(options.validateModules);
+        if (options.resDirName != null) {
+            logMessage("Renaming resources root dir: " + options.resDirName);
             mergedModule.setResourcesRootDir(options.resDirName);
         }
-        if(options.validateResDir){
+        if (options.validateResDir) {
             logMessage("Validating resources dir ...");
             mergedModule.validateResourcesDir();
         }
-        if(options.cleanMeta){
+        if (options.cleanMeta) {
             logMessage("Clearing META-INF ...");
             clearMeta(mergedModule);
         }
@@ -210,7 +211,7 @@ public class Merger extends BaseCommand<MergerOptions> {
                 continue;
             }
             String path = resValue.getValueAsString();
-            logMessage("Removed-table-entry : "+path);
+            logMessage("Removed-table-entry : " + path);
             //Remove file entry
             zipEntryMap.remove(path);
             // It's not safe to destroy entry, resource id might be used in dex code.
@@ -222,37 +223,4 @@ public class Merger extends BaseCommand<MergerOptions> {
         }
         return true;
     }
-    public static void execute(String[] args) throws ARGException, IOException {
-        if(Util.isHelp(args)){
-            throw new ARGException(MergerOptions.getHelp());
-        }
-        MergerOptions option=new MergerOptions();
-        option.parse(args);
-        File outFile=option.outputFile;
-        if(Objects.equals(outFile.getParentFile(), option.inputFile)){
-            throw new IOException("Output file can not be inside input directory!");
-        }
-        Util.deleteEmptyDirectories(outFile);
-        Merger merger = new Merger(option);
-        merger.logVersion();
-        if(outFile.exists()){
-            if(!option.force){
-                throw new ARGException("Path already exists: " + outFile);
-            }
-            merger.logMessage("Deleting: " + outFile);
-            Util.deleteDir(outFile);
-        }
-        merger.logMessage("Merging ...\n"+option);
-        merger.run();
-    }
-    public static boolean isCommand(String command){
-        if(Util.isEmpty(command)){
-            return false;
-        }
-        command=command.toLowerCase().trim();
-        return command.equals(ARG_SHORT) || command.equals(ARG_LONG);
-    }
-    public static final String ARG_SHORT="m";
-    public static final String ARG_LONG="merge";
-    public static final String DESCRIPTION="Merges split apk files from directory or compressed apk files like XAPK, APKM, APKS ...";
 }

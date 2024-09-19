@@ -16,43 +16,19 @@
 package com.reandroid.apkeditor.cloner;
 
 import com.reandroid.apkeditor.APKEditor;
-import com.reandroid.apkeditor.BaseCommand;
+import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.commons.command.ARGException;
 
 import java.io.IOException;
 
-public class Cloner extends BaseCommand<ClonerOptions> {
+public class Cloner extends CommandExecutor<ClonerOptions> {
     public Cloner(ClonerOptions options){
         super(options, "[CLONE] ");
     }
     @Override
-    public void run() throws IOException{
+    public void runCommand() throws IOException {
         logWarn("This feature not implemented, follow updates on: " + APKEditor.getRepo());
     }
 
-    public static void execute(String[] args) throws ARGException, IOException {
-        if(Util.isHelp(args)){
-            throw new ARGException(ClonerOptions.getHelp());
-        }
-        ClonerOptions option = new ClonerOptions();
-        option.parse(args);
-        Cloner cloner = new Cloner(option);
-        cloner.logVersion();
-        cloner.run();
-    }
-
-    public static boolean isCommand(String command){
-        if(Util.isEmpty(command)){
-            return false;
-        }
-        command = command.toLowerCase().trim();
-        return command.equals(ARG_LONG);
-        //return command.equals(ARG_SHORT) || command.equals(ARG_LONG);
-    }
-
-    public static final String ARG_SHORT = "c";
-    public static final String ARG_LONG = "clone";
-
-    public static final String DESCRIPTION = "Clones apk";
 }
