@@ -57,6 +57,9 @@ public class BuildOptions extends OptionsWithFramework {
     @OptionArg(name = "-no-cache", description = "build_no_cache", flag = true)
     public boolean noCache;
 
+    @OptionArg(name = "-sig", description = "signatures_path")
+    public File signaturesDirectory;
+
     public BuildOptions() {
         super();
     }

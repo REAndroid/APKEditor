@@ -16,8 +16,6 @@
 package com.reandroid.apkeditor.info;
 
 import com.reandroid.apkeditor.OptionsWithFramework;
-import com.reandroid.apkeditor.Util;
-import com.reandroid.commons.command.ARGException;
 import com.reandroid.jcommand.annotations.ChoiceArg;
 import com.reandroid.jcommand.annotations.CommandOptions;
 import com.reandroid.jcommand.annotations.OptionArg;
@@ -40,29 +38,29 @@ public class InfoOptions extends OptionsWithFramework {
     @ChoiceArg(name = "-t", description = "info_print_types", values = {TYPE_TEXT, TYPE_JSON, TYPE_XML})
     public String type = TYPE_TEXT;
     @OptionArg(name = "-v", description = "info_verbose_mode", flag = true)
-    public boolean verbose = true;
+    public boolean verbose = false;
     @OptionArg(name = "-package", description = "info_package_name", flag = true)
-    public boolean packageName = true;
+    public boolean packageName = false;
     @OptionArg(name = "-version-code", description = "info_app_version_code", flag = true)
-    public boolean versionCode = true;
+    public boolean versionCode = false;
     @OptionArg(name = "-version-name", description = "info_app_version_name", flag = true)
-    public boolean versionName = true;
+    public boolean versionName = false;
     @OptionArg(name = "-min-sdk-version", description = "info_min_sdk_version", flag = true)
-    public boolean minSdkVersion = true;
+    public boolean minSdkVersion = false;
     @OptionArg(name = "-target-sdk-version", description = "info_target_sdk_version", flag = true)
-    public boolean targetSdkVersion = true;
+    public boolean targetSdkVersion = false;
     @OptionArg(name = "-app-name", description = "info_app_name", flag = true)
-    public boolean appName = true;
+    public boolean appName = false;
     @OptionArg(name = "-app-icon", description = "info_app_icon", flag = true)
-    public boolean appIcon = true;
+    public boolean appIcon = false;
     @OptionArg(name = "-app-round-icon", description = "info_app_icon_round", flag = true)
-    public boolean appRoundIcon = true;
+    public boolean appRoundIcon = false;
     @OptionArg(name = "-permissions", description = "info_permissions", flag = true)
     public boolean permissions = false;
     @OptionArg(name = "-app-class", description = "info_app_class_name", flag = true)
-    public boolean appClass = true;
+    public boolean appClass = false;
     @OptionArg(name = "-activities", description = "info_activities", flag = true)
-    public boolean activities = true;
+    public boolean activities = false;
     @OptionArg(name = "-res", description = "info_res")
     public final List<String> resList = new ArrayList<>();
     @OptionArg(name = "-resources", description = "info_resources", flag = true)
@@ -81,14 +79,14 @@ public class InfoOptions extends OptionsWithFramework {
     }
 
     @Override
-    public void parse(String[] args) throws ARGException {
-        initializeDefaults(args);
-        super.parse(args);
+    public Info newCommandExecutor() {
+        return new Info(this);
     }
 
     @Override
-    public Info newCommandExecutor() {
-        return new Info(this);
+    public void validateValues() {
+        super.validateValues();
+        initializeDefaults();
     }
 
     @Override
@@ -123,21 +121,26 @@ public class InfoOptions extends OptionsWithFramework {
         }
     }
 
-    private void initializeDefaults(String[] args){
-        resources = false;
-        if(!Util.isEmpty(args) && args.length > 2){
-            packageName = false;
-            versionCode = false;
-            versionName = false;
-            minSdkVersion = false;
-            targetSdkVersion = false;
-            appName = false;
-            appIcon = false;
-            appRoundIcon = false;
-            permissions = false;
-            activities = false;
-            appClass = false;
-            dex = false;
+    private void initializeDefaults(){
+        if(!isDefault()) {
+            return;
         }
+        appName = true;
+        appIcon = true;
+        activities = true;
+        appClass = true;
+        packageName = true;
+        versionCode = true;
+        versionName = true;
+        if (verbose) {
+            permissions = true;
+        }
+    }
+    private boolean isDefault() {
+        boolean flagsChanged = activities || appClass || appIcon || appName || appRoundIcon ||
+                dex || minSdkVersion || packageName || permissions || targetSdkVersion ||
+                resources || signatures || signatures_base64 || versionCode || versionName;
+
+        return !flagsChanged && resList.isEmpty() && typeFilterList.isEmpty();
     }
 }

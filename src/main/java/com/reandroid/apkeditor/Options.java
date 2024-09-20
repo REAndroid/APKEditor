@@ -16,7 +16,6 @@
 package com.reandroid.apkeditor;
 
 import com.reandroid.arsc.ARSCLib;
-import com.reandroid.commons.command.ARGException;
 import com.reandroid.jcommand.CommandHelpBuilder;
 import com.reandroid.jcommand.OptionStringBuilder;
 import com.reandroid.jcommand.SubCommandHelpBuilder;
@@ -50,11 +49,9 @@ public class Options {
         builder.setColumnSeparator("   ");
         return builder.build();
     }
-    public void parse(String[] args) throws ARGException {
+    public void parse(String[] args) {
         SubCommandParser.parse(this, args);
-        if (!help) {
-            validateValues();
-        }
+        validate();
     }
     public void runCommand() throws IOException {
         CommandExecutor<?> executor = newCommandExecutor();

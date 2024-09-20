@@ -27,8 +27,6 @@ public class OptionsWithFramework extends Options {
     public Integer frameworkVersion;
     @OptionArg(name = "-framework", description = "path_of_framework")
     public final List<File> frameworks = new ArrayList<>();
-    @OptionArg(name = "-sig", description = "signatures_path")
-    public File signaturesDirectory;
 
 
     public OptionsWithFramework() {

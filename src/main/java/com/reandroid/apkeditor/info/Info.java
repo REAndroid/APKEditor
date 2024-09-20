@@ -282,7 +282,7 @@ public class Info extends CommandExecutor<InfoOptions> {
     }
     private void printUsesPermissions(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();
-        if(!options.permissions && !options.verbose){
+        if(!options.permissions){
             return;
         }
         AndroidManifestBlock manifest = apkModule.getAndroidManifest();

@@ -17,8 +17,6 @@ package com.reandroid.apkeditor.cloner;
 
 import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.CommandExecutor;
-import com.reandroid.apkeditor.Util;
-import com.reandroid.commons.command.ARGException;
 
 import java.io.IOException;
 

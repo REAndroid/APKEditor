@@ -68,6 +68,9 @@ public class DecompileOptions extends OptionsWithFramework {
     @OptionArg(name = "-dex-markers", flag = true, description = "dump_dex_markers")
     public boolean dexMarkers;
 
+    @OptionArg(name = "-sig", description = "signatures_path")
+    public File signaturesDirectory;
+
     public DecompileOptions() {
     }
 
