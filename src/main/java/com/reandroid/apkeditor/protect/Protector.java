@@ -18,9 +18,11 @@ package com.reandroid.apkeditor.protect;
 import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
+import com.reandroid.archive.Archive;
 import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.chunk.UnknownChunk;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
+import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.item.ByteArray;
 import com.reandroid.arsc.item.FixedLengthString;
 import com.reandroid.apk.*;
@@ -31,10 +33,12 @@ import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResConfig;
 
 import java.io.IOException;
-import java.util.zip.ZipEntry;
+import java.util.Iterator;
+import java.util.Random;
 
 public class Protector extends CommandExecutor<ProtectorOptions> {
-    public Protector(ProtectorOptions options){
+
+    public Protector(ProtectorOptions options) {
         super(options, "[PROTECT] ");
     }
 
@@ -71,7 +75,18 @@ public class Protector extends CommandExecutor<ProtectorOptions> {
         }
         logMessage("Confusing AndroidManifest ...");
         AndroidManifestBlock manifestBlock = apkModule.getAndroidManifest();
-        manifestBlock.setAttributesUnitSize(24, true);
+        manifestBlock.setAttributesUnitSize(25, true);
+        int defaultAttributeSize = 20;
+        Iterator<ResXmlElement> iterator = manifestBlock.recursiveElements();
+        Random random = new Random();
+        while (iterator.hasNext()) {
+            ResXmlElement element = iterator.next();
+            int size = defaultAttributeSize + random.nextInt(6) + 1;
+            element.setAttributesUnitSize(size, false);
+            logMessage("ATTR SIZE: " + element.getName() + ": " + size);
+        }
+        manifestBlock.getManifestElement().setAttributesUnitSize(
+                defaultAttributeSize, false);
         manifestBlock.refresh();
     }
     private void confuseByteOffset(ApkModule apkModule) {
@@ -128,7 +143,7 @@ public class Protector extends CommandExecutor<ProtectorOptions> {
                 continue;
             }
             String pathNew = ApkUtil.replaceRootDir(path, dirNames[i]);
-            if(method==ZipEntry.STORED){
+            if(method == Archive.STORED) {
                 uf.replacePath(path, pathNew);
             }
             resFile.setFilePath(pathNew);
