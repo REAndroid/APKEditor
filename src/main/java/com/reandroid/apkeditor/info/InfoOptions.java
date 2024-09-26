@@ -73,6 +73,14 @@ public class InfoOptions extends OptionsWithFramework {
     public boolean signatures = false;
     @OptionArg(name = "-signatures-base64", description = "info_signatures_base64", flag = true)
     public boolean signatures_base64 = false;
+    @OptionArg(name = "-xmlstrings", description = "info_xml_strings")
+    public String xmlStrings;
+    @OptionArg(name = "-xmltree", description = "info_xml_tree")
+    public final List<String> xmlTree = new ArrayList<>();
+    @OptionArg(name = "-list-files", description = "info_list_files", flag = true)
+    public boolean listFiles = false;
+    @OptionArg(name = "-list-xml-files", description = "info_list_xml_files", flag = true)
+    public boolean listXmlFiles = false;
 
     public InfoOptions(){
         super();
@@ -139,8 +147,9 @@ public class InfoOptions extends OptionsWithFramework {
     private boolean isDefault() {
         boolean flagsChanged = activities || appClass || appIcon || appName || appRoundIcon ||
                 dex || minSdkVersion || packageName || permissions || targetSdkVersion ||
-                resources || signatures || signatures_base64 || versionCode || versionName;
+                resources || signatures || signatures_base64 || versionCode || versionName ||
+                listFiles || listXmlFiles || xmlStrings != null;
 
-        return !flagsChanged && resList.isEmpty() && typeFilterList.isEmpty();
+        return !flagsChanged && resList.isEmpty() && typeFilterList.isEmpty() && xmlTree.isEmpty();
     }
 }

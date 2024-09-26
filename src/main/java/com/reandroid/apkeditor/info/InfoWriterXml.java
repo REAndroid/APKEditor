@@ -16,12 +16,15 @@
 package com.reandroid.apkeditor.info;
 
 import com.reandroid.archive.block.CertificateBlock;
+import com.reandroid.arsc.chunk.xml.ResXmlDocument;
+import com.reandroid.arsc.chunk.xml.ResXmlNode;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.dex.sections.MapItem;
 import com.reandroid.dex.sections.MapList;
 import com.reandroid.dex.sections.Marker;
 import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.ComputeList;
+import com.reandroid.xml.XMLUtil;
 import com.reandroid.xml.kxml2.KXmlSerializer;
 import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
@@ -32,6 +35,7 @@ import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
 import com.reandroid.arsc.value.ResValue;
 import com.reandroid.arsc.value.ResValueMap;
+import org.xmlpull.v1.XmlSerializer;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -46,6 +50,24 @@ public class InfoWriterXml extends InfoWriter{
 
     public InfoWriterXml(Writer writer) {
         super(writer);
+    }
+
+    @Override
+    public void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException {
+        KXmlSerializer serializer = getSerializer();
+        serializer.flush();
+        Writer writer = getWriter();
+        writer.write("\n");
+        String name = "document";
+        serializer.startTag(null, name);
+        serializer.attribute(null, "source-path", sourcePath);
+        XmlSerializer documentSerializer = newSerializer();
+        for (ResXmlNode xmlNode : xmlDocument) {
+            xmlNode.serialize(documentSerializer, false);
+        }
+        documentSerializer.flush();
+        writer.write("\n");
+        serializer.endTag(null, name);
     }
 
     @Override
@@ -364,6 +386,18 @@ public class InfoWriterXml extends InfoWriter{
         writeIndent(serializer, 0);
         serializer.startTag(null, TAG_INFO);
         mSerializer = serializer;
+        return serializer;
+    }
+    private XmlSerializer newSerializer() throws IOException {
+        XmlSerializer current = this.mSerializer;
+        if (current != null) {
+            current.flush();
+        }
+        Writer writer = getWriter();
+        writer.flush();
+        XmlSerializer serializer = new KXmlSerializer();
+        serializer.setOutput(writer);
+        XMLUtil.setFeatureSafe(serializer, XMLUtil.FEATURE_INDENT_OUTPUT, true);
         return serializer;
     }
 

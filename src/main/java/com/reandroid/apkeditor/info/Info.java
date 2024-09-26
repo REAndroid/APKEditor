@@ -16,13 +16,16 @@
 package com.reandroid.apkeditor.info;
 
 import com.reandroid.apk.ApkModule;
+import com.reandroid.apk.ResFile;
 import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.app.AndroidManifest;
+import com.reandroid.archive.InputSource;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
+import com.reandroid.arsc.chunk.xml.ResXmlDocument;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.coder.EncodeResult;
 import com.reandroid.arsc.coder.ReferenceString;
@@ -94,6 +97,11 @@ public class Info extends CommandExecutor<InfoOptions> {
         printResources(apkModule);
         printDex(apkModule);
         printSignatures(apkModule);
+
+        printXmlTree(apkModule);
+        printXmlStrings(apkModule);
+        listFiles(apkModule);
+        listXmlFiles(apkModule);
     }
     private void printSourceFile() throws IOException {
         InfoOptions options = getOptions();
@@ -101,7 +109,8 @@ public class Info extends CommandExecutor<InfoOptions> {
             return;
         }
         if(options.verbose || !options.resources){
-            getInfoWriter().writeNameValue("source-file",
+            InfoWriter infoWriter = getInfoWriter();
+            infoWriter.writeNameValue("source-file",
                     options.inputFile.getAbsolutePath());
         }
     }
@@ -345,6 +354,56 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(value != null){
             getInfoWriter().writeNameValue("application-class", value);
         }
+    }
+    private void printXmlStrings(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        String xmlStrings = options.xmlStrings;
+        if (xmlStrings == null) {
+            return;
+        }
+        InfoWriter infoWriter = getInfoWriter();
+        ResXmlDocument document = apkModule.loadResXmlDocument(xmlStrings);
+        document.setApkFile(null);
+        document.setPackageBlock(null);
+        infoWriter.writeStringPool(document.getStringPool());
+    }
+    private void printXmlTree(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        InfoWriter infoWriter = getInfoWriter();
+        for (String path : options.xmlTree) {
+            logMessage("Writing: " + path);
+            ResXmlDocument document = apkModule.loadResXmlDocument(path);
+            document.setApkFile(null);
+            document.setPackageBlock(null);
+            infoWriter.writeXmlDocument(path, document);
+        }
+    }
+    private void listFiles(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        if (!options.listFiles) {
+            return;
+        }
+        InputSource[] inputSources = apkModule.getInputSources();
+        int count = inputSources.length;
+        String[] names = new String[count];
+        for (int i = 0; i < count; i++) {
+            names[i] = inputSources[i].getAlias();
+        }
+        getInfoWriter().writeArray("Files", names);
+    }
+    private void listXmlFiles(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        if (!options.listXmlFiles) {
+            return;
+        }
+        List<ResFile> resFileList = apkModule.listResFiles();
+        List<String> names = new ArrayList<>();
+        for (ResFile resFile : resFileList) {
+            if(resFile.isBinaryXml()) {
+                names.add(resFile.getFilePath());
+            }
+        }
+        getInfoWriter().writeArray("CompiledXmlFiles", names.toArray(new String[0]));
     }
     private String getValueOfName(ResXmlElement element){
         ResXmlAttribute attribute = element

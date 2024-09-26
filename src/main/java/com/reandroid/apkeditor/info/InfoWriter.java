@@ -18,9 +18,11 @@ package com.reandroid.apkeditor.info;
 import com.reandroid.archive.block.ApkSignatureBlock;
 import com.reandroid.archive.block.CertificateBlock;
 import com.reandroid.arsc.chunk.PackageBlock;
+import com.reandroid.arsc.chunk.xml.ResXmlDocument;
 import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
+import com.reandroid.arsc.pool.StringPool;
 import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.utils.HexUtil;
@@ -58,6 +60,10 @@ public abstract class InfoWriter implements Closeable {
         }
     }
 
+    public void writeStringPool(StringPool<?> stringPool) throws IOException {
+
+    }
+    public abstract void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException;
     public abstract void writeCertificates(List<CertificateBlock> certificateList, boolean base64) throws IOException;
     public abstract void writeDexInfo(DexFile dexFile, boolean writeSectionInfo) throws IOException;
     public abstract void writeResources(ResourceEntry resourceEntry, boolean writeEntries) throws IOException;
@@ -86,13 +92,6 @@ public abstract class InfoWriter implements Closeable {
         }
         return null;
     }
-    static String getValueAsString(Entry entry){
-        ResValue resValue = entry.getResValue();
-        if(resValue == null){
-            return "";
-        }
-        return getValueAsString(resValue);
-    }
     static String getValueAsString(Value value){
         ValueType valueType = value.getValueType();
         if(valueType == ValueType.STRING){
@@ -112,6 +111,12 @@ public abstract class InfoWriter implements Closeable {
     }
     static String toBase64(byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    static void writeSpaces(Writer writer, int amount) throws IOException {
+        for (int i = 0; i < amount; i ++) {
+            writer.append(' ');
+        }
     }
 
     static final String TAG_RES_PACKAGES = "resource-packages";

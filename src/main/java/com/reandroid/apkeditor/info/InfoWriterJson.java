@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.info;
 import com.reandroid.archive.block.CertificateBlock;
 import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
+import com.reandroid.arsc.chunk.xml.ResXmlDocument;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.value.Entry;
@@ -44,6 +45,14 @@ public class InfoWriterJson extends InfoWriter{
         JSONWriter jsonWriter = new JSONWriter(writer);
         jsonWriter = jsonWriter.array();
         this.mJsonWriter = jsonWriter;
+    }
+
+    @Override
+    public void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException {
+        JSONWriter jsonWriter = mJsonWriter.object();
+        jsonWriter.key("source_path").value(sourcePath);
+        jsonWriter.key("document").value(xmlDocument.toJson());
+        jsonWriter.endObject();
     }
 
     @Override
@@ -220,6 +229,7 @@ public class InfoWriterJson extends InfoWriter{
                 .endObject();
         getWriter().flush();
     }
+
     @Override
     public void flush() throws IOException {
         Writer writer = getWriter();

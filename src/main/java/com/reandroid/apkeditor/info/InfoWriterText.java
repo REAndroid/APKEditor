@@ -18,12 +18,14 @@ package com.reandroid.apkeditor.info;
 import com.reandroid.archive.block.CertificateBlock;
 import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
+import com.reandroid.arsc.chunk.xml.*;
 import com.reandroid.arsc.container.SpecTypePair;
+import com.reandroid.arsc.header.StringPoolHeader;
+import com.reandroid.arsc.item.StringItem;
 import com.reandroid.arsc.model.ResourceEntry;
-import com.reandroid.arsc.value.Entry;
-import com.reandroid.arsc.value.ResTableMapEntry;
-import com.reandroid.arsc.value.ResValue;
-import com.reandroid.arsc.value.ResValueMap;
+import com.reandroid.arsc.pool.StringPool;
+import com.reandroid.arsc.value.*;
+import com.reandroid.common.Namespace;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.dex.sections.MapItem;
 import com.reandroid.dex.sections.MapList;
@@ -42,6 +44,140 @@ public class InfoWriterText extends InfoWriter {
 
     public InfoWriterText(Writer writer) {
         super(writer);
+    }
+
+    @Override
+    public void writeStringPool(StringPool<?> stringPool) throws IOException {
+        Writer writer = getWriter();
+        writer.write("String pool of ");
+        writer.write(Integer.toString(stringPool.size()));
+        writer.write(" unique ");
+        if (stringPool.isUtf8()) {
+            writer.write("UTF-8 ");
+        } else {
+            writer.write("UTF-16 ");
+        }
+        StringPoolHeader header = stringPool.getHeaderBlock();
+        if (!header.isSorted()) {
+            writer.write("non-");
+        }
+        writer.write("sorted strings, ");
+        writer.write(Integer.toString(stringPool.size()));
+        writer.write(" entries and ");
+        writer.write(Integer.toString(stringPool.countStyles()));
+        writer.write(" styles using ");
+        writer.write(Integer.toString(header.getChunkSize()));
+        writer.write(" bytes:");
+        writer.write("\n");
+        int size = stringPool.size();
+        for (int i = 0; i < size; i++ ) {
+            StringItem item = stringPool.get(i);
+            writer.write("String #");
+            writer.write(Integer.toString(i));
+            writer.write(": ");
+            writer.write(item.get());
+            writer.write("\n");
+        }
+    }
+
+    @Override
+    public void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException {
+        writeNameValue("source-path", sourcePath);
+        for (ResXmlNode node : xmlDocument) {
+            if (node instanceof ResXmlElement) {
+                writeElement((ResXmlElement) node);
+            } else if (node instanceof ResXmlTextNode) {
+                writeTextNode(0, (ResXmlTextNode) node);
+            }
+        }
+        Writer writer = getWriter();
+        writer.flush();
+    }
+    private void writeElement(ResXmlElement element) throws IOException {
+        int indent = element.getDepth() * 2;
+
+        int count = element.getNamespaceCount();
+        for (int i = 0; i < count; i++) {
+            writeNamespace(indent, element.getNamespaceAt(i));
+        }
+        indent = indent + 2;
+        Writer writer = getWriter();
+        writeIndent(indent);
+        writer.write("E: ");
+        writer.write(element.getName(true));
+        writer.write(" (line=");
+        writer.write(Integer.toString(element.getLineNumber()));
+        writer.write(")");
+        writer.write("\n");
+
+        Iterator<ResXmlAttribute> attributes = element.getAttributes();
+        while (attributes.hasNext()) {
+            writeAttribute(indent, attributes.next());
+        }
+        flush();
+        Iterator<ResXmlNode> iterator = element.iterator();
+        while (iterator.hasNext()) {
+            ResXmlNode node = iterator.next();
+            if (node instanceof ResXmlElement) {
+                writeElement((ResXmlElement) node);
+            } else if (node instanceof ResXmlTextNode) {
+                writeTextNode(indent, (ResXmlTextNode) node);
+            }
+        }
+    }
+    private void writeTextNode(int indent, ResXmlTextNode textNode) throws IOException {
+        Writer writer = getWriter();
+        writeIndent(indent + 2);
+        writer.write("T: \"");
+        writer.write(textNode.getText());
+        writer.write("\"");
+        writer.write("\n");
+    }
+    private void writeNamespace(int indent, ResXmlNamespace namespace) throws IOException {
+        Writer writer = getWriter();
+        writeIndent(indent);
+        writer.write("N: ");
+        writer.write(namespace.getPrefix());
+        writer.write("=");
+        writer.write(namespace.getUri());
+        writer.write("\n");
+    }
+    private void writeAttribute(int indent, ResXmlAttribute attribute) throws IOException {
+        Writer writer = getWriter();
+        writeIndent(indent + 2);
+        writer.write("A: ");
+        Namespace namespace = attribute.getNamespace();
+        if (namespace != null) {
+            writer.write(namespace.getPrefix());
+            writer.append(':');
+        }
+        writer.write(attribute.getName());
+        int id = attribute.getNameId();
+        if (id != 0) {
+            writer.append('(');
+            writer.write(HexUtil.toHex8(id));
+            writer.append(')');
+        }
+        writer.append('=');
+        ValueType valueType = attribute.getValueType();
+        if (valueType == ValueType.STRING) {
+            writer.append('"');
+            writer.write(attribute.getDataAsPoolString().getXml());
+            writer.append('"');
+            writer.write(" (Raw: \"");
+            writer.write(attribute.getValueString());
+            writer.write("\")");
+        } else if (valueType == ValueType.BOOLEAN) {
+            writer.append('"');
+            writer.write(attribute.getValueAsBoolean() ? "true" : "false");
+            writer.append('"');
+        } else {
+            writer.write("(type ");
+            writer.write(HexUtil.toHex(valueType.getByte() & 0xff, 1));
+            writer.write(")");
+            writer.write(HexUtil.toHex(attribute.getData(), 1));
+        }
+        writer.write("\n");
     }
 
     @Override
@@ -296,6 +432,9 @@ public class InfoWriterText extends InfoWriter {
     }
 
 
+    private void writeIndent(int amount) throws IOException {
+        writeSpaces(getWriter(), amount);
+    }
     private void writeWithTab(Writer writer, String tab, String value) throws IOException {
         String[] splits = StringsUtil.split(value, '\n');
         for(String line : splits){
