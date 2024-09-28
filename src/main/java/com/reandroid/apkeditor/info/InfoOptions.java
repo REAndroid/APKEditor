@@ -37,50 +37,84 @@ public class InfoOptions extends OptionsWithFramework {
 
     @ChoiceArg(name = "-t", description = "info_print_types", values = {TYPE_TEXT, TYPE_JSON, TYPE_XML})
     public String type = TYPE_TEXT;
+
     @OptionArg(name = "-v", description = "info_verbose_mode", flag = true)
     public boolean verbose = false;
+
     @OptionArg(name = "-package", description = "info_package_name", flag = true)
     public boolean packageName = false;
+
     @OptionArg(name = "-version-code", description = "info_app_version_code", flag = true)
     public boolean versionCode = false;
+
     @OptionArg(name = "-version-name", description = "info_app_version_name", flag = true)
     public boolean versionName = false;
+
     @OptionArg(name = "-min-sdk-version", description = "info_min_sdk_version", flag = true)
     public boolean minSdkVersion = false;
+
     @OptionArg(name = "-target-sdk-version", description = "info_target_sdk_version", flag = true)
     public boolean targetSdkVersion = false;
+
     @OptionArg(name = "-app-name", description = "info_app_name", flag = true)
     public boolean appName = false;
+
     @OptionArg(name = "-app-icon", description = "info_app_icon", flag = true)
     public boolean appIcon = false;
+
     @OptionArg(name = "-app-round-icon", description = "info_app_icon_round", flag = true)
     public boolean appRoundIcon = false;
+
     @OptionArg(name = "-permissions", description = "info_permissions", flag = true)
     public boolean permissions = false;
+
     @OptionArg(name = "-app-class", description = "info_app_class_name", flag = true)
     public boolean appClass = false;
+
     @OptionArg(name = "-activities", description = "info_activities", flag = true)
     public boolean activities = false;
+
     @OptionArg(name = "-res", description = "info_res")
     public final List<String> resList = new ArrayList<>();
+
     @OptionArg(name = "-resources", description = "info_resources", flag = true)
     public boolean resources = false;
+
     @OptionArg(name = "-filter-type", description = "info_filter_type")
     public final List<String> typeFilterList = new ArrayList<>();
+
     @OptionArg(name = "-dex", description = "info_dex", flag = true)
     public boolean dex = false;
+
     @OptionArg(name = "-signatures", description = "info_signatures", flag = true)
     public boolean signatures = false;
+
     @OptionArg(name = "-signatures-base64", description = "info_signatures_base64", flag = true)
     public boolean signatures_base64 = false;
+
     @OptionArg(name = "-xmlstrings", description = "info_xml_strings")
-    public String xmlStrings;
+    public List<String> xmlStrings = new ArrayList<>();
+
+    @OptionArg(name = "-strings", description = "info_strings", flag = true)
+    public boolean strings = false;
+
     @OptionArg(name = "-xmltree", description = "info_xml_tree")
     public final List<String> xmlTree = new ArrayList<>();
+
     @OptionArg(name = "-list-files", description = "info_list_files", flag = true)
     public boolean listFiles = false;
+
     @OptionArg(name = "-list-xml-files", description = "info_list_xml_files", flag = true)
     public boolean listXmlFiles = false;
+
+    @OptionArg(name = "-configurations", description = "info_configurations", flag = true)
+    public boolean configurations = false;
+
+    @OptionArg(name = "-languages", description = "info_languages", flag = true)
+    public boolean languages = false;
+
+    @OptionArg(name = "-locales", description = "info_locales", flag = true)
+    public boolean locales = false;
 
     public InfoOptions(){
         super();
@@ -148,8 +182,9 @@ public class InfoOptions extends OptionsWithFramework {
         boolean flagsChanged = activities || appClass || appIcon || appName || appRoundIcon ||
                 dex || minSdkVersion || packageName || permissions || targetSdkVersion ||
                 resources || signatures || signatures_base64 || versionCode || versionName ||
-                listFiles || listXmlFiles || xmlStrings != null;
+                listFiles || listXmlFiles || configurations || languages || locales || strings;
 
-        return !flagsChanged && resList.isEmpty() && typeFilterList.isEmpty() && xmlTree.isEmpty();
+        return !flagsChanged && resList.isEmpty() && typeFilterList.isEmpty() &&
+                xmlTree.isEmpty() && xmlStrings.isEmpty();
     }
 }
