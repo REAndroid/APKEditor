@@ -47,8 +47,10 @@ public class InfoWriterText extends InfoWriter {
     }
 
     @Override
-    public void writeStringPool(StringPool<?> stringPool) throws IOException {
+    public void writeStringPool(String source, StringPool<?> stringPool) throws IOException {
         Writer writer = getWriter();
+        writer.write(source);
+        writer.write("\n");
         writer.write("String pool of ");
         writer.write(Integer.toString(stringPool.size()));
         writer.write(" unique ");

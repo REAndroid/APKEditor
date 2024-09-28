@@ -20,7 +20,9 @@ import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlDocument;
 import com.reandroid.arsc.container.SpecTypePair;
+import com.reandroid.arsc.item.StringItem;
 import com.reandroid.arsc.model.ResourceEntry;
+import com.reandroid.arsc.pool.StringPool;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
 import com.reandroid.arsc.value.ResValue;
@@ -47,6 +49,24 @@ public class InfoWriterJson extends InfoWriter{
         this.mJsonWriter = jsonWriter;
     }
 
+    @Override
+    public void writeStringPool(String source, StringPool<?> stringPool) throws IOException {
+        JSONWriter jsonWriter = mJsonWriter.object()
+                .key("string_pool").object()
+                .key("source").value(source)
+                .key("count").value(stringPool.size())
+                .key("styles").value(stringPool.countStyles())
+                .key("sorted").value(stringPool.getHeaderBlock().isSorted())
+                .key("utf8").value(stringPool.isUtf8())
+                .key("bytes").value(stringPool.getHeaderBlock().getChunkSize())
+                .key("strings").array();
+        int size = stringPool.size();
+        for (int i = 0; i < size; i++ ) {
+            StringItem item = stringPool.get(i);
+            jsonWriter.value(item.get());
+        }
+        jsonWriter.endArray().endObject().endObject();
+    }
     @Override
     public void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException {
         JSONWriter jsonWriter = mJsonWriter.object();

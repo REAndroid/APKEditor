@@ -365,7 +365,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         ResXmlDocument document = apkModule.loadResXmlDocument(xmlStrings);
         document.setApkFile(null);
         document.setPackageBlock(null);
-        infoWriter.writeStringPool(document.getStringPool());
+        infoWriter.writeStringPool(xmlStrings, document.getStringPool());
     }
     private void printXmlTree(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();

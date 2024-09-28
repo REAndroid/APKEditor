@@ -60,9 +60,7 @@ public abstract class InfoWriter implements Closeable {
         }
     }
 
-    public void writeStringPool(StringPool<?> stringPool) throws IOException {
-
-    }
+    public abstract void writeStringPool(String source, StringPool<?> stringPool) throws IOException;
     public abstract void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException;
     public abstract void writeCertificates(List<CertificateBlock> certificateList, boolean base64) throws IOException;
     public abstract void writeDexInfo(DexFile dexFile, boolean writeSectionInfo) throws IOException;

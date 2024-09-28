@@ -18,6 +18,8 @@ package com.reandroid.apkeditor.info;
 import com.reandroid.archive.block.CertificateBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlDocument;
 import com.reandroid.arsc.chunk.xml.ResXmlNode;
+import com.reandroid.arsc.item.StringItem;
+import com.reandroid.arsc.pool.StringPool;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.dex.sections.MapItem;
 import com.reandroid.dex.sections.MapList;
@@ -52,6 +54,36 @@ public class InfoWriterXml extends InfoWriter{
         super(writer);
     }
 
+    @Override
+    public void writeStringPool(String source, StringPool<?> stringPool) throws IOException {
+        KXmlSerializer serializer = getSerializer();
+        int indent = mIndent + 2;
+        mIndent = indent;
+        writeIndent(serializer, indent);
+        indent = mIndent + 2;
+        mIndent = indent;
+        serializer.startTag(null, "string-pool");
+        serializer.attribute(null, "source", source);
+        serializer.attribute(null, "count", Integer.toString(stringPool.size()));
+        serializer.attribute(null, "styles", Integer.toString(stringPool.countStyles()));
+        serializer.attribute(null, "sorted", String.valueOf(stringPool.getHeaderBlock().isSorted()));
+        serializer.attribute(null, "utf8", String.valueOf(stringPool.isUtf8()));
+        serializer.attribute(null, "bytes", String.valueOf(stringPool.getHeaderBlock().getChunkSize()));
+
+        int size = stringPool.size();
+        for (int i = 0; i < size; i++ ) {
+            StringItem item = stringPool.get(i);
+            writeIndent(serializer, indent);
+            serializer.startTag(null, "item");
+            serializer.text(item.get());
+            serializer.endTag(null, "item");
+        }
+
+        indent = indent - 2;
+        writeIndent(serializer, indent);
+        serializer.endTag(null, "string-pool");
+        serializer.flush();
+    }
     @Override
     public void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException {
         KXmlSerializer serializer = getSerializer();
