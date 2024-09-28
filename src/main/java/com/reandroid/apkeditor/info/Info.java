@@ -31,17 +31,16 @@ import com.reandroid.arsc.coder.EncodeResult;
 import com.reandroid.arsc.coder.ReferenceString;
 import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.model.ResourceEntry;
+import com.reandroid.arsc.value.*;
 import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.utils.CompareUtil;
 import com.reandroid.utils.HexUtil;
-import com.reandroid.arsc.value.AttributeDataFormat;
-import com.reandroid.arsc.value.Entry;
-import com.reandroid.arsc.value.ResValue;
-import com.reandroid.arsc.value.ValueType;
 import com.reandroid.utils.collection.CollectionUtil;
+import com.reandroid.utils.collection.ComputeIterator;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.Function;
 
 public class Info extends CommandExecutor<InfoOptions> {
     private InfoWriter mInfoWriter;
@@ -100,8 +99,12 @@ public class Info extends CommandExecutor<InfoOptions> {
 
         printXmlTree(apkModule);
         printXmlStrings(apkModule);
+        printStrings(apkModule);
         listFiles(apkModule);
         listXmlFiles(apkModule);
+        printConfigurations(apkModule);
+        printLanguages(apkModule);
+        printLocales(apkModule);
     }
     private void printSourceFile() throws IOException {
         InfoOptions options = getOptions();
@@ -357,15 +360,25 @@ public class Info extends CommandExecutor<InfoOptions> {
     }
     private void printXmlStrings(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();
-        String xmlStrings = options.xmlStrings;
-        if (xmlStrings == null) {
+        List<String> xmlStrings = options.xmlStrings;
+        if (xmlStrings.isEmpty()) {
             return;
         }
         InfoWriter infoWriter = getInfoWriter();
-        ResXmlDocument document = apkModule.loadResXmlDocument(xmlStrings);
-        document.setApkFile(null);
-        document.setPackageBlock(null);
-        infoWriter.writeStringPool(xmlStrings, document.getStringPool());
+        for (String path : xmlStrings) {
+            ResXmlDocument document = apkModule.loadResXmlDocument(path);
+            document.setApkFile(null);
+            document.setPackageBlock(null);
+            infoWriter.writeStringPool(path, document.getStringPool());
+        }
+    }
+    private void printStrings(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        if (!options.strings || !apkModule.hasTableBlock()) {
+            return;
+        }
+        InfoWriter infoWriter = getInfoWriter();
+        infoWriter.writeStringPool(TableBlock.FILE_NAME, apkModule.getTableBlock().getStringPool());
     }
     private void printXmlTree(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();
@@ -404,6 +417,53 @@ public class Info extends CommandExecutor<InfoOptions> {
             }
         }
         getInfoWriter().writeArray("CompiledXmlFiles", names.toArray(new String[0]));
+    }
+    private void printConfigurations(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        if (!options.configurations || !apkModule.hasTableBlock()) {
+            return;
+        }
+        Iterator<ResConfig> iterator = apkModule.getTableBlock().getResConfigs();
+        List<String> qualifiers = CollectionUtil.toUniqueList(
+                ComputeIterator.of(iterator, config -> {
+                    String qualifier = config.getQualifiers();
+                    if (qualifier.length() != 0) {
+                        qualifier = qualifier.substring(1);
+                    }
+                    return qualifier;
+                }));
+
+        qualifiers.sort(CompareUtil.getComparableComparator());
+
+        getInfoWriter().writeArray("configurations", qualifiers.toArray(new String[0]));
+    }
+    private void printLanguages(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        if (!options.languages || !apkModule.hasTableBlock()) {
+            return;
+        }
+        Iterator<ResConfig> iterator = apkModule.getTableBlock().getResConfigs();
+        List<String> languages = CollectionUtil.toUniqueList(
+                ComputeIterator.of(iterator, ResConfig::getLanguage));
+
+        languages.sort(CompareUtil.getComparableComparator());
+
+        getInfoWriter().writeArray("languages", languages.toArray(new String[0]));
+    }
+    private void printLocales(ApkModule apkModule) throws IOException {
+        InfoOptions options = getOptions();
+        if (!options.locales || !apkModule.hasTableBlock()) {
+            return;
+        }
+        Iterator<ResConfig> iterator = apkModule.getTableBlock().getResConfigs();
+        List<String> locales = CollectionUtil.toUniqueList(
+                ComputeIterator.of(iterator, ResConfig::getLocale));
+
+        locales.remove("");
+
+        locales.sort(CompareUtil.getComparableComparator());
+
+        getInfoWriter().writeArray("locales", locales.toArray(new String[0]));
     }
     private String getValueOfName(ResXmlElement element){
         ResXmlAttribute attribute = element
