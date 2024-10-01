@@ -20,6 +20,8 @@ import com.reandroid.jcommand.annotations.CommandOptions;
 import com.reandroid.jcommand.annotations.OptionArg;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 @CommandOptions(
         name = "p",
@@ -33,8 +35,24 @@ public class ProtectorOptions extends Options {
     @OptionArg(name = "-skip-manifest", flag = true, description = "protect_skip_manifest")
     public boolean skipManifest;
 
+    @OptionArg(name = "-keep-type", description = "protect_keep_type")
+    public final Set<String> keepTypes = new HashSet<>();
+
     public ProtectorOptions() {
         super();
+    }
+
+    @Override
+    public void validateValues() {
+        super.validateValues();
+        addDefaultKeepTypes();
+    }
+    private void addDefaultKeepTypes() {
+        Set<String> keepTypes = this.keepTypes;
+        if (!keepTypes.isEmpty()) {
+            return;
+        }
+        keepTypes.add("font");
     }
 
     @Override
