@@ -22,27 +22,23 @@ import com.reandroid.apk.DexFileInputSource;
 import com.reandroid.apkeditor.APKEditor;
 import com.reandroid.apkeditor.decompile.DecompileOptions;
 import com.reandroid.arsc.chunk.TableBlock;
-import com.reandroid.common.DiagnosticsReporter;
 import com.reandroid.dex.common.AnnotationVisibility;
 import com.reandroid.dex.data.AnnotationItem;
-import com.reandroid.dex.key.MethodKey;
 import com.reandroid.dex.key.TypeKey;
-import com.reandroid.dex.model.DexClass;
 import com.reandroid.dex.model.DexClassRepository;
 import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.dex.model.DexFile;
-import com.reandroid.dex.refactor.RenameTypes;
 import com.reandroid.dex.sections.SectionType;
 import com.reandroid.dex.smali.SmaliWriter;
 import com.reandroid.dex.smali.SmaliWriterSetting;
-import com.reandroid.graph.ApkBuilder;
 import com.reandroid.utils.CompareUtil;
-import com.reandroid.utils.StringsUtil;
 import com.reandroid.utils.collection.ArrayCollection;
 import org.jf.baksmali.Baksmali;
 import org.jf.baksmali.BaksmaliOptions;
 import org.jf.dexlib2.Opcodes;
+import org.jf.dexlib2.VersionMap;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import org.jf.dexlib2.dexbacked.raw.HeaderItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -53,10 +49,13 @@ import java.util.List;
 import java.util.Set;
 
 public class SmaliDecompiler implements DexDecoder {
+
     private final TableBlock tableBlock;
     private final DecompileOptions decompileOptions;
     private ResourceComment mComment;
+    private Opcodes mCurrentOpcodes;
     private APKLogger apkLogger;
+
     public SmaliDecompiler(TableBlock tableBlock, DecompileOptions decompileOptions){
         this.tableBlock = tableBlock;
         this.decompileOptions = decompileOptions;
@@ -215,7 +214,16 @@ public class SmaliDecompiler implements DexDecoder {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         inputSource.write(outputStream);
         outputStream.close();
-        return new DexBackedDexFile(Opcodes.forApi(options.apiLevel), outputStream.toByteArray());
+        byte[] bytes = outputStream.toByteArray();
+        int version = HeaderItem.getVersion(bytes, 0);
+        int api = VersionMap.mapDexVersionToApi(version);
+        options.apiLevel = api;
+        Opcodes opcodes = this.mCurrentOpcodes;
+        if (opcodes == null || api != opcodes.api) {
+            opcodes = Opcodes.forApi(api);
+            this.mCurrentOpcodes = opcodes;
+        }
+        return new DexBackedDexFile(opcodes, bytes);
     }
     public ResourceComment getComment() {
         ResourceComment comment = this.mComment;
