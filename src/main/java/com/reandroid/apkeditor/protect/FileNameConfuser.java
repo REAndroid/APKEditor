@@ -84,7 +84,7 @@ public class FileNameConfuser extends Confuser {
         i = simpleName.lastIndexOf('.');
         String ext;
         if (i < 0) {
-            ext = "";
+            ext = ".";
         } else {
             if (simpleName.endsWith(".9.png")) {
                 ext = ".9.png";
