@@ -64,6 +64,5 @@ public class Protector extends CommandExecutor<ProtectorOptions> {
         module.writeApk(options.outputFile);
         module.close();
         logMessage("Saved to: " + options.outputFile);
-        module.close();
     }
 }

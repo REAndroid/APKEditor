@@ -21,8 +21,8 @@ import com.reandroid.arsc.chunk.xml.ResXmlNode;
 import com.reandroid.arsc.item.StringItem;
 import com.reandroid.arsc.pool.StringPool;
 import com.reandroid.dex.model.DexFile;
-import com.reandroid.dex.sections.MapItem;
-import com.reandroid.dex.sections.MapList;
+import com.reandroid.dex.model.DexLayout;
+import com.reandroid.dex.model.DexSectionInfo;
 import com.reandroid.dex.sections.Marker;
 import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.ComputeList;
@@ -119,35 +119,73 @@ public class InfoWriterXml extends InfoWriter{
         int indent = mIndent + 2;
         mIndent = indent;
         writeIndent(serializer, indent);
-        indent = mIndent + 2;
-        mIndent = indent;
         serializer.startTag(null, "dex");
+
         serializer.attribute(null, "name", dexFile.getFileName());
         serializer.attribute(null, "version", Integer.toString(dexFile.getVersion()));
-        List<Marker> markersList = CollectionUtil.toList(dexFile.getMarkers());
-        writeArray("markers", markersList.toArray());
-
-        MapList mapList = dexFile.getDexLayout().getMapList();
-        writeIndent(serializer, indent);
-        serializer.startTag(null, "dex-sections");
-        indent = mIndent + 2;
-        mIndent = indent;
-        for(MapItem mapItem : mapList){
-            writeIndent(serializer, indent);
-            serializer.startTag(null, "section");
-            serializer.attribute(null, "name", mapItem.getSectionType().getName());
-            serializer.attribute(null, "count", Integer.toString(mapItem.getCountValue()));
-            serializer.attribute(null, "offset", Integer.toString(mapItem.getOffsetValue()));
-            serializer.endTag(null, "section");
+        if (dexFile.isMultiLayout()) {
+            int size = dexFile.size();
+            serializer.attribute(null, "layouts", Integer.toString(size));
+            for (int i = 0; i < size; i++) {
+                writeDexLayout(serializer, dexFile.getLayout(i));
+            }
+        } else if (dexFile.size() != 0) {
+            writeDexLayout(serializer, dexFile.getFirst());
+        } else {
+            serializer.text("EMPTY DEX");
         }
-        indent = mIndent - 2;
-        mIndent = indent;
-        writeIndent(serializer, indent);
-        serializer.endTag(null, "dex-sections");
-        indent = mIndent - 2;
-        mIndent = indent;
         writeIndent(serializer, indent);
         serializer.endTag(null, "dex");
+        indent = mIndent - 2;
+        mIndent = indent;
+    }
+    private void writeDexLayout(KXmlSerializer serializer, DexLayout layout) throws IOException {
+        int indent = mIndent + 2;
+        mIndent = indent;
+        boolean tagOpened = false;
+        if (layout.isMultiLayoutEntry()) {
+            writeIndent(serializer, indent);
+            serializer.startTag(null, "layout");
+            indent = mIndent + 2;
+            mIndent = indent;
+            tagOpened = true;
+            serializer.attribute(null, "name", layout.getName());
+            serializer.attribute(null, "version", Integer.toString(layout.getVersion()));
+        }
+        List<Marker> markersList = CollectionUtil.toList(layout.getMarkers());
+        if (markersList.size() != 0) {
+            writeArray("markers", markersList.toArray());
+        }
+        writeSectionInfo(serializer, layout);
+        indent = indent - 2;
+        this.mIndent = indent;
+        if (tagOpened) {
+            writeIndent(serializer, indent);
+            serializer.endTag(null, "layout");
+            indent = indent - 2;
+            this.mIndent = indent;
+        }
+    }
+    private void writeSectionInfo(KXmlSerializer serializer, DexLayout layout) throws IOException {
+        Iterator<DexSectionInfo> iterator = layout.getSectionInfo();
+        if (!iterator.hasNext()) {
+            return;
+        }
+        int indent = this.mIndent;
+        writeIndent(serializer, indent);
+        serializer.startTag(null, "dex-sections");
+        while (iterator.hasNext()) {
+            DexSectionInfo sectionInfo = iterator.next();
+            writeIndent(serializer, indent + 2);
+            serializer.startTag(null, "section");
+            serializer.attribute(null, "name", sectionInfo.getSectionType().getName());
+            serializer.attribute(null, "count", Integer.toString(sectionInfo.getCount()));
+            serializer.attribute(null, "offset", Integer.toString(sectionInfo.getOffset()));
+            serializer.endTag(null, "section");
+        }
+        this.mIndent = indent;
+        writeIndent(serializer, indent);
+        serializer.endTag(null, "dex-sections");
     }
     @Override
     public void writeResources(PackageBlock packageBlock, List<String> typeFilters, boolean writeEntries) throws IOException {

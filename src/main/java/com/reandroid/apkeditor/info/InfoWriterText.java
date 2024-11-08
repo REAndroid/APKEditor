@@ -27,8 +27,8 @@ import com.reandroid.arsc.pool.StringPool;
 import com.reandroid.arsc.value.*;
 import com.reandroid.common.Namespace;
 import com.reandroid.dex.model.DexFile;
-import com.reandroid.dex.sections.MapItem;
-import com.reandroid.dex.sections.MapList;
+import com.reandroid.dex.model.DexLayout;
+import com.reandroid.dex.model.DexSectionInfo;
 import com.reandroid.dex.sections.Marker;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.utils.StringsUtil;
@@ -203,8 +203,41 @@ public class InfoWriterText extends InfoWriter {
         Writer writer = getWriter();
         writer.write("\n");
         writeNameValue("Name", dexFile.getFileName());
-        writeNameValue("Version", dexFile.getVersion());
-        List<Marker> markersList = CollectionUtil.toList(dexFile.getMarkers());
+        if (dexFile.isMultiLayout()) {
+            int size = dexFile.size();
+            for (int i = 0; i < size; i++) {
+                writeLayout(dexFile.getLayout(i));
+            }
+            writeNameValue("TotalClasses", dexFile.getDexClassesCountForDebug());
+        } else if(dexFile.size() != 0) {
+            writeLayout(dexFile.getFirst());
+        } else {
+            writer.write("EMPTY DEX");
+            writer.write("\n");
+        }
+        writer.flush();
+    }
+    private void writeLayout(DexLayout layout) throws IOException {
+        Writer writer = getWriter();
+        if (layout.isMultiLayoutEntry()) {
+            writer.write(layout.getName());
+            writer.write(", ");
+        }
+        writeNameValue("Version", layout.getVersion());
+        writeMarkers(layout.getMarkers());
+        writer.write("Sections:");
+        Iterator<DexSectionInfo> iterator = layout.getSectionInfo();
+        while (iterator.hasNext()){
+            DexSectionInfo sectionInfo = iterator.next();
+            writer.write("\n");
+            writer.write(ARRAY_TAB);
+            writer.write(sectionInfo.print(false));
+        }
+        writer.write("\n");
+    }
+    private void writeMarkers(Iterator<Marker> iterator) throws IOException {
+        Writer writer = getWriter();
+        List<Marker> markersList = CollectionUtil.toList(iterator);
         if(markersList.size() != 0){
             writer.write("Markers:");
             for(Marker marker : markersList){
@@ -213,16 +246,6 @@ public class InfoWriterText extends InfoWriter {
                 writer.write(marker.toString());
             }
         }
-        writer.write("\n");
-        MapList mapList = dexFile.getDexLayout().getMapList();
-        writer.write("Sections:");
-        for(MapItem mapItem : mapList){
-            writer.write("\n");
-            writer.write(ARRAY_TAB);
-            writer.write(mapItem.toString());
-        }
-        writer.write("\n");
-        writer.flush();
     }
     @Override
     public void writeResources(PackageBlock packageBlock, List<String> typeFilters, boolean writeEntries) throws IOException {

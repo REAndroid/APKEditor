@@ -70,9 +70,7 @@ public class Builder extends CommandExecutor<BuildOptions> {
 
         BuildOptions options = getOptions();
 
-        SmaliCompiler smaliCompiler = new SmaliCompiler(options.noCache);
-        smaliCompiler.setApkLogger(this);
-        encoder.setDexEncoder(smaliCompiler);
+        encoder.setDexEncoder(getSmaliCompiler());
 
         encoder.scanDirectory(options.inputFile);
         ApkModule loadedModule = encoder.getApkModule();
@@ -99,10 +97,8 @@ public class Builder extends CommandExecutor<BuildOptions> {
 
         BuildOptions options = getOptions();
 
-        SmaliCompiler smaliCompiler = new SmaliCompiler(options.noCache);
-        smaliCompiler.setApkLogger(this);
+        encoder.setDexEncoder(getSmaliCompiler());
 
-        encoder.setDexEncoder(smaliCompiler);
         ApkModule loadedModule = encoder.getApkModule();
         loadedModule.setAPKLogger(this);
 
@@ -128,10 +124,8 @@ public class Builder extends CommandExecutor<BuildOptions> {
             logMessage("Keep original binaries");
         }
 
-        SmaliCompiler smaliCompiler = new SmaliCompiler(options.noCache);
-        smaliCompiler.setApkLogger(this);
+        encoder.setDexEncoder(getSmaliCompiler());
 
-        encoder.setDexEncoder(smaliCompiler);
         ApkModule loadedModule = encoder.getApkModule();
         loadedModule.setAPKLogger(this);
 
@@ -145,5 +139,10 @@ public class Builder extends CommandExecutor<BuildOptions> {
         loadedModule.writeApk(options.outputFile, null);
         loadedModule.close();
         logMessage("Saved to: " + options.outputFile);
+    }
+    private SmaliCompiler getSmaliCompiler() {
+        SmaliCompiler smaliCompiler = new SmaliCompiler(getOptions());
+        smaliCompiler.setApkLogger(this);
+        return smaliCompiler;
     }
 }

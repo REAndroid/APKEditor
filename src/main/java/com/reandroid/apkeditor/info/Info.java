@@ -33,6 +33,7 @@ import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.value.*;
 import com.reandroid.dex.model.DexDirectory;
+import com.reandroid.dex.sections.SectionType;
 import com.reandroid.utils.CompareUtil;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.utils.collection.CollectionUtil;
@@ -40,7 +41,6 @@ import com.reandroid.utils.collection.ComputeIterator;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.Function;
 
 public class Info extends CommandExecutor<InfoOptions> {
     private InfoWriter mInfoWriter;
@@ -138,8 +138,13 @@ public class Info extends CommandExecutor<InfoOptions> {
             return;
         }
         InfoWriter infoWriter = getInfoWriter();
-        DexDirectory dexDirectory = DexDirectory.readStrings(apkModule.getZipEntryMap());
+        DexDirectory dexDirectory = DexDirectory.fromZip(apkModule.getZipEntryMap(),
+                sectionType -> sectionType == SectionType.STRING_ID ||
+                sectionType == SectionType.STRING_DATA);
+
         infoWriter.writeDexInfo(dexDirectory);
+
+        dexDirectory.close();
     }
     private void printSignatures(ApkModule apkModule) throws IOException {
         InfoOptions options = getOptions();

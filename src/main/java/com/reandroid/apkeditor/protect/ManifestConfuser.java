@@ -16,6 +16,7 @@
 package com.reandroid.apkeditor.protect;
 
 import com.reandroid.apk.ApkModule;
+import com.reandroid.app.AndroidApiLevel;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
@@ -38,6 +39,7 @@ public class ManifestConfuser extends Confuser {
         }
         ApkModule apkModule = getApkModule();
         AndroidManifestBlock manifestBlock = apkModule.getAndroidManifest();
+        placeBadChunk(manifestBlock);
         int defaultAttributeSize = 20;
         List<ResXmlElement> elementList = CollectionUtil.toList(manifestBlock.recursiveElements());
         Random random = new Random();
@@ -51,5 +53,16 @@ public class ManifestConfuser extends Confuser {
         manifestBlock.getManifestElement().setAttributesUnitSize(
                 defaultAttributeSize, false);
         manifestBlock.refresh();
+    }
+    private void placeBadChunk(AndroidManifestBlock manifestBlock) {
+        AndroidManifestBlock badManifest = new AndroidManifestBlock();
+        badManifest.setPackageName("android");
+        badManifest.setCompileSdk(AndroidApiLevel.U);
+        badManifest.setPlatformBuild(AndroidApiLevel.U);
+        badManifest.setVersionCode(1);
+        badManifest.setVersionName("1.0");
+        badManifest.refreshFull();
+        manifestBlock.getUnexpectedBlockContainer()
+                .setItem(badManifest);
     }
 }

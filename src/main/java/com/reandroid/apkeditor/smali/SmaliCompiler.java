@@ -19,16 +19,12 @@ import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkModuleEncoder;
 import com.reandroid.apk.DexEncoder;
 import com.reandroid.apkeditor.APKEditor;
+import com.reandroid.apkeditor.compile.BuildOptions;
 import com.reandroid.archive.FileInputSource;
 import com.reandroid.archive.InputSource;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.dex.model.DexFile;
-import com.reandroid.dex.sections.Marker;
-import com.reandroid.dex.sections.SectionType;
-import com.reandroid.dex.smali.SmaliReader;
 import com.reandroid.utils.StringsUtil;
-import com.reandroid.utils.io.FileIterator;
-import com.reandroid.utils.io.IOUtil;
 import org.jf.dexlib2.extra.DexMarker;
 import org.jf.smali.Smali;
 import org.jf.smali.SmaliOptions;
@@ -39,12 +35,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SmaliCompiler implements DexEncoder {
+
+    private final BuildOptions buildOptions;
     private APKLogger apkLogger;
-    private final boolean noCache;
     private Integer minSdkVersion;
-    public SmaliCompiler(boolean noCache){
-        this.noCache = noCache;
+
+    public SmaliCompiler(BuildOptions buildOptions) {
+        this.buildOptions = buildOptions;
     }
+
     @Override
     public List<InputSource> buildDexFiles(ApkModuleEncoder apkModuleEncoder, File mainDir) throws IOException {
         File smaliDir = new File(mainDir, "smali");
@@ -56,7 +55,7 @@ public class SmaliCompiler implements DexEncoder {
             this.minSdkVersion = manifestBlock.getMinSdkVersion();
         }
         if(minSdkVersion == null){
-            minSdkVersion = 30;
+            minSdkVersion = 24;
         }
         List<InputSource> results = new ArrayList<>();
         List<File> classesDirList = listClassesDirectories(smaliDir);
@@ -112,48 +111,24 @@ public class SmaliCompiler implements DexEncoder {
     private InputSource buildExperimental(String progress, File classesDir, File dexCacheFile) throws IOException {
         logMessage(progress + "Smali: " + dexCacheFile.getName());
         DexFile dexFile = DexFile.createDefault();
-        FileIterator fileIterator = new FileIterator(classesDir,
-                FileIterator.getExtensionFilter(".smali"));
-        while (fileIterator.hasNext()) {
-            File file = fileIterator.next();
-            try {
-                dexFile.fromSmali(SmaliReader.of(file));
-            }catch (Exception e) {
-                throw new IOException("Error at: " + file, e);
-            }
-        }
-        dexFile.refresh();
-        readMarkers(dexFile, classesDir);
         int version = 0;
         if (this.minSdkVersion != null) {
             version = minSdkVersion;
         }
         version = apiToDexVersion(version);
         dexFile.setVersion(version);
+        dexFile.parseSmaliDirectory(classesDir);
+        dexFile.refresh();
         dexFile.clearEmptySections();
-        dexFile.sortSection(SectionType.getR8Order());
         dexFile.shrink();
         dexFile.refreshFull();
         dexFile.write(dexCacheFile);
         dexFile.close();
         return new FileInputSource(dexCacheFile, dexCacheFile.getName());
     }
-    private void readMarkers(DexFile dexFile, File classesDir) throws IOException {
-        File markersFile = new File(classesDir, DexMarker.FILE_NAME);
-        if(markersFile.isFile()){
-            logMessage("Reading markers ...");
-            String[] content = StringsUtil.split(IOUtil.readUtf8(markersFile), '\n');
-            for(String markerString : content) {
-                Marker marker = Marker.parse(markerString);
-                if(marker != null) {
-                    dexFile.addMarker(marker);
-                }
-            }
-        }
-    }
 
     private boolean isModified(File classesDir, File dexCacheFile){
-        if(noCache || !dexCacheFile.isFile()){
+        if(buildOptions.noCache || !dexCacheFile.isFile()){
             return true;
         }
         long dexMod = dexCacheFile.lastModified();
