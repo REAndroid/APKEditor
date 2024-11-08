@@ -61,7 +61,12 @@ public class Protector extends CommandExecutor<ProtectorOptions> {
         new TableConfuser(this).confuse();
         module.getTableBlock().refresh();
         logMessage("Writing apk ...");
-        module.writeApk(options.outputFile);
+        if (!options.skipZip) {
+            logMessage("Protecting zip structure");
+            new ProtectedFileWriter(module, options.outputFile).write();
+        } else {
+            module.writeApk(options.outputFile);
+        }
         module.close();
         logMessage("Saved to: " + options.outputFile);
     }

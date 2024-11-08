@@ -35,6 +35,9 @@ public class ProtectorOptions extends Options {
     @OptionArg(name = "-skip-manifest", flag = true, description = "protect_skip_manifest")
     public boolean skipManifest;
 
+    @OptionArg(name = "-skip-zip", flag = true, description = "protect_skip_zip")
+    public boolean skipZip;
+
     @OptionArg(name = "-keep-type", description = "protect_keep_type")
     public final Set<String> keepTypes = new HashSet<>();
 
