@@ -170,7 +170,7 @@ public class Merger extends CommandExecutor<MergerOptions> {
                 splits_removed = removeSplitsTableEntry(meta, apkModule);
             }
             logMessage("Removed-element : <" + meta.getName() + "> name=\""
-                    + AndroidManifestHelper.getNamedValue(meta) + "\"");
+                    + AndroidManifestBlock.getAndroidNameValue(meta) + "\"");
             application.remove(meta);
         }
         manifest.refresh();

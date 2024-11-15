@@ -94,7 +94,9 @@ public class InfoWriterXml extends InfoWriter{
         serializer.startTag(null, name);
         serializer.attribute(null, "source-path", sourcePath);
         XmlSerializer documentSerializer = newSerializer();
-        for (ResXmlNode xmlNode : xmlDocument) {
+        Iterator<ResXmlNode> iterator = xmlDocument.iterator();
+        while (iterator.hasNext()) {
+            ResXmlNode xmlNode = iterator.next();
             xmlNode.serialize(documentSerializer, false);
         }
         documentSerializer.flush();

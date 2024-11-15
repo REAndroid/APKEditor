@@ -71,9 +71,9 @@ public class AndroidManifestHelper {
             }
             return;
         }
-            int removed = manifestElement.removeAttributesWithName(resourceName);
-            if (removed > 0 && logger != null) {
-                logger.logMessage("Removed-attribute : " + resourceName);
+        boolean removed = manifestElement.removeAttributesWithName(resourceName);
+        if (removed && logger != null) {
+            logger.logMessage("Removed-attribute : " + resourceName);
         }
     }
     public static void removeAttributeFromManifestById(AndroidManifestBlock androidManifestBlock,
@@ -85,8 +85,8 @@ public class AndroidManifestHelper {
             }
             return;
         }
-        int removed = manifestElement.removeAttributesWithId(resourceId);
-        if (removed > 0 && logger != null) {
+        boolean removed = manifestElement.removeAttributesWithId(resourceId);
+        if (removed && logger != null) {
             logger.logMessage("Removed-attribute : " + HexUtil.toHex8("@0x", resourceId));
         }
     }
@@ -104,50 +104,22 @@ public class AndroidManifestHelper {
             }
             return;
         }
-        int removed = manifestElement.removeAttributesWithId(resourceId);
+        boolean removed = manifestElement.removeAttributesWithId(resourceId);
         ResXmlElement applicationElement = manifestElement.getElement(
                 AndroidManifest.TAG_application);
-        if(removed > 1){
-            if(logger != null){
-                logger.logMessage("Duplicate attributes on <manifest> removed: "
-                        + HexUtil.toHex8("0x", resourceId));
-            }
+
+        if(removed && logger != null) {
+            logger.logMessage("Attributes on <manifest> removed: "
+                    + HexUtil.toHex8("0x", resourceId) + " (" + nameForLogging + ")");
         }
         if(applicationElement == null){
             return;
         }
         removed = applicationElement.removeAttributesWithId(resourceId);
-        if(removed > 1){
-            if(logger != null){
-                logger.logMessage("Duplicate attributes on <application> removed: "
-                        + HexUtil.toHex8("0x", resourceId));
-            }
+        if(removed && logger != null) {
+            logger.logMessage("Attributes on <application> removed: "
+                    + HexUtil.toHex8("0x", resourceId) + " (" + nameForLogging + ")");
         }
-        if(removed > 0){
-            if(logger != null){
-                logger.logMessage("Removed-attribute " + (removed > 1? "(" + removed + "): " : ": ") +
-                        nameForLogging);
-            }
-        }
-    }
-    @Deprecated
-    public static int removeApplicationAttribute(AndroidManifestBlock manifestBlock, int resourceId){
-        if(resourceId == 0){
-            return 0;
-        }
-        ResXmlElement applicationElement = manifestBlock.getApplicationElement();
-        if(applicationElement == null){
-            return 0;
-        }
-        return applicationElement.removeAttributesWithId(resourceId);
-    }
-    public static String getNamedValue(ResXmlElement element) {
-        ResXmlAttribute attribute = CollectionUtil.getFirst(element.getAttributes(
-                AndroidManifestHelper::isNameResourceId));
-        if(attribute == null){
-            return "<not name attribute>";
-        }
-        return attribute.decodeValue();
     }
     static boolean isNameResourceId(ResXmlAttribute attribute){
         int resourceId = attribute.getNameId();

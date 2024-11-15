@@ -515,22 +515,16 @@ public class TypeNameRefactor {
         if(!"PreferenceScreen".equals(root.getName())){
             return false;
         }
-        for(ResXmlElement element:root.listElements()){
-            String tag = element.getName();
-            if("PreferenceCategory".equals(tag)){
-                return true;
-            }
-            if("CheckBoxPreference".equals(tag)){
-                return true;
-            }
-        }
-        return false;
+        return root.getElement("PreferenceCategory") != null ||
+                root.getElement("CheckBoxPreference") != null;
     }
     private boolean isPaths(ResXmlElement root){
         if(!"paths".equals(root.getName())){
             return false;
         }
-        for(ResXmlElement element:root.listElements()){
+        Iterator<ResXmlElement> iterator = root.getElements();
+        while(iterator.hasNext()){
+            ResXmlElement element = iterator.next();
             String tag = element.getName();
             if("files-path".equals(tag) || "cache-path".equals(tag)){
                 return true;

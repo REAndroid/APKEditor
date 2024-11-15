@@ -85,7 +85,9 @@ public class InfoWriterText extends InfoWriter {
     @Override
     public void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException {
         writeNameValue("source-path", sourcePath);
-        for (ResXmlNode node : xmlDocument) {
+        Iterator<ResXmlNode> iterator = xmlDocument.iterator();
+        while (iterator.hasNext()) {
+            ResXmlNode node = iterator.next();
             if (node instanceof ResXmlElement) {
                 writeElement((ResXmlElement) node);
             } else if (node instanceof ResXmlTextNode) {

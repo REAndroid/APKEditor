@@ -20,8 +20,11 @@ import com.reandroid.app.AndroidApiLevel;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
+import com.reandroid.arsc.chunk.xml.UnknownResXmlNode;
+import com.reandroid.arsc.io.BlockReader;
 import com.reandroid.utils.collection.CollectionUtil;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
@@ -62,7 +65,11 @@ public class ManifestConfuser extends Confuser {
         badManifest.setVersionCode(1);
         badManifest.setVersionName("1.0");
         badManifest.refreshFull();
-        manifestBlock.getUnexpectedBlockContainer()
-                .setItem(badManifest);
+        UnknownResXmlNode unknown = manifestBlock.newUnknown();
+        try {
+            unknown.readBytes(new BlockReader(badManifest.getBytes()));
+        } catch (IOException ignored) {
+        }
+        manifestBlock.moveTo(unknown, 0);
     }
 }
