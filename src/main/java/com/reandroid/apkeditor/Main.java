@@ -73,7 +73,7 @@ public class Main {
     }
 
     @OtherOption(
-            names = {"-h", "-help"},
+            names = {"-h", "-help"}, alternates = {"--help"},
             description = "Displays this help and exit"
     )
     void onMainHelp() {
@@ -84,7 +84,7 @@ public class Main {
         System.err.println(builder.build());
     }
     @OtherOption(
-            names = {"-v", "-version"},
+            names = {"-v", "-version"}, alternates = {"--version"},
             description = "Displays version"
     )
     void onPrintVersion() {
