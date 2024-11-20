@@ -16,12 +16,13 @@
 package com.reandroid.apkeditor.protect;
 
 import com.reandroid.apk.ApkModule;
-import com.reandroid.app.AndroidApiLevel;
-import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
-import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
-import com.reandroid.arsc.chunk.xml.ResXmlElement;
-import com.reandroid.arsc.chunk.xml.UnknownResXmlNode;
+import com.reandroid.arsc.chunk.ChunkType;
+import com.reandroid.arsc.chunk.xml.*;
 import com.reandroid.arsc.io.BlockReader;
+import com.reandroid.arsc.item.IntegerItem;
+import com.reandroid.arsc.item.ResXmlString;
+import com.reandroid.arsc.pool.ResXmlStringPool;
+import com.reandroid.utils.NumbersUtil;
 import com.reandroid.utils.collection.CollectionUtil;
 
 import java.io.IOException;
@@ -57,19 +58,50 @@ public class ManifestConfuser extends Confuser {
                 defaultAttributeSize, false);
         manifestBlock.refresh();
     }
+
     private void placeBadChunk(AndroidManifestBlock manifestBlock) {
-        AndroidManifestBlock badManifest = new AndroidManifestBlock();
-        badManifest.setPackageName("android");
-        badManifest.setCompileSdk(AndroidApiLevel.U);
-        badManifest.setPlatformBuild(AndroidApiLevel.U);
-        badManifest.setVersionCode(1);
-        badManifest.setVersionName("1.0");
-        badManifest.refreshFull();
+        placeBadChunk(manifestBlock, ChunkType.XML_END_ELEMENT);
+        placeBadChunk(manifestBlock, ChunkType.XML_END_NAMESPACE);
+    }
+
+    private void placeBadChunk(AndroidManifestBlock manifestBlock, ChunkType chunkType) {
         UnknownResXmlNode unknown = manifestBlock.newUnknown();
         try {
-            unknown.readBytes(new BlockReader(badManifest.getBytes()));
+            unknown.readBytes(new BlockReader(
+                    randomStringPool(chunkType)));
         } catch (IOException ignored) {
         }
         manifestBlock.moveTo(unknown, 0);
+    }
+    private byte[] randomStringPool(ChunkType chunkType) {
+        ResXmlDocument document = new ResXmlDocument();
+        ResXmlStringPool stringPool = document.getStringPool();
+
+        Random random = new Random();
+
+        int size = NumbersUtil.min(20, 5 + random.nextInt(21));
+        stringPool.setUtf8(size % 2 == 0);
+
+        for (int i = 0; i < size; i++) {
+            String s = randomString();
+            ResXmlString xml = stringPool.getOrCreate(s);
+            xml.addReference(new IntegerItem());
+        }
+
+        stringPool.refresh();
+        stringPool.refresh();
+        stringPool.getHeaderBlock().setType(chunkType);
+
+        return stringPool.getBytes();
+    }
+    private String randomString() {
+        StringBuilder builder = new StringBuilder();
+        Random random = new Random();
+        int size = NumbersUtil.min(100, 15 + random.nextInt(90));
+        for (int i = 0; i < size; i++) {
+            char c = (char) (10 + random.nextInt(240));
+            builder.append(c);
+        }
+        return builder.toString();
     }
 }

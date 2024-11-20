@@ -59,28 +59,49 @@ public class TableConfuser extends Confuser {
         tableBlock.refresh();
     }
     private void confuseTypeNames() {
-        //TODO: let the user choose which types to confuse,
-        // and use user provided type names
+        if (isKeepAllTypes()) {
+            logMessage("Skip type names");
+            return;
+        }
+        logMessage("Type names ...");
         ApkModule apkModule = getApkModule();
         TableBlock tableBlock = apkModule.getTableBlock();
         for(PackageBlock packageBlock:tableBlock.listPackages()){
             TypeStringPool pool = packageBlock.getTypeStringPool();
             for(TypeString typeString : pool) {
                 String type = typeString.get();
-                if ("attr".equals(type) ) {
-                    typeString.set("style");
-                } else if ("style".equals(type)) {
-                    typeString.set("plurals");
-                } else if ("id".equals(type)) {
-                    typeString.set("attr");
-                } else if ( "mipmap".equals(type)) {
-                    typeString.set("id");
-                } else {
+                String replace = getReplacement(type);
+                if (type.equals(replace)) {
                     continue;
                 }
+                typeString.set(replace);
                 logVerbose("'" + type + "' -> '" + typeString.get() + "'");
             }
         }
         tableBlock.refresh();
+    }
+
+    private String getReplacement(String type) {
+        if (isKeepType(type)) {
+            return type;
+        }
+
+        String replacement;
+
+        if ("attr".equals(type) ) {
+            replacement = "style";
+        } else if ("style".equals(type)) {
+            replacement = "plurals";
+        } else if ("id".equals(type)) {
+            replacement = "attr";
+        } else if ( "mipmap".equals(type)) {
+            replacement = "id";
+        } else {
+            replacement = type;
+        }
+        if (isKeepType(replacement)) {
+            replacement = type;
+        }
+        return replacement;
     }
 }

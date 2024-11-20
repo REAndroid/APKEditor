@@ -18,8 +18,14 @@ package com.reandroid.apkeditor.protect;
 import com.reandroid.apkeditor.Options;
 import com.reandroid.jcommand.annotations.CommandOptions;
 import com.reandroid.jcommand.annotations.OptionArg;
+import com.reandroid.utils.StringsUtil;
+import com.reandroid.utils.collection.ArrayCollection;
+import com.reandroid.utils.io.FileUtil;
+import com.reandroid.utils.io.IOUtil;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,11 +41,17 @@ public class ProtectorOptions extends Options {
     @OptionArg(name = "-skip-manifest", flag = true, description = "protect_skip_manifest")
     public boolean skipManifest;
 
-    @OptionArg(name = "-skip-zip", flag = true, description = "protect_skip_zip")
-    public boolean skipZip;
+    @OptionArg(name = "-confuse-zip", flag = true, description = "protect_confuse_zip")
+    public boolean confuse_zip;
 
     @OptionArg(name = "-keep-type", description = "protect_keep_type")
     public final Set<String> keepTypes = new HashSet<>();
+
+    @OptionArg(name = "-dic-dir-names", flag = true, description = "protect_dic_dir_name")
+    public File dic_dir_name;
+
+    @OptionArg(name = "-dic-file-names", flag = true, description = "protect_dic_file_name")
+    public File dic_file_name;
 
     public ProtectorOptions() {
         super();
@@ -77,4 +89,44 @@ public class ProtectorOptions extends Options {
     public File generateOutputFromInput(File input) {
         return generateOutputFromInput(input, "_protected.apk");
     }
+
+    public String[] loadDirectoryNameDictionary() {
+        return loadDictionary(dic_dir_name, "/protect_dic_dir_name.txt");
+    }
+    public String[] loadFileNameDictionary() {
+        return loadDictionary(dic_file_name, "/protect_dic_file_name.txt");
+    }
+
+    private String[] loadDictionary(File file, String resource) {
+        InputStream inputStream;
+        if (file != null) {
+            try {
+                inputStream = FileUtil.inputStream(file);
+            } catch (IOException exception) {
+                throw new RuntimeException(exception);
+            }
+        } else {
+            inputStream = ProtectorOptions.class.getResourceAsStream(resource);
+        }
+        String full;
+        try {
+            full = IOUtil.readUtf8(inputStream);
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+        ArrayCollection<String> results = new ArrayCollection<>(
+                StringsUtil.split(full, '\n', true));
+        results.removeIf(StringsUtil::isEmpty);
+        return results.toArray(new String[results.size()]);
+    }
+    public boolean isKeepType(String type) {
+        Set<String> keepTypes = this.keepTypes;
+        return keepTypes.contains(type) ||
+                keepTypes.contains(KEEP_ALL_TYPES);
+    }
+    public boolean isKeepAllTypes() {
+        return keepTypes.contains(KEEP_ALL_TYPES);
+    }
+
+    private static final String KEEP_ALL_TYPES = "all-types";
 }

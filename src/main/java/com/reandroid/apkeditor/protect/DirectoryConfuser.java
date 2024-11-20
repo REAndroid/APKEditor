@@ -16,14 +16,10 @@
 package com.reandroid.apkeditor.protect;
 
 import com.reandroid.apk.ApkModule;
-import com.reandroid.apk.DexFileInputSource;
 import com.reandroid.apk.ResFile;
 import com.reandroid.apk.UncompressedFiles;
 import com.reandroid.apkeditor.utils.CyclicIterator;
 import com.reandroid.archive.Archive;
-import com.reandroid.utils.collection.CollectionUtil;
-
-import java.util.List;
 
 public class DirectoryConfuser extends Confuser {
 
@@ -31,7 +27,8 @@ public class DirectoryConfuser extends Confuser {
 
     public DirectoryConfuser(Protector protector) {
         super(protector, "DirectoryConfuser: ");
-        this.namesIterator = new CyclicIterator<>(loadDirNameList(protector.getApkModule()));
+        this.namesIterator = new CyclicIterator<>(
+                protector.getOptions().loadDirectoryNameDictionary());
     }
 
     @Override
@@ -87,42 +84,5 @@ public class DirectoryConfuser extends Confuser {
             dirName = dirName + "/";
         }
         return dirName + simpleName;
-    }
-    private static String[] loadDirNameList(ApkModule apkModule) {
-        List<String> nameList = CollectionUtil.asList(
-                "AndroidManifest.xml",
-                "/AndroidManifest.xml",
-                "resources.arsc",
-                "/resources.arsc",
-                "classes.dex",
-                "/classes.dex",
-                "kotlin",
-                "META-INF",
-                "",
-                "kotlin/annotation",
-                "kotlin/collections",
-                "kotlin/coroutines",
-                "kotlin/internal",
-                "kotlin/ranges",
-                "kotlin/reflect",
-                "res/values/arrays.xml",
-                "res/values/attrs.xml",
-                "res/values/bools.xml",
-                "res/values/colors.xml",
-                "res/values/dimens.xml",
-                "res/values/drawables.xml",
-                "res/values/ids.xml",
-                "res/values/integers.xml",
-                "res/values/plurals.xml",
-                "res/values/public.xml",
-                "res/values/strings.xml",
-                "res/values/styles.xml"
-        );
-        List<DexFileInputSource> dexList = apkModule.listDexFiles();
-        int size = dexList.size();
-        for (int i = 1; i < size; i++) {
-            nameList.add(dexList.get(i).getAlias());
-        }
-        return nameList.toArray(new String[0]);
     }
 }

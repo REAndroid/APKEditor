@@ -60,7 +60,10 @@ public abstract class Confuser implements APKLogger {
         return filePaths;
     }
     public boolean isKeepType(String type) {
-        return getOptions().keepTypes.contains(type);
+        return getOptions().isKeepType(type);
+    }
+    public boolean isKeepAllTypes() {
+        return getOptions().isKeepAllTypes();
     }
     public Protector getProtector() {
         return protector;

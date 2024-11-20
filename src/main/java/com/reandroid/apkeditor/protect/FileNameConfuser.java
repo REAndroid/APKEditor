@@ -27,7 +27,8 @@ public class FileNameConfuser extends Confuser {
 
     public FileNameConfuser(Protector protector) {
         super(protector, "FileNameConfuser: ");
-        this.namesIterator = new CyclicIterator<>(loadFileNames());
+        this.namesIterator = new CyclicIterator<>(
+                protector.getOptions().loadFileNameDictionary());
     }
 
     @Override
@@ -93,22 +94,5 @@ public class FileNameConfuser extends Confuser {
             }
         }
         return dirName + symbol + ext;
-    }
-    private static String[] loadFileNames() {
-        return new String[]{
-                ".",
-                "//",
-                "///",
-                "////",
-                "\\\\",
-                "\\\\\\",
-                "\\/",
-                " ",
-                "  ",
-                "classes.dex",
-                "AndroidManifest.xml",
-                "AndroidManifest",
-                "resources.arsc",
-        };
     }
 }
