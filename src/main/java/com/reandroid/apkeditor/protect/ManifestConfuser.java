@@ -60,8 +60,8 @@ public class ManifestConfuser extends Confuser {
     }
 
     private void placeBadChunk(AndroidManifestBlock manifestBlock) {
-        placeBadChunk(manifestBlock, ChunkType.XML_END_ELEMENT);
         placeBadChunk(manifestBlock, ChunkType.XML_END_NAMESPACE);
+        placeBadChunk(manifestBlock, ChunkType.PACKAGE);
     }
 
     private void placeBadChunk(AndroidManifestBlock manifestBlock, ChunkType chunkType) {
