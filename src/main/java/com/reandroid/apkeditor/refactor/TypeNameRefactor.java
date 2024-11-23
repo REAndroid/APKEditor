@@ -318,7 +318,7 @@ public class TypeNameRefactor {
         if(!"menu".equals(root.getName())){
             return false;
         }
-        if(root.listElements("item").size()==0){
+        if(!root.getElements("item").hasNext()){
             return false;
         }
         return rename(resourceId, name);
@@ -337,14 +337,14 @@ public class TypeNameRefactor {
         }
         int state_enabled=0x0101009e;
         boolean hasObjectAnimator=false;
-        for(ResXmlElement itemElement:root.listElements("item")){
-            if(itemElement.searchAttributeByResourceId(state_enabled)==null){
-                continue;
-            }
-            hasObjectAnimator=itemElement
-                    .listElements("objectAnimator").size()>0;
-            if(hasObjectAnimator){
-                break;
+        Iterator<ResXmlElement> iterator = root.getElements("item");
+        while (iterator.hasNext()) {
+            ResXmlElement itemElement = iterator.next();
+            if (itemElement.searchAttributeByResourceId(state_enabled) != null ) {
+                if (itemElement.getElements("objectAnimator").hasNext()) {
+                    hasObjectAnimator = true;
+                    break;
+                }
             }
         }
         if(!hasObjectAnimator){
@@ -366,9 +366,11 @@ public class TypeNameRefactor {
         }
         int pathData=0x01010405;
         boolean hasPathData=false;
-        for(ResXmlElement element:root.listElements("path")){
-            if(element.searchAttributeByResourceId(pathData)!=null){
-                hasPathData=true;
+        Iterator<ResXmlElement> iterator = root.getElements("path");
+        while (iterator.hasNext()){
+            ResXmlElement element = iterator.next();
+            if (element.searchAttributeByResourceId(pathData) != null) {
+                hasPathData = true;
             }
         }
         if(!hasPathData){
