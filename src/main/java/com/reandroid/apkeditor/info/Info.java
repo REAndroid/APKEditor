@@ -325,7 +325,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(manifest == null){
             return;
         }
-        List<ResXmlElement> activityList = manifest.listActivities(true);
+        List<ResXmlElement> activityList = CollectionUtil.toList(manifest.getActivities(true));
         if(activityList.size() == 0){
             return;
         }
