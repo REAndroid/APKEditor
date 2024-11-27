@@ -20,7 +20,6 @@ import com.reandroid.arsc.array.ResValueMapArray;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlDocument;
 import com.reandroid.arsc.container.SpecTypePair;
-import com.reandroid.arsc.item.StringItem;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.pool.StringPool;
 import com.reandroid.arsc.value.Entry;
@@ -41,31 +40,26 @@ import java.util.List;
 
 public class InfoWriterJson extends InfoWriter{
     private final JSONWriter mJsonWriter;
+    private final JSONObject mJsonObject;
 
     public InfoWriterJson(Writer writer) {
         super(writer);
-        JSONWriter jsonWriter = new JSONWriter(writer);
-        jsonWriter = jsonWriter.array();
-        this.mJsonWriter = jsonWriter;
+        this.mJsonWriter = new JSONWriter(writer);
+        this.mJsonObject = new JSONObject();
+        this.mJsonWriter.array();
     }
 
     @Override
     public void writeStringPool(String source, StringPool<?> stringPool) throws IOException {
-        JSONWriter jsonWriter = mJsonWriter.object()
-                .key("string_pool").object()
-                .key("source").value(source)
-                .key("count").value(stringPool.size())
-                .key("styles").value(stringPool.countStyles())
-                .key("sorted").value(stringPool.getHeaderBlock().isSorted())
-                .key("utf8").value(stringPool.isUtf8())
-                .key("bytes").value(stringPool.getHeaderBlock().getChunkSize())
-                .key("strings").array();
-        int size = stringPool.size();
-        for (int i = 0; i < size; i++ ) {
-            StringItem item = stringPool.get(i);
-            jsonWriter.value(item.get());
-        }
-        jsonWriter.endArray().endObject().endObject();
+        JSONObject stringPoolObject = new JSONObject();
+        stringPoolObject.put("source", source);
+        stringPoolObject.put("count", stringPool.size());
+        stringPoolObject.put("styles", stringPool.countStyles());
+        stringPoolObject.put("sorted", stringPool.getHeaderBlock().isSorted());
+        stringPoolObject.put("utf8", stringPool.isUtf8());
+        stringPoolObject.put("bytes", stringPool.getHeaderBlock().getChunkSize());
+        stringPoolObject.put("strings", stringPool.getStringsArray());
+        mJsonObject.put("string_pool", stringPoolObject);
     }
     @Override
     public void writeXmlDocument(String sourcePath, ResXmlDocument xmlDocument) throws IOException {
@@ -243,16 +237,16 @@ public class InfoWriterJson extends InfoWriter{
     }
     @Override
     public void writeNameValue(String name, Object value) throws IOException {
-        mJsonWriter.object()
-                .key(name)
-                .value(value)
-                .endObject();
+        mJsonObject.put(name, value);
         getWriter().flush();
     }
 
     @Override
     public void flush() throws IOException {
         Writer writer = getWriter();
+        if (!mJsonObject.isEmpty()) {
+            mJsonWriter.value(mJsonObject);
+        }
         mJsonWriter.endArray();
         writer.write("\n");
         writer.flush();
