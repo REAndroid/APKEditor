@@ -44,9 +44,11 @@ public class InfoWriterJson extends InfoWriter{
 
     public InfoWriterJson(Writer writer) {
         super(writer);
-        this.mJsonWriter = new JSONWriter(writer);
-        this.mJsonObject = new JSONObject();
-        this.mJsonWriter.array();
+        JSONWriter jsonWriter = new JSONWriter(writer);
+        jsonWriter = jsonWriter.array();
+        JSONObject jsonObject = new JSONObject();
+        this.mJsonWriter = jsonWriter;
+        this.mJsonObject = jsonObject;
     }
 
     @Override
