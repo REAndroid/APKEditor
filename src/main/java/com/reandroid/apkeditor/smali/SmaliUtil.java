@@ -16,13 +16,16 @@
 package com.reandroid.apkeditor.smali;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class SmaliUtil {
 
     static void sortDexFiles(List<File> fileList){
-        fileList.sort(new Comparator<File>() {
+        Object[] a = fileList.toArray();
+        Arrays.sort(a, (Comparator) new Comparator<File>() {
             @Override
             public int compare(File file1, File file2) {
                 int i1 = getDexNumber(file1.getName());
@@ -36,6 +39,11 @@ public class SmaliUtil {
                 return 1;
             }
         });
+        ListIterator<File> i = fileList.listIterator();
+        for (Object e : a) {
+            i.next();
+            i.set((File) e);
+        }
     }
     static String getDexFileName(int i){
         if(i==0){

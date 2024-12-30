@@ -72,8 +72,7 @@ public class FileLogger extends WriterLogger{
             dir.mkdirs();
         }
         FileOutputStream outputStream=new FileOutputStream(file, true);
-        OutputStreamWriter writer=new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
-        return writer;
+        return new OutputStreamWriter(outputStream, "UTF-8");
     }
     public static FileLogger create(File file){
         try {

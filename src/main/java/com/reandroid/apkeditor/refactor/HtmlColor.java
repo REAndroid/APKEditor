@@ -228,7 +228,7 @@ class HtmlColor {
                     continue;
                 }
                 Integer val=htmlColor.getRGBValue();
-                results.putIfAbsent(val, htmlColor);
+                if (results.get(val) == null) results.put(val, htmlColor);
             }
         } catch (IOException e) {
         }
