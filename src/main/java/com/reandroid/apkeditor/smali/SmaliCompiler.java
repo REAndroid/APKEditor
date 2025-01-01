@@ -118,9 +118,6 @@ public class SmaliCompiler implements DexEncoder {
         version = apiToDexVersion(version);
         dexFile.setVersion(version);
         dexFile.parseSmaliDirectory(classesDir);
-        dexFile.refresh();
-        dexFile.clearEmptySections();
-        dexFile.shrink();
         dexFile.refreshFull();
         dexFile.write(dexCacheFile);
         dexFile.close();
