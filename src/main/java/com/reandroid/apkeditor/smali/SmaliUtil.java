@@ -25,7 +25,7 @@ public class SmaliUtil {
 
     static void sortDexFiles(List<File> fileList){
         Object[] a = fileList.toArray();
-        Arrays.sort(a, (Comparator) new Comparator<File>() {
+        com.reandroid.utils.collection.ArraySort.sort(a, (Comparator) new Comparator<File>() {
             @Override
             public int compare(File file1, File file2) {
                 int i1 = getDexNumber(file1.getName());

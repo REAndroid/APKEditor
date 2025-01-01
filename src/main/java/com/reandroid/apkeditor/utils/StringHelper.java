@@ -38,7 +38,7 @@ public class StringHelper {
     public static List<String> sortAscending(List<String> nameList){
         Comparator<String> cmp= (s1, s2) -> s1.compareTo(s2);
         Object[] a = nameList.toArray();
-        Arrays.sort(a, (Comparator) cmp);
+        com.reandroid.utils.collection.ArraySort.sort(a, (Comparator) cmp);
         ListIterator<String> i = nameList.listIterator();
         for (Object e : a) {
             i.next();

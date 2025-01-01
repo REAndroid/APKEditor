@@ -310,7 +310,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         List<String> usesPermissions = manifest.getUsesPermissions();
         if(usesPermissions.isEmpty()) return;
         Object[] a = usesPermissions.toArray();
-        Arrays.sort(a, (Comparator) CompareUtil.getComparableComparator());
+        com.reandroid.utils.collection.ArraySort.sort(a, (Comparator) CompareUtil.getComparableComparator());
         ListIterator<String> i = usesPermissions.listIterator();
         for (Object e : a) {
             i.next();
@@ -441,7 +441,7 @@ public class Info extends CommandExecutor<InfoOptions> {
                 }));
 
         Object[] a = qualifiers.toArray();
-        Arrays.sort(a, (Comparator) CompareUtil.getComparableComparator());
+        com.reandroid.utils.collection.ArraySort.sort(a, (Comparator) CompareUtil.getComparableComparator());
         ListIterator<String> i = qualifiers.listIterator();
         for (Object e : a) {
             i.next();
@@ -460,7 +460,7 @@ public class Info extends CommandExecutor<InfoOptions> {
                 ComputeIterator.of(iterator, ResConfig::getLanguage));
 
         Object[] a = languages.toArray();
-        Arrays.sort(a, (Comparator) CompareUtil.getComparableComparator());
+        com.reandroid.utils.collection.ArraySort.sort(a, (Comparator) CompareUtil.getComparableComparator());
         ListIterator<String> i = languages.listIterator();
         for (Object e : a) {
             i.next();
@@ -481,7 +481,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         locales.remove("");
 
         Object[] a = locales.toArray();
-        Arrays.sort(a, (Comparator) CompareUtil.getComparableComparator());
+        com.reandroid.utils.collection.ArraySort.sort(a, (Comparator) CompareUtil.getComparableComparator());
         ListIterator<String> i = locales.listIterator();
         for (Object e : a) {
             i.next();
@@ -589,7 +589,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         };
         //results.sort(cmp);
         Object[] elements = results.toArray();
-        Arrays.sort(elements, cmp);
+        com.reandroid.utils.collection.ArraySort.sort(elements, cmp);
         ListIterator<Entry> iterator = results.listIterator();
         for (Object element : elements) {
             iterator. next();
