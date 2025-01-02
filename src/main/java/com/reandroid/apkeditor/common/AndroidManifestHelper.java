@@ -27,7 +27,7 @@ import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.EmptyList;
 
 import java.util.List;
-import java.util.function.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 public class AndroidManifestHelper {
 

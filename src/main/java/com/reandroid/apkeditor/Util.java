@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import java.util.function.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 public class Util {
     public static boolean isHelp(String[] args){
