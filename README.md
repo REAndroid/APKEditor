@@ -154,7 +154,7 @@ Package name=com.mypackage id=0x7f
   type string id=1 entryCount=1
     resource 0x7f010000 string/app_name
       () My Application
-      (-de) Meine Bewerbung
+      (-de) Meine Anwendung
       (-ru-rRU) Мое заявление
   type mipmap id=2 entryCount=1
     resource 0x7f020000 mipmap/ic_launcher_round
