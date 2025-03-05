@@ -58,6 +58,7 @@ public class ManifestConfuser extends Confuser {
             element.setAttributesUnitSize(size, false);
             ResXmlAttribute attribute = element.newAttribute();
             attribute.setName(" >\n  </" + element.getName() + ">\n  android:name", 0);
+            attribute.setName(" >\n  </" + element.getName() + ">\n  android:tag", 0);
             attribute.setValueAsBoolean(false);
         }
         manifestBlock.getManifestElement().setAttributesUnitSize(
