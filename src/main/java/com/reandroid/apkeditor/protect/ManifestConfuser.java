@@ -57,7 +57,21 @@ public class ManifestConfuser extends Confuser {
             int size = defaultAttributeSize + random.nextInt(6) + 1;
             element.setAttributesUnitSize(size, false);
             ResXmlAttribute attribute = element.newAttribute();
-            attribute.setName(" >\n  </" + element.getName() + ">\n  android:name", 0,">\n  android:tag", 0);
+            attribute.setName(" >\n  </" + element.getName() + ">\n  android:name", 0);
+            attribute.setValueAsBoolean(false);
+        }
+        manifestBlock.getManifestElement().setAttributesUnitSize(
+                defaultAttributeSize, false);
+    }
+    private void confuseAttributes(AndroidManifestBlock manifestBlock) {
+        int defaultAttributeSize = 20;
+        List<ResXmlElement> elementList = CollectionUtil.toList(manifestBlock.recursiveElements());
+        Random random = new Random();
+        for (ResXmlElement element : elementList) {
+            int size = defaultAttributeSize + random.nextInt(6) + 1;
+            element.setAttributesUnitSize(size, false);
+            ResXmlAttribute attribute = element.newAttribute();
+            attribute.setName(" >\n  </" + element.getName() + ">\n  android:tag", 0);
             attribute.setValueAsBoolean(false);
         }
         manifestBlock.getManifestElement().setAttributesUnitSize(
