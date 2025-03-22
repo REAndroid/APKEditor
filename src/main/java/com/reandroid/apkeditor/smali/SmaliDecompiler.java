@@ -32,6 +32,7 @@ import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.VersionMap;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
 import org.jf.dexlib2.dexbacked.raw.HeaderItem;
+import org.jf.util.ExceptionWithContext;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -116,8 +117,16 @@ public class SmaliDecompiler implements DexDecoder {
         options.debugInfo = !decompileOptions.noDexDebug;
         options.dumpMarkers = decompileOptions.dexMarkers;
         options.setCommentProvider(getComment());
-        DexBackedDexFile dexFile = getInputDexFile(inputSource, options);
-        Baksmali.disassembleDexFile(dexFile, dir, 1, options);
+        try {
+            DexBackedDexFile dexFile = getInputDexFile(inputSource, options);
+            Baksmali.disassembleDexFile(dexFile, dir, 1, options);
+        }catch (ExceptionWithContext exceptionWithContext){
+            logMessage("Error decompiling dex file: "+inputSource.getAlias()+" ,"+exceptionWithContext.getMessage());
+            return;
+        }catch (IOException exception){
+            logMessage("Error decompiling dex file: "+inputSource.getAlias()+" ,"+exception.getMessage());
+            return;
+        }
     }
     private void disassembleWithInternalDexLib(DexFileInputSource inputSource, File mainDir) throws IOException {
         Predicate<SectionType<?>> filter;
