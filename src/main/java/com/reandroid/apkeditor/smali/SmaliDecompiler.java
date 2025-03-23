@@ -37,7 +37,6 @@ import org.jf.util.ExceptionWithContext;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ArrayIndexOutOfBoundsException;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -123,9 +122,6 @@ public class SmaliDecompiler implements DexDecoder {
             Baksmali.disassembleDexFile(dexFile, dir, 1, options);
         }catch (ExceptionWithContext exceptionWithContext){
             logMessage("Error decompiling dex file: "+inputSource.getAlias()+" ,"+exceptionWithContext.getMessage());
-            return;
-        }catch (ArrayIndexOutOfBoundsException arrayIndexOutOfBoundsException){
-            logMessage("Error decompiling dex file: "+inputSource.getAlias()+" ,"+arrayIndexOutOfBoundsException.getMessage());
             return;
         }catch (IOException exception){
             logMessage("Error decompiling dex file: "+inputSource.getAlias()+" ,"+exception.getMessage());
