@@ -30,54 +30,33 @@ To make using `APKEditor.jar` more convenient on Windows, you can use the follow
 @echo off
 setlocal EnableDelayedExpansion
 
-:: Define ESC character for ANSI sequences (works in most modern terminals)
-for /F "tokens=1 delims=#" %%a in ('"prompt #$E# & echo on & for %%b in (1) do rem"') do set "ESC=%%a"
+::  colors
+set "red=[91m"
+set "green=[92m"
+set "yellow=[93m"
+set "cyan=[96m"
+set "reset=[0m"
 
-:: Color definitions using ESC
-set "red=%ESC%[91m"
-set "green=%ESC%[92m"
-set "yellow=%ESC%[93m"
-set "cyan=%ESC%[96m"
-set "reset=%ESC%[0m"
-set "bold=%ESC%[1m"
-
-:: Find the JAR file next to the batch script
 set "JAR_PATH=%~dp0APKEditor.jar"
 if not exist "%JAR_PATH%" (
-    echo %red%[ERROR]%reset% APKEditor.jar not found in %~dp0
-    echo %yellow%Please place APKEditor.jar in the same directory as this script.%reset%
+    echo %red%[ERROR] APKEditor.jar not found in %~dp0%reset%
     exit /b 1
 )
 
-:: Check for help flags or no arguments
-set "SHOW_HELP="
-if "%~1"=="" set "SHOW_HELP=1"
-if /I "%~1"=="-h" set "SHOW_HELP=1"
-if /I "%~1"=="--help" set "SHOW_HELP=1"
-if /I "%~1"=="/?" set "SHOW_HELP=1"
-
-if defined SHOW_HELP (
-    echo %yellow%%bold%APKEditor Wrapper%reset%
-    echo.
+if "%~1"=="" (
+    echo %yellow%APKEditor%reset% 
+	
     echo %cyan%Usage:%reset% apkeditor [command] [options]
-    echo %cyan%Example:%reset% apkeditor d -i app.apk -o output_dir
-    echo.
-    echo %cyan%Available commands (from APKEditor.jar):%reset%
-    echo -------------------------------------------
-    java -jar "%JAR_PATH%" -h
-    echo -------------------------------------------
+    echo %cyan%Commands:%reset% use %green% apkeditor -h %reset%- to see the available commands
+    echo %cyan%Example:%reset% apkeditor d -i app.apk
     exit /b 0
 )
 
-:: Execute the command
-echo %yellow%[INFO]%reset% Running: %cyan%java -jar "%JAR_PATH%" %*%reset%
-echo.
+echo %yellow%[INFO] Running command: java -jar APKEditor.jar %* %reset%
 java -jar "%JAR_PATH%" %*
 
-:: Propagate the exit code from java
 exit /b %ERRORLEVEL%
 
-endlocal
 ```
 
 ### Usage Examples (using the wrapper):
