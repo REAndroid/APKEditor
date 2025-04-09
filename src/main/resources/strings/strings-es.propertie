@@ -1,0 +1,130 @@
+
+# strings-es.properties
+################################################################################################
+# Localized strings used by APKEditor
+# File naming:
+#        strings-[language]-[country(optional)].properties
+#     default:
+#        strings.properties
+#.       e.g. : strings-en-US.properties, strings-en.properties
+# Content: The content is as per specification of java.util.Properties
+# Encoding: utf-8 only. If utf-8 can not handle, use escaped hex encoding.
+# format:
+# name={VALUE}
+# name: A unique string of characters starting with a-z , digits 0-9 and underscore '_'
+# {VALUE}: the value
+#Comment: New line starting with '#' character
+#NOTES:
+#1 - Optionally, keep the list alphabetically sorted by name.
+#2 - If the name and {VALUE} is the same as default, the entry can be ignored
+###############################################################################################
+# Authors: github.com/REAndroid, <Contributors: github.com/VictorH028 >
+################################################################################################
+
+app_version=Muestra la información de la versión y sale
+app_help=Muestra esta ayuda y sale
+build_description=Compila binarios de Android a partir de json/xml/raw.
+build_example_1=[Básico]\n java -jar APKEditor.jar b -i path/input_directory
+build_example_2=[Especificar Salida]\n java -jar APKEditor.jar b -i path/input_directory -o path/output.apk
+build_example_3=[Restaurar firma]\n java -jar APKEditor.jar b -t sig -i path/input.apk -sig path/signatures_dir
+build_example_4=[Especificar el marco]\n java -jar APKEditor.jar b -i path/input_directory -framework framework-res.apk -framework platforms/android-32/android.jar
+build_no_cache=Ignora los archivos .dex almacenados en caché compilados y vuelve a compilar los archivos smali.
+build_types=Tipos de compilación, por defecto los tipos de compilación se determinan mediante el análisis rápido de los archivos del directorio de entrada. Los valores son:
+clean_meta=Limpia el directorio META-INF junto con el bloque de firma.
+decode_description=Decodifica el binario de los recursos de Android en json/xml/raw legible.
+decode_example_1=[Básico]\njava -jar APKEditor.jar d -i path/input.apk
+decode_example_2=[Especificar salida]\njava -jar APKEditor.jar d -i path/input.apk -o path/output.apk
+decode_example_3=[Especificar el tipo de decodificación]\njava -jar APKEditor.jar d -t xml -i path/input.apk
+decode_example_4=[Especificar archivo(s) de marco]\njava -jar APKEditor.jar d -i path/input.apk -framework framework-res.apk -framework platforms/android-32/android.jar
+decode_example_5=[Decodificar el bloque de firma apk]\njava -jar APKEditor.jar d -t sig -i path/input.apk -sig path/signatures_dir
+decode_load_dex=Número de archivos dex para cargar a la vez.\nSi el conteo de archivos dex del apk es mayor que este valor, entonces el decodificador carga un dex a la vez.\n Aplica solo cuando -dex-lib está configurado como interno.\n Por defecto = 3\n Ver abajo.
+decode_note_1=[interno] Constructor Dex:\n Soporta completamente archivos dex hasta 042.\n Máxima compresión de archivos dex.\n Construye con orden de sección dex similar a r8/dx.\n Edición conveniente de marcadores dex, ver archivo smali/classes/dex-file.json\n Comentarios smali adicionales útiles: ej. jerarquía de clase/método.\n Soporta espacios en blanco en nombres simples de clase como se introdujo en dex 041+
+decode_note_2=[-load-dex] Para imprimir la jerarquía correcta de clase/método, es necesario cargar todos los archivos dex a la vez. Esto puede resultar en alto consumo de memoria y podría fallar con "OutOfMemoryError", por lo que debes limitar el número de archivos dex a cargar a la vez. Puedes solucionar este problema con el argumento de memoria -Xmx ej. java -Xmx8g -jar APKEditor.jar ...
+decode_types=Tipos de decodificación:
+decode_usage=d [Opciones, banderas]
+dump_dex_markers=Vuelca marcadores dex (aplica solo en modo smali).
+duplicate_option_exception=Opción duplicada '%s'
+dex_lib=Librería Dex a usar:\n 1) internal : Usa librería interna, soporta versiones dex hasta 042.\n 2) jf : Usa librería de JesusFreke/smali, soporta versiones dex 035 e inferiores.\n Por defecto = jf\n *ADVERTENCIA: El valor por defecto será reemplazado por "internal" en versiones futuras.\n Ver abajo.
+empty_command_args_exception=Comando vacío, ejecuta con -h para obtener ayuda
+empty_command_option_exception=Opciones vacías, ejecuta con -h para obtener ayuda
+force_delete=Forzar eliminación de ruta de salida.
+framework_version_number=Número de versión de marco preferido
+help_description=Muestra esta ayuda y sale.
+help_main_footer=Para obtener ayuda sobre cada comando ejecuta con:
+info_activities=Imprime el nombre de la clase de actividad principal. En modo verbose, imprime todas las actividades declaradas incluyendo .
+info_app_class_name=Nombre de la clase de aplicación.
+info_app_icon=Ruta/valor del icono de la aplicación. En modo verbose, imprime todas las configuraciones.
+info_app_icon_round=Ruta/valor del icono redondo de la aplicación. En modo verbose, imprime todas las configuraciones.
+info_app_name=Nombre de la aplicación. En modo verbose, imprime todas las configuraciones.
+info_app_version_code=Código de versión de la aplicación.
+info_app_version_name=Nombre de versión de la aplicación.
+info_description=Imprime información del apk.
+info_dex=Imprime información dex.
+info_example_1=[Básico]\n java -jar APKEditor.jar info -i file.apk
+info_example_2=[Especificar salida y tipo]\n java -jar APKEditor.jar info -i path/input.apk -t json -v -o info_file.json
+info_example_3=[Imprimir solo tipo específico]\n java -jar APKEditor.jar info -i path/input.apk -resources -filter-type drawable
+info_filter_type=Imprime solo los nombres de tipo de recurso especificados\n Aplica solo cuando se usa la bandera '-resources'.\n Puede ser múltiple.
+info_invalid_output_extension=¡Extensión de archivo inválida! Se esperaba '%s', '%s'
+info_configurations=Imprime las configuraciones en el APK.
+info_languages=Imprime los idiomas en el APK.
+info_locales=Imprime las localizaciones en el APK.
+info_list_files=Lista archivos dentro del apk.
+info_list_xml_files=Lista archivos xml compilados dentro del apk.
+info_min_sdk_version=Versión mínima de SDK.
+info_package_name=Nombre del paquete (ID de aplicación) del manifiesto y en modo verbose, imprime los paquetes de la tabla de recursos.
+info_permissions=Permisos.
+info_print_types=Tipos/formatos a imprimir:
+info_res=Imprime entradas de recursos especificadas por cualquiera de:\n 1) ID de recurso hexadecimal o decimal.\n 2) Nombre completo del recurso ej. @string/app_name.\n Puede ser múltiple.
+info_resources=Imprime todos los recursos
+info_signatures=Imprime información de firma.
+info_signatures_base64=Imprime información de firma con certificados en base64.
+info_strings=Imprime el contenido del grupo de cadenas de la tabla de recursos en el APK.
+info_target_sdk_version=Versión objetivo de SDK.
+info_verbose_mode=Modo verbose.
+info_xml_tree=Imprime los xmls compilados en los assets dados.\n Puede ser múltiple
+info_xml_strings=Imprime las cadenas de los assets xml compilados dados.\n Puede ser múltiple
+input_path=Ruta de entrada.
+invalid_sig_parameter_combination=¡Combinación de parámetros inválida!\nDirectorio de firmas proporcionado pero falta: -t sig
+invalid_type_format=<%s> inválido cadena '%s'
+keep_original_res=Mantiene las rutas originales de archivos res/:\n Aplica solo al decodificar a xml\n Todos los archivos res/ se colocarán en el directorio \n Las rutas relativas estarán vinculadas a values/xml
+merge_description=Fusiona archivos apk divididos desde un directorio o archivos apk comprimidos como XAPK, APKM, APKS...
+merge_example_1=[Básico]\n java -jar APKEditor.jar m -i path/input -o path/output.apk
+missing_input_file=Falta archivo de entrada.
+missing_sig_directory=Falta directorio de firmas.
+missing_value_exception=Falta valor para '%s'
+no_dex_debug=Elimina toda la información de depuración de smali/dex.
+no_such_directory=No existe el directorio: '%s'
+no_such_file=No existe el archivo: '%s'.
+no_such_file_or_directory=No existe el archivo o directorio: '%s'
+output_path=Ruta de salida. Opcional, si no se proporciona se generará un nuevo archivo en el mismo directorio que la entrada
+path_already_exists=La ruta ya existe: '%s'
+path_is_directory_expect_file=La ruta es un directorio, se esperaba archivo: '%s'
+path_is_file_expect_directory=La ruta es un archivo, se esperaba directorio: '%s'
+path_of_framework=Ruta del archivo de marco (puede ser múltiple).
+protect_confuse_zip=Confunde la estructura zip. Cuando está activado:\n Las apps pueden fallar si acceden directamente a archivos apk ej. Class.getResourceAsStream().\n Algunos escáneres apk pueden marcarlo como "Zip malformado"
+protect_description=Protege/Ofusca archivos de recursos del apk. Usando técnicas únicas de ofuscación.
+protect_dic_dir_name=Ruta a un archivo de texto que contiene una lista de nombres de directorios separados por nueva línea.
+protect_dic_file_name=Ruta a un archivo de texto que contiene una lista de nombres de archivos separados por nueva línea.
+protect_example_1=[Básico]\n java -jar APKEditor.jar p -i path/input.apk -o path/output.apk
+protect_keep_type=Mantener nombres de tipos de recursos específicos (ej. drawable), por defecto solo mantiene el tipo de recurso .\n Puede ser múltiple
+protect_skip_manifest=No proteger el manifiesto.
+raw_dex=Copiar archivos dex crudos / omitir smali.
+res_dir_name=Establece el nombre del directorio raíz de archivos de recursos. ej. para ofuscación para mover archivos de 'res/' a 'r/' o viceversa.
+refactor_description=Refactoriza nombres de recursos ofuscados
+refactor_example_1=[Básico]\n java -jar APKEditor.jar x -i path/input.apk -o path/output.apk
+refactor_fix_types=Corrige nombres de tipos de recursos basados en usos y valores
+refactor_public_xml=Ruta del archivo xml de IDs de recursos (public.xml)\nCarga nombres y aplica a recursos desde archivo 'public.xml'
+signatures_path=Ruta del directorio de firmas.
+split_json=Divide resources.arsc en múltiples partes según entradas de tipo (usa esto para archivos grandes)
+title_commands=Comandos:
+title_app_description=Editor de archivos de recursos binarios de Android
+title_example=Ejemplo:
+title_flags=Banderas:
+title_options=Opciones:
+title_other_options=Otras opciones:
+title_notes=Notas:
+title_usage=Uso:
+unknown_command_exception=Comando desconocido: '%s'
+unknown_option_exception=Opción desconocida: '%s'
+validate_modules=Valida para el mismo número de versión de base.apk como archivos apk divididos.
+validate_resources_dir=Valida el nombre del directorio de recursos\n(ej. si la ruta de un archivo de recurso de diseño es 'res/abc.png', entonces se moverá a 'res/drawable/abc.png)'
