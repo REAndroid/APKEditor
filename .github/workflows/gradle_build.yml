@@ -5,6 +5,7 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:  # Allows manual execution from the GitHub interface
 
 permissions:
   contents: read
@@ -21,6 +22,7 @@ jobs:
         with:
           java-version: '8'
           distribution: 'temurin'
+          cache: 'gradle' 
       - uses: gradle/actions/setup-gradle@v4
       - name: Build with Gradle
         run: ./gradlew fatJar
