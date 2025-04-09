@@ -46,16 +46,19 @@ import com.reandroid.jcommand.exceptions.CommandException;
 )
 public class Main {
 
-    private boolean mEmptyOption;
+    private static final int EXIT_SUCCESS = 0;
+    private static final int EXIT_ERROR = 1;
+    private static final int EXIT_HELP = 2;
+
     private Options mOptions;
-    private int mExitCode;
+    private boolean mEmptyOption;
+    private int mExitCode = EXIT_HELP ;
 
     private Main() {
 
     }
     public static void main(String[] args) {
-        int result = execute(args);
-        System.exit(result);
+        System.exit(execute(args));
     }
 
     /**
@@ -68,8 +71,7 @@ public class Main {
      *
      * */
     public static int execute(String[] args) {
-        Main main = new Main();
-        return main.run(args);
+        return new Main().run(args);
     }
 
     @OtherOption(
@@ -77,7 +79,7 @@ public class Main {
             description = "Displays this help and exit"
     )
     void onMainHelp() {
-        mExitCode = 2;
+        mExitCode; // 2
         CommandHelpBuilder builder = new CommandHelpBuilder(
                 ResourceStrings.INSTANCE, Main.class);
         builder.setFooters("", "help_main_footer", "<command> -h", "");
