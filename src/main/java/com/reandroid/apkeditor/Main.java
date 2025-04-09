@@ -42,110 +42,127 @@ import com.reandroid.jcommand.exceptions.CommandException;
                 RefactorOptions.class,
                 ProtectorOptions.class,
                 InfoOptions.class
-        }
-)
+                }   
+)      
+
 public class Main {
+    private static final int EXIT_SUCCESS = 0;
+    private static final int EXIT_ERROR = 1;
+    private static final int EXIT_HELP = 2;
+    
+    private Options currentOptions;
+    private int exitCode = EXIT_HELP;
+    private boolean emptyOption;
 
-    private boolean mEmptyOption;
-    private Options mOptions;
-    private int mExitCode;
-
-    private Main() {
-
-    }
     public static void main(String[] args) {
-        int result = execute(args);
-        System.exit(result);
+        System.exit(execute(args));
     }
 
-    /**
-     * If you are running inside java application, use this method to
-     * avoid unwanted System.exit()
-     *
-     * Returns 0 - executed successfully
-     * Returns 1 - error
-     * Returns 2 - non executing commands like help, version
-     *
-     * */
     public static int execute(String[] args) {
-        Main main = new Main();
-        return main.run(args);
+        return new Main().run(args);
+    }
+
+    
+    @OtherOption(
+            names = {"-h", "--help"},
+            description = "Display this help and exit"
+    )
+    private void displayHelp() {
+        exitCode = EXIT_HELP;
+        System.err.println(buildHelpText());
     }
 
     @OtherOption(
-            names = {"-h", "-help"}, alternates = {"--help"},
-            description = "Displays this help and exit"
+            names = {"-v", "--version"},
+            description = "Display version information"
     )
-    void onMainHelp() {
-        mExitCode = 2;
-        CommandHelpBuilder builder = new CommandHelpBuilder(
-                ResourceStrings.INSTANCE, Main.class);
-        builder.setFooters("", "help_main_footer", "<command> -h", "");
-        System.err.println(builder.build());
+    private void displayVersion() {
+        exitCode = EXIT_HELP;
+        System.out.println(buildVersionText());
     }
-    @OtherOption(
-            names = {"-v", "-version"}, alternates = {"--version"},
-            description = "Displays version"
-    )
-    void onPrintVersion() {
-        mExitCode = 2;
-        System.err.println(APKEditor.getName() +
-                " version " + APKEditor.getVersion() +
-                ", " + ARSCLib.getName() +
-                " version " + ARSCLib.getVersion());
-    }
+
+    // Option selection handle 
     @OnOptionSelected
-    void onOption(Object option, boolean emptyArgs) {
-        this.mOptions = (Options) option;
-        this.mEmptyOption = emptyArgs;
+    private void onOptionSelected(Object option, boolean emptyArgs) {
+        this.currentOptions = (Options) option;
+        this.emptyOption = emptyArgs;
     }
 
     private int run(String[] args) {
-        mOptions = null;
-        mEmptyOption = false;
-        mExitCode = 2;
-        CommandParser parser = new CommandParser(Main.class);
+        resetState();
+        
         try {
+            CommandParser parser = new CommandParser(Main.class);
             parser.parse(this, args);
+            
+            if (currentOptions == null) {
+                return exitCode;
+            }
+            
+            if (emptyOption) {
+                throw new CommandException("empty_command_option_exception");
+            }
+            
+            processSelectedOption();
+            
         } catch (CommandException e) {
-            System.err.flush();
-            System.err.println(e.getMessage(ResourceStrings.INSTANCE));
-            return mExitCode;
+            handleCommandException(e);
+        } catch (EncodeException | XmlEncodeException e) {
+            handleEncodeException(e);
+        } catch (Exception e) {
+            handleUnexpectedException(e);
         }
-        if(mOptions == null) {
-            return mExitCode;
-        }
-        if(mEmptyOption) {
-            System.err.println(ResourceStrings.INSTANCE.getString(
-                    "empty_command_option_exception"));
-            return mExitCode;
-        }
-        try {
-            mOptions.validate();
-        } catch (CommandException e) {
-            System.err.flush();
-            System.err.println(e.getMessage(ResourceStrings.INSTANCE));
-            return mExitCode;
-        }
-        if(mOptions.help) {
-            System.err.println(mOptions.getHelp());
-            return mExitCode;
-        }
-        mExitCode = 1;
-        try {
-            mOptions.runCommand();
-            mExitCode = 0;
-        }  catch (CommandException ex1) {
-            System.err.flush();
-            System.err.println(ex1.getMessage(ResourceStrings.INSTANCE));
-        } catch (EncodeException | XmlEncodeException ex) {
-            System.err.flush();
-            System.err.println("\nERROR:\n" + ex.getMessage());
-        } catch (Exception exception) {
-            System.err.flush();
-            System.err.println("\nERROR:");
-            exception.printStackTrace(System.err);
-        }
-        return mExitCode;
+        
+        return exitCode;
     }
-}
+
+    
+    private void resetState() {
+        currentOptions = null;
+        exitCode = EXIT_HELP;
+        emptyOption = false;
+    }
+
+    private void processSelectedOption() throws Exception {
+        currentOptions.validate();
+        
+        if (currentOptions.help) {
+            System.err.println(currentOptions.getHelp());
+            return;
+        }
+        
+        exitCode = EXIT_ERROR;
+        currentOptions.runCommand();
+        exitCode = EXIT_SUCCESS;
+    }
+
+    private String buildHelpText() {
+        CommandHelpBuilder builder = new CommandHelpBuilder(
+                ResourceStrings.INSTANCE, Main.class);
+        builder.setFooters("", "help_main_footer", "<command> -h", "");
+        return builder.build();
+    }
+
+    private String buildVersionText() {
+        return String.format("%s version %s, %s version %s",
+                APKEditor.getName(), APKEditor.getVersion(),
+                ARSCLib.getName(), ARSCLib.getVersion());
+    }
+
+    private void handleCommandException(CommandException e) {
+        System.err.flush();
+        System.err.println(e.getMessage(ResourceStrings.INSTANCE));
+    }
+
+    private void handleEncodeException(Exception e) {
+        System.err.flush();
+        System.err.println("\nERROR:\n" + e.getMessage());
+    }
+
+    private void handleUnexpectedException(Exception e) {
+        System.err.flush();
+        System.err.println("\nUNEXPECTED ERROR:");
+        e.printStackTrace(System.err);
+    }
+}    
+                
