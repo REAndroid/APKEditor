@@ -64,18 +64,23 @@ jobs:
         run: |
           dpkg-deb --build deb-package
           mkdir -p artifacts
-          mv deb-package.deb artifacts/apkeditor_1.0-${{ github.run_number }}_all.deb 
+          mv deb-package.deb artifacts/apkeditor_1.4-${{ github.run_number }}_all.deb 
            
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Build-Outputs-${{ github.run_id }}
-          path: |
-            build/libs 
-            artifacts
+          name: DEBIAN-DEB-APKEDITOR 
+          path: artifacts 
+
+      - name: Upload artifacts 
+        uses: actions/upload-artifact@v4 
+        with:
+          name: TERMUX-DEB-APKEDITOR
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: APKEditor
-          path: artifacts   
+          name: APKEDITOR.jar  
+          path: build/libs  
+
+    
