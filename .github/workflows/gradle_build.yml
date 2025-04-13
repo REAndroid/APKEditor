@@ -64,9 +64,13 @@ jobs:
         run: |
           dpkg-deb --build deb-package
           mkdir -p artifacts
-          mv deb-package.deb artifacts/apkeditor_1.0-${{ github.run_number }}_all.deb
-
-      - uses: actions/upload-artifact@v4
+          mv deb-package.deb artifacts/apkeditor_1.0-${{ github.run_number }}_all.deb 
+           
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: APKEditor
-          path: build/libs
+          name: Build-Outputs-${{ github.run_id }}
+          path: |
+            build/libs/*.jar
+            artifacts/*.deb
+      
