@@ -33,51 +33,93 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y dh-make debhelper devscripts
           
-      - name: Create DEB package structure
+      - name: Create DEB package structure DEBIAN
         run: |
-          mkdir -p deb-package/usr/share/apkeditor
-          mkdir -p deb-package/usr/bin
-          mkdir -p deb-package/DEBIAN
-          chmod 755 deb-package 
-
+          ################ DEBIAN #####################
+          mkdir -p deb-package-debian/usr/share/apkeditor
+          mkdir -p deb-package-debian/usr/bin
+          mkdir -p deb-package-debian/DEBIAN
+          chmod 755 deb-package-debian 
+          
           # Copy the built jar
-          cp build/libs/*.jar deb-package/usr/share/apkeditor/apkeditor.jar
+          cp build/libs/*.jar deb-package-debian/usr/share/apkeditor/apkeditor.jar
           
           # Create launcher script
-          echo '#!/bin/sh' > deb-package/usr/bin/apkeditor
-          echo 'java -jar /usr/share/apkeditor/apkeditor.jar "$@"' >> deb-package/usr/bin/apkeditor
-          chmod +x deb-package/usr/bin/apkeditor
+          echo '#!/bin/sh' > deb-package-debian/usr/bin/apkeditor
+          echo 'java -jar /usr/share/apkeditor/apkeditor.jar "$@"' >> deb-package-debian/usr/bin/apkeditor
+          chmod +x deb-package-debian/usr/bin/apkeditor
           
           # Create control file
-          cat > deb-package/DEBIAN/control <<EOL
+          cat > deb-package-debian/DEBIAN/control <<EOL
           Package: apkeditor
           Version: 1.4-${{ github.run_number }}
           Section: utils
           Priority: optional
           Architecture: all
-          Maintainer: @demonr_rip <your.email@example.com>
+          Maintainer: VictorH028 <t.me/demonr_rip>
           Description: APK Editor tool
            A tool for editing APK files.
           EOL
+
+      - name: Create DEB package structure TERMUX
+        run: |
+          ############## TERMUX ###############
+          mkdir -p deb-package-termux/data/data/com.termux/files/usr/share/apkeditor
+          mkdir -p deb-package-termux/data/data/com.termux/files/usr/bin
+          mkdir -p deb-package-termux/DEBIAN
+          chmod 755 deb-package-termux 
+           
+          # Copy the built jar
+          cp build/libs/*.jar deb-package-termux/data/com.termux/files/usr/share/apkeditor/apkeditor.jar
+           
+          # Create launcher script
+          #
+          cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor <<EOL
+          #!/data/data/com.termux/files/usr/bin/bash
+          java -jar /data/com.termux/files/usr/share/apkeditor/apkeditor.jar 
+          EOL
           
+          
+          chmod +x deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor 
+          
+          # Create control file
+          cat > deb-package-termux/DEBIAN/control <<EOL
+          Package: apkeditor
+          Version: 1.4-${{ github.run_number }}
+          Section: utils
+          Priority: optional
+          Architecture: all
+          Maintainer: VictorH028 <t.me/demonr_rip>
+          Description: APK Editor tool
+           A tool for editing APK files.
+          EOL
+
+
       - name: Build DEB package
         run: |
-          dpkg-deb --build deb-package
+          #### debian ####
+          dpkg-deb --build deb-package-debian
           mkdir -p artifacts
-          mv deb-package.deb artifacts/apkeditor_1.4-${{ github.run_number }}_all.deb 
-           
-      - name: Upload artifacts
+          mv deb-package-debian.deb artifacts/apkeditor_1.4-${{ github.run_number }}_all.deb 
+          #### termux ####
+          dpkg-deb --build deb-package-termux
+          mkdir -p artifacts1
+          mv deb-package-termux.deb artifacts1/apkeditor_1.4-${{ github.run_number }}_all.deb 
+          
+
+      - name: Upload DEBIAN-DEB-APKEDITOR
         uses: actions/upload-artifact@v4
         with:
           name: DEBIAN-DEB-APKEDITOR 
           path: artifacts 
 
-      - name: Upload artifacts 
+      - name: Upload TERMUX-DEB-APKEDITOR 
         uses: actions/upload-artifact@v4 
         with:
           name: TERMUX-DEB-APKEDITOR
+          path: artifacts1
 
-      - name: Upload artifacts
+      - name: Upload APKEDITOR.jar 
         uses: actions/upload-artifact@v4
         with:
           name: APKEDITOR.jar  
