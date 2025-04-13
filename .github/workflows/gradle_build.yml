@@ -70,7 +70,7 @@ jobs:
           chmod 755 deb-package-termux 
            
           # Copy the built jar
-          cp build/libs/*.jar deb-package-termux/data/com.termux/files/usr/share/apkeditor/apkeditor.jar
+          cp build/libs/*.jar deb-package-termux/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar
            
           # Create launcher script
           #
