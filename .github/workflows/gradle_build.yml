@@ -79,7 +79,7 @@ jobs:
           
           prog="$0"
           while [ -h "${prog}" ]; do
-              newProg=$(/data/data/com.termux/files/usr/bin/ls -ld "${prog}"
+              newProg=$(/data/data/com.termux/files/usr/bin/ls -ld "${prog}")
               newProg=$(expr "${newProg}" : ".* -> \(.*\)$")
               if expr "x${newProg}" : 'x/' >/dev/null; then
                   prog="${newProg}" 
