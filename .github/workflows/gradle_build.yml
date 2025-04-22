@@ -77,21 +77,15 @@ jobs:
           cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor << 'EOF'
           #!/data/data/com.termux/files/usr/bin/bash
           
-          JAR_PATH="/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar 
+          JAR_PATH="/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar" 
           if [ ! -f "$JAR_PATH" ]; then
                   echo "Error: I can't find  apkeditor.jar en $JAR_PATH" >&2
                   exit 1
           fi
 
-          JAVA_OPTS="-Xmx512M -Dfile.encoding=utf-8"
+          JAVA_OPTS="-Xmx512M "
 
-          # Procesar argumentos -J (si los hay)
-          while [[ "$1" == -J* ]]; do
-              JAVA_OPTS="$JAVA_OPTS -${1#-J}"
-              shift
-          don
-
-          exec java $JAVA_OPTS -jar "$JAR_PATH" "$@"
+          exec java -jar $JAVA_OPTS "$JAR_PATH" "$@"
           EOF
           
           
