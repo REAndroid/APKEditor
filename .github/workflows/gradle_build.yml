@@ -74,7 +74,7 @@ jobs:
            
           # Create launcher script
           #
-          cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor <<EOL
+          cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor << 'EOF'
           #!/data/data/com.termux/files/usr/bin/bash
           
           JAR_PATH="/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar 
@@ -92,7 +92,7 @@ jobs:
           don
 
           exec java $JAVA_OPTS -jar "$JAR_PATH" "$@"
-          EOL
+          EOF
           
           
           chmod +x deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor 
