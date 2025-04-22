@@ -50,7 +50,7 @@ jobs:
           chmod +x deb-package-debian/usr/bin/apkeditor
           
           # Create control file
-          cat > deb-package-debian/DEBIAN/control <<EOL
+          cat > deb-package-debian/DEBIAN/control <<`EOL`
           Package: apkeditor
           Version: 1.4-${{ github.run_number }}
           Section: utils
@@ -74,58 +74,24 @@ jobs:
            
           # Create launcher script
           #
-          cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor <<EOL
+          cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor <<`EOL`
           #!/data/data/com.termux/files/usr/bin/bash
           
-          prog="$0"
-          while [ -h "${prog}" ]; do
-              newProg=$(/data/data/com.termux/files/usr/bin/ls -ld "${prog}")
-              newProg=$(expr "${newProg}" : ".* -> \(.*\)$")
-              if expr "x${newProg}" : 'x/' >/dev/null; then
-                  prog="${newProg}" 
-              else
-                  progdir=$(dirname "${prog}")
-                  prog="${progdir}/${newProg}"
-              fi
-          done
-          oldwd=$(pwd)
-          progdir=$(dirname "${prog}")
-          cd "${progdir}"
-          progdir=$(pwd)
-          prog="${progdir}"/$(basename "${prog}")
-          cd "${oldwd}"
-
-          jarfile=apkeditor.jar
-          libdir="$PREFIX/share/apkeditor"
-          if [ ! -r "$libdir/$jarfile" ]; then
-             echo $(basename "$prog")": can't find $jarfile"
-             exit 1
+          JAR_PATH="/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar 
+          if [ ! -f "$JAR_PATH" ]; then
+                  echo "Error: I can't find  apkeditor.jar en $JAR_PATH" >&2
+                  exit 1
           fi
 
-          javaOpts="-Xmx512M -Dfile.encoding=utf-8"
+          JAVA_OPTS="-Xmx512M -Dfile.encoding=utf-8"
 
-          while expr "x$1" : 'x-J' >/dev/null; do
-                opt=$(expr "$1" : '-J\(.*\)')
-                javaOpts="${javaOpts} -${opt}"
-                shift
-          done
+          # Procesar argumentos -J (si los hay)
+          while [[ "$1" == -J* ]]; do
+              JAVA_OPTS="$JAVA_OPTS -${1#-J}"
+              shift
+          don
 
-          if [ "$OSTYPE" = "cygwin" ]; then
-               jarpath=$(cygpath -w "$libdir/$jarfile")
-          else
-               jarpath="$libdir/$jarfile"
-          fi
-
-          PATH=$PATH:$(pwd)
-          export PATH
-
-          if [ -f "$1" ]; then
-             input_file="$1"
-                output_file="${input_file%.*}.apk"
-                exec java $javaOpts -jar "$jarpath" m -i "$input_file" -o "$output_file"
-          else
-                exec java $javaOpts -jar "$jarpath" "$@"
-          fi
+          exec java $JAVA_OPTS -jar "$JAR_PATH" "$@"
           EOL
           
           
