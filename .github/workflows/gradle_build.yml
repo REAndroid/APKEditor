@@ -50,7 +50,7 @@ jobs:
           chmod +x deb-package-debian/usr/bin/apkeditor
           
           # Create control file
-          cat > deb-package-debian/DEBIAN/control <<`EOL`
+          cat > deb-package-debian/DEBIAN/control <<EOL
           Package: apkeditor
           Version: 1.4-${{ github.run_number }}
           Section: utils
@@ -74,7 +74,7 @@ jobs:
            
           # Create launcher script
           #
-          cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor <<`EOL`
+          cat > deb-package-termux/data/data/com.termux/files/usr/bin/apkeditor <<EOL
           #!/data/data/com.termux/files/usr/bin/bash
           
           JAR_PATH="/data/data/com.termux/files/usr/share/apkeditor/apkeditor.jar 
