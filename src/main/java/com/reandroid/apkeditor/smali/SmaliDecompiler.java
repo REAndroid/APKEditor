@@ -133,7 +133,9 @@ public class SmaliDecompiler implements DexDecoder {
                     + "version = " + dexFile.getVersion() + ", layouts = " + dexFile.size());
         }
         SmaliWriterSetting setting = new SmaliWriterSetting();
-        setting.setResourceIdComment(tableBlock.pickOne());
+        if (tableBlock != null) {
+            setting.setResourceIdComment(tableBlock.pickOne());
+        }
         setting.addClassComments(dexFile);
         setting.addMethodComments(dexFile);
         SmaliWriter smaliWriter = new SmaliWriter();

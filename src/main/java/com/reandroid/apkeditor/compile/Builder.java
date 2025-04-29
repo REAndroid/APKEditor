@@ -83,11 +83,8 @@ public class Builder extends CommandExecutor<BuildOptions> {
             logMessage("Validating resources dir ...");
             loadedModule.validateResourcesDir();
         }
-        logMessage("Writing apk...");
         loadedModule.getZipEntryMap().autoSortApkFiles();
-        loadedModule.writeApk(options.outputFile, null);
-        loadedModule.close();
-        logMessage("Saved to: " + options.outputFile);
+        writeApk(loadedModule);
     }
     public void buildXml() throws IOException {
         logMessage("Scanning XML directory ...");
@@ -108,10 +105,7 @@ public class Builder extends CommandExecutor<BuildOptions> {
         }
         encoder.scanDirectory(options.inputFile);
         loadedModule = encoder.getApkModule();
-        logMessage("Writing apk...");
-        loadedModule.writeApk(options.outputFile, null);
-        loadedModule.close();
-        logMessage("Saved to: " + options.outputFile);
+        writeApk(loadedModule);
     }
     public void buildRaw() throws IOException {
         logMessage("Scanning Raw directory ...");
@@ -135,9 +129,14 @@ public class Builder extends CommandExecutor<BuildOptions> {
         }
         encoder.scanDirectory(options.inputFile);
         loadedModule = encoder.getApkModule();
+        writeApk(loadedModule);
+    }
+    private void writeApk(ApkModule apkModule) throws IOException {
+        BuildOptions options = getOptions();
+        applyExtractNativeLibs(apkModule, options.getExtractNativeLibs());
         logMessage("Writing apk...");
-        loadedModule.writeApk(options.outputFile, null);
-        loadedModule.close();
+        apkModule.writeApk(options.outputFile, null);
+        apkModule.close();
         logMessage("Saved to: " + options.outputFile);
     }
     private SmaliCompiler getSmaliCompiler() {
