@@ -84,6 +84,20 @@ public class DecompileOptions extends OptionsWithFramework {
     )
     public String dexLib = DEX_LIB_JF;
 
+    @OptionArg(name = "-smali-registers", flag = true, description = "smali_registers")
+    public boolean smaliRegisters;
+
+    @ChoiceArg(name = "-comment-level",
+            values = {
+                    COMMENT_LEVEL_OFF,
+                    COMMENT_LEVEL_BASIC,
+                    COMMENT_LEVEL_DETAIL,
+                    COMMENT_LEVEL_FULL
+            },
+            description = "comment_level"
+    )
+    public String commentLevel = COMMENT_LEVEL_FULL;
+
     @OptionArg(name = "-sig", description = "signatures_path")
     public File signaturesDirectory;
 
@@ -109,4 +123,8 @@ public class DecompileOptions extends OptionsWithFramework {
         return generateOutputFromInput(input, "_decompile_" + type);
     }
 
+    public static final String COMMENT_LEVEL_OFF = "off";
+    public static final String COMMENT_LEVEL_BASIC = "basic";
+    public static final String COMMENT_LEVEL_DETAIL = "detail";
+    public static final String COMMENT_LEVEL_FULL = "full";
 }
