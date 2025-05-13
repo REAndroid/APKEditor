@@ -33,13 +33,36 @@ Usage:
 
 ```ShellSession
 $ java -jar APKEditor.jar d -i test.apk -o test_json
-00.000 I: [DECOMPILE] Decompiling ...
- Input: test.apk
-Output: test_json
- ---------------------------- 
-00.036 I: [DECOMPILE] Loading ...
-00.129 I: [DECOMPILE] Decompiling to json ...
-30.093 I: [DECOMPILE] Done
+00.000 I: [DECOMPILE] Using: APKEditor version 1.4.3, ARSCLib version 1.3.6
+             -t = xml      
+      -load-dex = 3        
+       -dex-lib = jf       
+             -i = test.apk 
+             -o = test_json
+ _________________________ 
+00.006 I: [DECOMPILE] Loading ...
+00.101 I: [DECOMPILE] Decompiling to xml ...
+00.264 I: [DECOMPILE] Initializing android framework ...
+00.264 I: [DECOMPILE] Loading android framework for version: 34
+00.304 I: [DECOMPILE] Initialized framework: android-34 (14)
+00.320 I: [DECOMPILE] [SANITIZE]: Sanitizing paths ...
+00.341 I: [DECOMPILE] Validating resource names ...
+00.396 I: [DECOMPILE] All resource names are valid
+00.396 I: [DECOMPILE] Decode: archive-info.json
+00.398 I: [DECOMPILE] Decode: uncompressed-files.json
+00.412 I: [DECOMPILE] Decoding: AndroidManifest.xml
+00.450 I: [DECOMPILE] public.xml: com.google.android.youtube -> package_1
+00.508 I: [DECOMPILE] Res files: resources
+02.483 I: [DECOMPILE] Baksmali: classes.dex
+05.041 I: [DECOMPILE] Baksmali: classes2.dex
+06.976 I: [DECOMPILE] Baksmali: classes3.dex
+08.857 I: [DECOMPILE] Baksmali: classes4.dex
+10.765 I: [DECOMPILE] Baksmali: classes5.dex
+12.466 I: [DECOMPILE] Baksmali: classes6.dex
+12.506 I: [DECOMPILE] Baksmali: classes7.dex
+12.643 I: [DECOMPILE] Extracting root files ...
+12.766 I: [DECOMPILE] Dumping signatures ...
+12.766 I: [DECOMPILE] Saved to: test_json
 ```
 <details> <summary><code>more info</code></summary>
 
@@ -124,17 +147,44 @@ Builds back to apk from decompiled json/XML files
 
 ```ShellSession
 $ java -jar APKEditor.jar b -i test_json -o test_edited.apk
-
-00.000 I: [BUILD] Building ...
- Input: test_json/base
-Output: test_edited.apk
- ---------------------------- 
-00.048 I: [BUILD] Scanning directory ...
-00.247 I: [BUILD] Writing apk...
-22.032 [BUILD] Writing: method=STORED total=284921526 bytes : resources.arsc  
-25.009 I: [BUILD] Zip align ...
-27.101 I: [BUILD] Saved to: test_edited.apk
-30.217 I: [BUILD] Done
+00.000 I: [BUILD] Using: APKEditor version 1.4.3, ARSCLib version 1.3.6
+            -t = xml            
+      -dex-lib = jf             
+            -i = test_json      
+            -o = test_edited.apk
+ ______________________________ 
+00.005 I: [BUILD] Scanning XML directory ...
+00.024 I: [BUILD] Scanning: test_json
+00.168 I: [BUILD] Initializing android framework ...
+00.168 I: [BUILD] Loading android framework for version: 34
+00.254 I: [BUILD] Initialized framework: android-34 (14)
+00.254 I: [BUILD] Set main package id from manifest: @mipmap/ic_launcher
+00.256 I: [BUILD] Main package id initialized: id = 0x7f, from: @mipmap/ic_launcher
+00.256 I: [BUILD] Encoding attrs ...
+00.307 I: [BUILD] Encoding values ...
+00.560 I: [BUILD] Scan: package_1/res
+00.661 I: [BUILD] Scanned 5718 files: package_1/res
+00.852 I: [BUILD] Add manifest: AndroidManifest.xml
+00.852 I: [BUILD] Building dex ...
+00.960 I: [BUILD] (1/7) Cached: classes.dex
+00.973 I: [BUILD] (2/7) Cached: classes2.dex
+00.992 I: [BUILD] (3/7) Cached: classes3.dex
+01.009 I: [BUILD] (4/7) Cached: classes4.dex
+01.030 I: [BUILD] (5/7) Cached: classes5.dex
+01.031 I: [BUILD] (6/7) Cached: classes6.dex
+01.032 I: [BUILD] (7/7) Cached: classes7.dex
+01.033 I: [BUILD] Scanning root directory ...
+01.036 I: [BUILD] Restoring original file paths ...
+01.078 I: [BUILD] Loading signatures ...
+01.082 I: [BUILD] Sorting files ...
+01.104 I: [BUILD] Refreshing resource table ...
+01.163 I: [BUILD] TableBlock: packages = 1, size = 3067996 bytes
+01.164 I: [BUILD] Applying: extractNativeLibs=false
+01.164 I: [BUILD] Writing apk...
+01.185 I: [BUILD] Buffering compress changed files ...
+06.083 I: [BUILD] Writing files: 6637
+06.201 I: [BUILD] Writing signature block ...
+06.241 I: [BUILD] Saved to: test_edited.apk
 ```
 <details> <summary><code>more info</code></summary>
 
@@ -201,32 +251,39 @@ Merges multiple splitted apk files (directory, xapk, apkm, apks ...) to standalo
 
  ```ShellSession
 $ java -jar APKEditor.jar m -i apk_files
-00.049 I: [MERGE] Merging ...
-   Input: apk_files
- Output: apk_files_merged.apk
- ---------------------------- 
-00.050 I: [MERGE] Searching apk files ...
-00.060 I: [MERGE] Found apk files: 3           
-00.192 I: [MERGE] Found modules: 3
-00.302 I: [MERGE] Merging: base
-00.307 I: [MERGE] Added [base] classes.dex -> classes.dex
-00.308 I: [MERGE] Merging resource table: base
-01.302 I: [MERGE] Merging: config.xxhdpi-1
-01.304 I: [MERGE] Merging resource table: config.xxhdpi-1
-01.386 [MERGE] tum_ic_visibility_white_24.png
-01.386 I: [MERGE] Merging: config.arm64_v8a-1
-01.390 [MERGE] : lib/arm64-v8a/libnativeai.so
-
-01.475 I: [MERGE] Sanitizing manifest ...
-01.478 I: [MERGE] Removed: extractNativeLibs
-01.480 I: [MERGE] Removed: isSplitRequired
-
-01.480 I: [MERGE] Writing apk...
-03.686 [MERGE] Writing: total=47693672 bytes : resources.arsc
-03.729 I: [MERGE] Zip align ... 
-04.611 I: [MERGE] Saved to: apk_files_merged.apk
-04.700 I: [MERGE] Done
-
+00.000 I: [MERGE] Using: APKEditor version 1.4.3, ARSCLib version 1.3.6
+      -i = apk_files           
+      -o = apk_files_merged.apk
+ _____________________________ 
+00.009 I: [MERGE] Searching apk files ...
+00.011 I: [MERGE] Found apk files: 3
+00.214 I: [MERGE] Found modules: 3                                              
+00.329 I: [MERGE] Merging: base
+00.331 I: [MERGE] Added [base] classes.dex -> classes.dex
+00.331 I: [MERGE] Added [base] classes2.dex -> classes2.dex
+00.332 I: [MERGE] Added [base] classes3.dex -> classes3.dex
+00.332 I: [MERGE] Added [base] classes4.dex -> classes4.dex
+00.332 I: [MERGE] Added [base] classes5.dex -> classes5.dex
+00.332 I: [MERGE] Added [base] classes6.dex -> classes6.dex
+00.332 I: [MERGE] Added [base] classes7.dex -> classes7.dex
+01.289 I: [MERGE] Merging: config.arm64_v8a                                     
+01.293 I: [MERGE] Merging: config.xxhdpi                                        
+01.634 I: [MERGE] Sanitizing manifest ...                                       
+01.637 I: [MERGE] Removed-attribute : splitTypes
+01.637 I: [MERGE] Removed-attribute : requiredSplitTypes
+01.640 I: [MERGE] Attributes on <application> removed: 0x01010591 (isSplitRequired)
+01.641 I: [MERGE] Removed-element : <meta-data> name="com.android.vending.splits.required"
+01.641 I: [MERGE] Removed-element : <meta-data> name="com.android.stamp.source"
+01.641 I: [MERGE] Removed-element : <meta-data> name="com.android.stamp.type"
+01.645 I: [MERGE] Removed-table-entry : res/xml/splits0.xml
+01.646 I: [MERGE] Removed-element : <meta-data> name="com.android.vending.splits"
+01.646 I: [MERGE] Removed-element : <meta-data> name="com.android.vending.derived.apk.id"
+01.779 I: [MERGE] Applying: extractNativeLibs=false
+01.779 I: [MERGE] Writing apk ...
+01.806 I: [MERGE] Buffering compress changed files ...
+04.766 I: [MERGE] Writing files: 6637
+04.981 I: [MERGE] Writing signature block ...                                   
+05.035 I: [MERGE] Saved to: apk_files_merged.apk
 ```  
 ![apkmerger](/.github/apkmerger.png)
 
@@ -274,18 +331,26 @@ Refactors obfuscated resource entry names
 
  ```ShellSession
 $ java -jar APKEditor.jar x -i input.apk
-00.000 I: [REFACTOR] Refactoring ...
-   Input: input.apk
- Output: input_refactored.apk
- ---------------------------- 
-00.017 I: [REFACTOR] Loading apk: input.apk
-00.952 I: [REFACTOR] Renamed entries: 5888
-00.954 I: [REFACTOR] Writing apk ...
-03.268 [REFACTOR] Writing: total=47589184 bytes : resources.arsc              
-03.350 I: [REFACTOR] Zip align ...
-03.504 I: [REFACTOR] Saved to: input_refactored.apk
-03.504 I: [REFACTOR] Done
-
+00.000 I: [REFACTOR] Using: APKEditor version 1.4.3, ARSCLib version 1.3.6
+      -i = input.apk           
+      -o = input_refactored.apk
+ _____________________________ 
+00.006 I: [REFACTOR] Loading apk: input.apk
+00.105 I: [REFACTOR] Auto refactoring ...
+00.105 I: [REFACTOR] Validating resource names ...
+00.279 I: [REFACTOR] Initializing android framework ...
+00.279 I: [REFACTOR] Loading android framework for version: 34
+00.320 I: [REFACTOR] Initialized framework: android-34 (14)
+00.364 I: [REFACTOR] All resource names are valid
+00.364 I: [REFACTOR] Validating file paths ...
+00.455 I: [REFACTOR] Auto renamed entries
+00.644 I: [REFACTOR] Removed unused table strings
+Table size changed = 3067996, 3282324
+00.644 I: [REFACTOR] Writing apk ...
+00.663 I: [REFACTOR] Buffering compress changed files ...
+01.587 I: [REFACTOR] Writing files: 6637
+01.729 I: [REFACTOR] Writing signature block ...
+01.783 I: [REFACTOR] Saved to: input_refactored.apk
 ```  
 <details> <summary><code>more info</code></summary>
 
@@ -315,19 +380,20 @@ Protects apk resources against almost all known decompile/modify tools.
 <details> <summary><code>java -jar APKEditor.jar <b>p</b> -i path/to/input.apk</code></summary>
 
  ```ShellSession
-00.026 I: [PROTECT] Protecting ...
-   Input: test.apk
- Output: test_protected.apk
- ---------------------------- 
-00.027 I: [PROTECT] Loading apk file ...
-00.052 I: [PROTECT] Protecting files ..
-00.454 I: [PROTECT] Protecting resource table ..
-00.474 I: [PROTECT] Writing apk ...
-02.264 [PROTECT] Writing: total=47654392 bytes : resources.arsc              
-02.346 I: [PROTECT] Zip align ...
-02.451 I: [PROTECT] Saved to: test_protected.apk
-02.451 I: [PROTECT] Done
-
+00.000 I: [PROTECT] Using: APKEditor version 1.4.3, ARSCLib version 1.3.6
+      -keep-type = font              
+              -i = test.apk          
+              -o = test_protected.apk
+ ___________________________________ 
+00.178 I: [PROTECT] DirectoryConfuser: Confusing ...
+00.519 I: [PROTECT] FileNameConfuser: Confusing ...
+00.602 I: [PROTECT] TableConfuser: Confusing ...
+00.758 I: [PROTECT] TableConfuser: Type names ...
+00.831 I: [PROTECT] Writing apk ...
+00.858 I: [PROTECT] Buffering compress changed files ...
+01.794 I: [PROTECT] Writing files: 6637
+01.931 I: [PROTECT] Writing signature block ...
+01.987 I: [PROTECT] Saved to: test_protected.apk
 ```  
 <details> <summary><code>more info</code></summary>
 
