@@ -51,15 +51,10 @@ $ java -jar APKEditor.jar d -i test.apk -o test_json
 00.396 I: [DECOMPILE] Decode: archive-info.json
 00.398 I: [DECOMPILE] Decode: uncompressed-files.json
 00.412 I: [DECOMPILE] Decoding: AndroidManifest.xml
-00.450 I: [DECOMPILE] public.xml: com.google.android.youtube -> package_1
+00.450 I: [DECOMPILE] public.xml: com.test.name -> package_1
 00.508 I: [DECOMPILE] Res files: resources
 02.483 I: [DECOMPILE] Baksmali: classes.dex
 05.041 I: [DECOMPILE] Baksmali: classes2.dex
-06.976 I: [DECOMPILE] Baksmali: classes3.dex
-08.857 I: [DECOMPILE] Baksmali: classes4.dex
-10.765 I: [DECOMPILE] Baksmali: classes5.dex
-12.466 I: [DECOMPILE] Baksmali: classes6.dex
-12.506 I: [DECOMPILE] Baksmali: classes7.dex
 12.643 I: [DECOMPILE] Extracting root files ...
 12.766 I: [DECOMPILE] Dumping signatures ...
 12.766 I: [DECOMPILE] Saved to: test_json
@@ -166,13 +161,8 @@ $ java -jar APKEditor.jar b -i test_json -o test_edited.apk
 00.661 I: [BUILD] Scanned 5718 files: package_1/res
 00.852 I: [BUILD] Add manifest: AndroidManifest.xml
 00.852 I: [BUILD] Building dex ...
-00.960 I: [BUILD] (1/7) Cached: classes.dex
-00.973 I: [BUILD] (2/7) Cached: classes2.dex
-00.992 I: [BUILD] (3/7) Cached: classes3.dex
-01.009 I: [BUILD] (4/7) Cached: classes4.dex
-01.030 I: [BUILD] (5/7) Cached: classes5.dex
-01.031 I: [BUILD] (6/7) Cached: classes6.dex
-01.032 I: [BUILD] (7/7) Cached: classes7.dex
+00.960 I: [BUILD] (1/2) Cached: classes.dex
+00.973 I: [BUILD] (2/2) Cached: classes2.dex
 01.033 I: [BUILD] Scanning root directory ...
 01.036 I: [BUILD] Restoring original file paths ...
 01.078 I: [BUILD] Loading signatures ...
@@ -261,11 +251,6 @@ $ java -jar APKEditor.jar m -i apk_files
 00.329 I: [MERGE] Merging: base
 00.331 I: [MERGE] Added [base] classes.dex -> classes.dex
 00.331 I: [MERGE] Added [base] classes2.dex -> classes2.dex
-00.332 I: [MERGE] Added [base] classes3.dex -> classes3.dex
-00.332 I: [MERGE] Added [base] classes4.dex -> classes4.dex
-00.332 I: [MERGE] Added [base] classes5.dex -> classes5.dex
-00.332 I: [MERGE] Added [base] classes6.dex -> classes6.dex
-00.332 I: [MERGE] Added [base] classes7.dex -> classes7.dex
 01.289 I: [MERGE] Merging: config.arm64_v8a                                     
 01.293 I: [MERGE] Merging: config.xxhdpi                                        
 01.634 I: [MERGE] Sanitizing manifest ...                                       
