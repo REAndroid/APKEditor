@@ -19,6 +19,7 @@ import com.reandroid.apk.APKLogger;
 import com.reandroid.apk.ApkModule;
 import com.reandroid.apk.ResFile;
 import com.reandroid.arsc.chunk.TableBlock;
+import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.identifiers.PackageIdentifier;
 import com.reandroid.identifiers.TableIdentifier;
 import com.reandroid.identifiers.TypeIdentifier;
@@ -42,9 +43,7 @@ public class AutoRefactor {
         int renameCount = 0;
         List<ResFile> resFileList = mApkModule.listResFiles();
         for(ResFile resFile:resFileList){
-            String path = resFile.buildPath();
-            path = path.startsWith(RefactorUtil.RES_DIR + "/") ? path
-                    : RefactorUtil.RES_DIR + "/" + path;
+            String path = resFile.buildPath(PackageBlock.RES_DIRECTORY_NAME);
             if(path.equals(resFile.getFilePath())){
                 continue;
             }
