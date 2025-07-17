@@ -71,7 +71,10 @@ public class ResourceComment extends CommentProvider {
             return ref;
         }
 
-        Entry entry = resourceEntry.get();
+        Entry entry = resourceEntry.get("-en");
+        if (entry == null || !entry.isScalar()) {
+            entry = resourceEntry.get();
+        }
         if (entry == null) {
             return ref;
         }

@@ -223,6 +223,7 @@ public class SmaliDecompiler implements DexDecoder {
         }
         if (DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
             setting.setMaximumCommentLines(-1);
+            setting.setCommentUnicodeStrings(true);
         }
     }
 
