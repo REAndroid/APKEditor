@@ -80,6 +80,9 @@ public class BuildOptions extends OptionsWithFramework {
     @OptionArg(name = "-sig", description = "signatures_path")
     public File signaturesDirectory;
 
+    @OptionArg(name = "-dex-profile", flag = true, description = "encode_dex_profile")
+    public boolean dexProfile;
+
     public BuildOptions() {
         super();
     }

@@ -15,13 +15,7 @@
   */
 package com.reandroid.apkeditor.decompile;
 
-import com.reandroid.apk.AndroidFrameworks;
-import com.reandroid.apk.ApkModule;
-import com.reandroid.apk.ApkModuleDecoder;
-import com.reandroid.apk.ApkModuleJsonDecoder;
-import com.reandroid.apk.ApkModuleRawDecoder;
-import com.reandroid.apk.ApkModuleXmlDecoder;
-import com.reandroid.apk.FrameworkApk;
+import com.reandroid.apk.*;
 import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apkeditor.smali.SmaliDecompiler;
@@ -84,6 +78,9 @@ public class Decompiler extends CommandExecutor<DecompileOptions> {
         }
         decoder.sanitizeFilePaths();
         decoder.setDexDecoder(getSmaliDecompiler(apkModule));
+        DexProfileDecoderImpl dexProfileDecoder = new DexProfileDecoderImpl(options);
+        dexProfileDecoder.setApkLogger(this);
+        decoder.setDexProfileDecoder(dexProfileDecoder);
         return decoder;
     }
     private SmaliDecompiler getSmaliDecompiler(ApkModule apkModule) throws IOException {
