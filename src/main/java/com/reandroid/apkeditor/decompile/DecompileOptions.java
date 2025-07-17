@@ -66,6 +66,9 @@ public class DecompileOptions extends OptionsWithFramework {
     @OptionArg(name = "-dex", flag = true, description = "raw_dex")
     public boolean dex;
 
+    @OptionArg(name = "-no-cache", description = "decode_no_cache", flag = true)
+    public boolean noCache;
+
     @OptionArg(name = "-no-dex-debug", flag = true, description = "no_dex_debug")
     public boolean noDexDebug;
 

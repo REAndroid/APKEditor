@@ -97,9 +97,11 @@ public class SmaliDecompiler implements DexDecoder {
         setting.clearMethodComments();
         directory.close();
 
-        List<DexFileInputSource> dexList = apkModule.listDexFiles();
-        for (DexFileInputSource inputSource : dexList) {
-            writeDexCache(inputSource, mainDirectory);
+        if (!decompileOptions.noCache) {
+            List<DexFileInputSource> dexList = apkModule.listDexFiles();
+            for (DexFileInputSource inputSource : dexList) {
+                writeDexCache(inputSource, mainDirectory);
+            }
         }
     }
 
@@ -137,9 +139,11 @@ public class SmaliDecompiler implements DexDecoder {
         dexFile.close();
     }
     private void writeDexCache(DexFileInputSource inputSource, File mainDir) throws IOException {
-        File cache = new File(mainDir, SmaliUtil.CACHE_DIR);
-        cache = new File(cache, inputSource.getAlias());
-        inputSource.write(cache);
+        if (!decompileOptions.noCache) {
+            File cache = new File(mainDir, SmaliUtil.CACHE_DIR);
+            cache = new File(cache, inputSource.getAlias());
+            inputSource.write(cache);
+        }
     }
     private File toOutDir(DexFileInputSource inputSource, File mainDir) {
         String name = "classes";
