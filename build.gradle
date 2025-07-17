@@ -56,10 +56,3 @@ task fatJar(type: Jar) {
     with jar
 }
 
-task betaJar() {
-    doFirst {
-        version = "${version}-beta"
-    }
-    finalizedBy(fatJar)
-}
-
