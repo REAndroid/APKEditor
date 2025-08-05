@@ -8,21 +8,25 @@ This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk r
 
 ```ShellSession
 $ java -jar APKEditor.jar -h
-APKEditor - x.x.x
-Using: ARSCLib-x.x.x
+APKEditor - 1.4.4
 https://github.com/REAndroid/APKEditor
 Android binary resource files editor
-Usage: 
- java -jar APKEditor.jar <command> <args>
- commands: 
-  1)  d | decode     -   Decodes android resources binary to readable json
-  2)  b | build      -   Builds android binary from json
-  3)  m | merge      -   Merges split apk files from directory or XAPK, APKM, APKS ...
-  4)  x | refactor   -   Refactors obfuscated resource names
-  5)  p | protect    -   Protects/Obfuscates apk resource
-  6)  info           -   Prints information of apk
- run with <command> -h to get detailed help about each command
- 
+Commands:
+  d | decode      Decodes android resources binary to readable json/xml/raw.
+  b | build       Builds android binary from json/xml/raw.
+  m | merge       Merges split apk files from directory or compressed apk files
+                  like XAPK, APKM, APKS ...
+  x | refactor    Refactors obfuscated resource names
+  p | protect     Protects/Obfuscates apk resource files. Using unique
+                  obfuscation techniques.
+  info            Prints information of apk.
+Other options:
+  -h | -help      Displays this help and exit
+  -v | -version   Displays version information and exit
+
+To get help about each command run with:
+<command> -h
+
 ```
 </details>
 
