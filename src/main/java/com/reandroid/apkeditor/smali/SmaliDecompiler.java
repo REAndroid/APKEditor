@@ -39,6 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 public class SmaliDecompiler implements DexDecoder {
@@ -223,7 +224,8 @@ public class SmaliDecompiler implements DexDecoder {
         }
         setting.setEnableComments(true);
         if (tableBlock != null) {
-            setting.setResourceIdComment(tableBlock.pickOne());
+            // TODO fix from ARCLib side
+            setting.setResourceIdComment(ResourceIdComment.of(tableBlock.pickOne(), new Locale(Locale.getDefault().getLanguage())));
         }
         if (DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
             setting.setMaximumCommentLines(-1);
