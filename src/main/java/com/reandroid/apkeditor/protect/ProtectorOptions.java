@@ -53,6 +53,9 @@ public class ProtectorOptions extends Options {
     @OptionArg(name = "-dic-file-names", flag = true, description = "protect_dic_file_name")
     public File dic_file_name;
 
+    @OptionArg(name = "-dex-level", description = "dex_protect_level")
+    public int dexLevel;
+
     public ProtectorOptions() {
         super();
     }

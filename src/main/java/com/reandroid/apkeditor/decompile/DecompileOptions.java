@@ -66,6 +66,9 @@ public class DecompileOptions extends OptionsWithFramework {
     @OptionArg(name = "-dex", flag = true, description = "raw_dex")
     public boolean dex;
 
+    @OptionArg(name = "-no-cache", description = "decode_no_cache", flag = true)
+    public boolean noCache;
+
     @OptionArg(name = "-no-dex-debug", flag = true, description = "no_dex_debug")
     public boolean noDexDebug;
 
@@ -82,7 +85,7 @@ public class DecompileOptions extends OptionsWithFramework {
             },
             description = "dex_lib"
     )
-    public String dexLib = DEX_LIB_JF;
+    public String dexLib = DEX_LIB_INTERNAL;
 
     @OptionArg(name = "-smali-registers", flag = true, description = "smali_registers")
     public boolean smaliRegisters;
@@ -96,10 +99,13 @@ public class DecompileOptions extends OptionsWithFramework {
             },
             description = "comment_level"
     )
-    public String commentLevel = COMMENT_LEVEL_FULL;
+    public String commentLevel = COMMENT_LEVEL_DETAIL;
 
     @OptionArg(name = "-sig", description = "signatures_path")
     public File signaturesDirectory;
+
+    @OptionArg(name = "-dex-profile", flag = true, description = "decode_dex_profile")
+    public boolean dexProfile;
 
     public DecompileOptions() {
     }

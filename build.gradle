@@ -2,7 +2,7 @@ apply plugin: 'application'
 apply plugin: 'java'
 
 group 'com.reandroid.apkeditor'
-version '1.4.3'
+version '1.4.5'
 
 mainClassName = 'com.reandroid.apkeditor.Main'
 
@@ -61,12 +61,5 @@ task fatJar(type: Jar) {
     }
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
-}
-
-task betaJar() {
-    doFirst {
-        version = "${version}-beta"
-    }
-    finalizedBy(fatJar)
 }
 

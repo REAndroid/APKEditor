@@ -75,10 +75,13 @@ public class BuildOptions extends OptionsWithFramework {
             },
             description = "dex_lib"
     )
-    public String dexLib = DEX_LIB_JF;
+    public String dexLib = DEX_LIB_INTERNAL;
 
     @OptionArg(name = "-sig", description = "signatures_path")
     public File signaturesDirectory;
+
+    @OptionArg(name = "-dex-profile", flag = true, description = "encode_dex_profile")
+    public boolean dexProfile;
 
     public BuildOptions() {
         super();

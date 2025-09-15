@@ -39,6 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 public class SmaliDecompiler implements DexDecoder {
@@ -49,6 +50,7 @@ public class SmaliDecompiler implements DexDecoder {
     private SmaliWriterSetting smaliWriterSetting;
     private Opcodes mCurrentOpcodes;
     private APKLogger apkLogger;
+    private boolean mDexForCommentLoaded;
 
     public SmaliDecompiler(TableBlock tableBlock, DecompileOptions decompileOptions) {
         this.tableBlock = tableBlock;
@@ -73,11 +75,16 @@ public class SmaliDecompiler implements DexDecoder {
         }
         DexDirectory directory = (DexDirectory) apkModule.getTag(DexDirectory.class);
         if (directory == null) {
-            if (apkModule.listDexFiles().size() > decompileOptions.loadDex) {
+            int size = apkModule.listDexFiles().size();
+            logMessage("Dex files: " + size);
+            if (size > decompileOptions.loadDex) {
+                if (size < decompileOptions.loadDex * 5) {
+                    loadMinimalDexForComment(apkModule);
+                }
                 DexDecoder.super.decodeDex(apkModule, mainDirectory);
                 return;
             }
-            logMessage("Loading full dex files: " + apkModule.listDexFiles().size());
+            logMessage("Loading full dex files ...");
             Predicate<SectionType<?>> filter;
             if (decompileOptions.noDexDebug) {
                 filter = sectionType -> sectionType != SectionType.DEBUG_INFO;
@@ -97,12 +104,27 @@ public class SmaliDecompiler implements DexDecoder {
         setting.clearMethodComments();
         directory.close();
 
-        List<DexFileInputSource> dexList = apkModule.listDexFiles();
-        for (DexFileInputSource inputSource : dexList) {
-            writeDexCache(inputSource, mainDirectory);
+        if (!decompileOptions.noCache) {
+            List<DexFileInputSource> dexList = apkModule.listDexFiles();
+            for (DexFileInputSource inputSource : dexList) {
+                writeDexCache(inputSource, mainDirectory);
+            }
         }
     }
 
+    private void loadMinimalDexForComment(ApkModule apkModule) throws IOException {
+        String commentLevel = decompileOptions.commentLevel;
+        if (!DecompileOptions.COMMENT_LEVEL_DETAIL.equals(commentLevel) &&
+                !DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
+            return;
+        }
+        logMessage("Loading basic structures of dex ...");
+        DexDirectory dexDirectory = DexDirectory.fromZip(
+                apkModule.getZipEntryMap(), SectionType.minimal());
+        mDexForCommentLoaded = false;
+        getSmaliWriterSetting(dexDirectory);
+        mDexForCommentLoaded = true;
+    }
     private void disassembleWithJesusFrekeLib(DexFileInputSource inputSource, File mainDir) throws IOException {
         File dir = toOutDir(inputSource, mainDir);
         BaksmaliOptions options = new BaksmaliOptions();
@@ -132,14 +154,18 @@ public class SmaliDecompiler implements DexDecoder {
         SmaliWriter smaliWriter = new SmaliWriter();
         smaliWriter.setWriterSetting(setting);
         dexFile.writeSmali(smaliWriter, toSmaliRoot(mainDir));
-        setting.clearClassComments();
-        setting.clearMethodComments();
+        if (!mDexForCommentLoaded) {
+            setting.clearClassComments();
+            setting.clearMethodComments();
+        }
         dexFile.close();
     }
     private void writeDexCache(DexFileInputSource inputSource, File mainDir) throws IOException {
-        File cache = new File(mainDir, SmaliUtil.CACHE_DIR);
-        cache = new File(cache, inputSource.getAlias());
-        inputSource.write(cache);
+        if (!decompileOptions.noCache) {
+            File cache = new File(mainDir, SmaliUtil.CACHE_DIR);
+            cache = new File(cache, inputSource.getAlias());
+            inputSource.write(cache);
+        }
     }
     private File toOutDir(DexFileInputSource inputSource, File mainDir) {
         String name = "classes";
@@ -186,12 +212,14 @@ public class SmaliDecompiler implements DexDecoder {
 
     private SmaliWriterSetting getSmaliWriterSetting(DexClassRepository classRepository) {
         SmaliWriterSetting setting = getSmaliWriterSetting();
-        setting.clearClassComments();
-        setting.clearMethodComments();
-        String commentLevel = decompileOptions.commentLevel;
-        if (DecompileOptions.COMMENT_LEVEL_DETAIL.equals(commentLevel) || DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
-            setting.addClassComments(classRepository);
-            setting.addMethodComments(classRepository);
+        if (!mDexForCommentLoaded) {
+            setting.clearClassComments();
+            setting.clearMethodComments();
+            String commentLevel = decompileOptions.commentLevel;
+            if (DecompileOptions.COMMENT_LEVEL_DETAIL.equals(commentLevel) || DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
+                setting.addClassComments(classRepository);
+                setting.addMethodComments(classRepository);
+            }
         }
         return setting;
     }
@@ -219,10 +247,12 @@ public class SmaliDecompiler implements DexDecoder {
         }
         setting.setEnableComments(true);
         if (tableBlock != null) {
-            setting.setResourceIdComment(tableBlock.pickOne());
+            // TODO fix from ARCLib side
+            setting.setResourceIdComment(ResourceIdComment.of(tableBlock.pickOne(), new Locale(Locale.getDefault().getLanguage())));
         }
         if (DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
             setting.setMaximumCommentLines(-1);
+            setting.setCommentUnicodeStrings(true);
         }
     }
 
