@@ -1,2 +1,4 @@
 rootProject.name = 'APKEditor'
 
+include ':ARSCLib'
+project(':ARSCLib').projectDir = new File(rootProject.projectDir, 'modules/ARSCLib')

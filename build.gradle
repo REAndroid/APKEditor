@@ -9,26 +9,23 @@ java {
     targetCompatibility JavaVersion.VERSION_1_8
 }
 
-if (JavaVersion.current().isJava8Compatible()) {
-    allprojects {
-        tasks.compileJava {
-            //options.addStringOption('-Xlint:unchecked', '-quiet')
-        }
-    }
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    //implementation("io.github.reandroid:ARSCLib:+")
-    compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
+    // Use ARSCLib as a submodule project dependency
+    compile project(':ARSCLib')
 
     // built from: https://github.com/REAndroid/smali-lib
-    compile(files("$rootProject.projectDir/libs/smali.jar"))
+    compile files("$rootProject.projectDir/libs/smali.jar")
 
     // built from: https://github.com/REAndroid/JCommand
-    compile(files("$rootProject.projectDir/libs/JCommand.jar"))
+    compile files("$rootProject.projectDir/libs/JCommand.jar")
 }
 
 processResources {

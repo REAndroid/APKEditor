@@ -508,8 +508,8 @@ Examples:
 
  ```ShellSession
  
-# NB: Due to my lazyness , the dependency ARSCLib.jar is pre-built and placed under APKEditor/libs/ARSCLib.jar or you can build yourself and replace it.
-git clone https://github.com/REAndroid/APKEditor
+# ARSCLib is now included as a Git submodule, so clone with --recurse-submodules
+git clone --recurse-submodules https://github.com/REAndroid/APKEditor
 cd APKEditor
 ./gradlew fatJar
 # Executable jar will be placed ./build/libs/APKEditor-x.x.x.jar
