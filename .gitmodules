@@ -1,0 +1,3 @@
+[submodule "modules/ARSCLib"]
+	path = modules/ARSCLib
+	url = https://github.com/REAndroid/ARSCLib.git
