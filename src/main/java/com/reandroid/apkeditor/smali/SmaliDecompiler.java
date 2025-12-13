@@ -25,7 +25,6 @@ import com.reandroid.dex.model.DexClassRepository;
 import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.dex.sections.SectionType;
-import com.reandroid.dex.smali.SmaliWriter;
 import com.reandroid.dex.smali.SmaliWriterSetting;
 import com.reandroid.dex.smali.formatters.ResourceIdComment;
 import org.jf.baksmali.Baksmali;
@@ -59,7 +58,6 @@ public class SmaliDecompiler implements DexDecoder {
 
     @Override
     public void decodeDex(DexFileInputSource inputSource, File mainDir) throws IOException {
-        logMessage("Baksmali: " + inputSource.getAlias());
         if (DecompileOptions.DEX_LIB_INTERNAL.equals(decompileOptions.dexLib)) {
             disassembleWithInternalDexLib(inputSource, mainDir);
         } else {
@@ -78,10 +76,14 @@ public class SmaliDecompiler implements DexDecoder {
             int size = apkModule.listDexFiles().size();
             logMessage("Dex files: " + size);
             if (size > decompileOptions.loadDex) {
+                DexDirectory dexDirectory = null;
                 if (size < decompileOptions.loadDex * 5) {
-                    loadMinimalDexForComment(apkModule);
+                    dexDirectory = loadMinimalDexForComment(apkModule);
                 }
                 DexDecoder.super.decodeDex(apkModule, mainDirectory);
+                if (dexDirectory != null) {
+                    dexDirectory.close();
+                }
                 return;
             }
             logMessage("Loading full dex files ...");
@@ -96,10 +98,7 @@ public class SmaliDecompiler implements DexDecoder {
 
         File smali = toSmaliRoot(mainDirectory);
         SmaliWriterSetting setting = getSmaliWriterSetting(directory);
-        SmaliWriter smaliWriter = new SmaliWriter();
-        smaliWriter.setWriterSetting(setting);
-        logMessage("Baksmali ...");
-        directory.writeSmali(smaliWriter, smali);
+        directory.writeSmali(setting, smali, this::logBaksmaliDex);
         setting.clearClassComments();
         setting.clearMethodComments();
         directory.close();
@@ -111,12 +110,16 @@ public class SmaliDecompiler implements DexDecoder {
             }
         }
     }
+    boolean logBaksmaliDex(DexFile dexFile) {
+        logMessage("Baksmali<" + dexFile.getDexClassesCount() + ">: " + dexFile.getSimpleName());
+        return true;
+    }
 
-    private void loadMinimalDexForComment(ApkModule apkModule) throws IOException {
+    private DexDirectory loadMinimalDexForComment(ApkModule apkModule) throws IOException {
         String commentLevel = decompileOptions.commentLevel;
         if (!DecompileOptions.COMMENT_LEVEL_DETAIL.equals(commentLevel) &&
                 !DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
-            return;
+            return null;
         }
         logMessage("Loading basic structures of dex ...");
         DexDirectory dexDirectory = DexDirectory.fromZip(
@@ -124,8 +127,10 @@ public class SmaliDecompiler implements DexDecoder {
         mDexForCommentLoaded = false;
         getSmaliWriterSetting(dexDirectory);
         mDexForCommentLoaded = true;
+        return dexDirectory;
     }
     private void disassembleWithJesusFrekeLib(DexFileInputSource inputSource, File mainDir) throws IOException {
+        logMessage("Baksmali: " + inputSource.getAlias());
         File dir = toOutDir(inputSource, mainDir);
         BaksmaliOptions options = new BaksmaliOptions();
         options.localsDirective = true;
@@ -146,14 +151,14 @@ public class SmaliDecompiler implements DexDecoder {
         }
         DexFile dexFile = DexFile.read(inputSource.openStream(), filter);
         dexFile.setSimpleName(inputSource.getAlias());
+        logBaksmaliDex(dexFile);
         if (dexFile.isMultiLayout()) {
             logMessage("Multi layout dex file: " + inputSource.getAlias()
                     + "version = " + dexFile.getVersion() + ", layouts = " + dexFile.size());
         }
         SmaliWriterSetting setting = getSmaliWriterSetting(dexFile);
-        SmaliWriter smaliWriter = new SmaliWriter();
-        smaliWriter.setWriterSetting(setting);
-        dexFile.writeSmali(smaliWriter, toSmaliRoot(mainDir));
+        File dir = new File(toSmaliRoot(mainDir), dexFile.buildSmaliDirectoryName());
+        dexFile.writeSmali(setting, dir);
         if (!mDexForCommentLoaded) {
             setting.clearClassComments();
             setting.clearMethodComments();
@@ -247,8 +252,7 @@ public class SmaliDecompiler implements DexDecoder {
         }
         setting.setEnableComments(true);
         if (tableBlock != null) {
-            // TODO fix from ARCLib side
-            setting.setResourceIdComment(ResourceIdComment.of(tableBlock.pickOne(), new Locale(Locale.getDefault().getLanguage())));
+            setting.setResourceIdComment(ResourceIdComment.of(tableBlock.pickOne(), Locale.getDefault()));
         }
         if (DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
             setting.setMaximumCommentLines(-1);
