@@ -111,7 +111,10 @@ public class SmaliDecompiler implements DexDecoder {
         }
     }
     boolean logBaksmaliDex(DexFile dexFile) {
-        logMessage("Baksmali<" + dexFile.getDexClassesCount() + ">: " + dexFile.getSimpleName());
+        int count = dexFile.size();
+        String layout = count > 1 ? "/" + count : "";
+        logMessage("Baksmali: v0" + dexFile.getVersion() + layout
+                + "<" + dexFile.getDexClassesCount() + "> " + dexFile.getSimpleName());
         return true;
     }
 
@@ -152,10 +155,6 @@ public class SmaliDecompiler implements DexDecoder {
         DexFile dexFile = DexFile.read(inputSource.openStream(), filter);
         dexFile.setSimpleName(inputSource.getAlias());
         logBaksmaliDex(dexFile);
-        if (dexFile.isMultiLayout()) {
-            logMessage("Multi layout dex file: " + inputSource.getAlias()
-                    + "version = " + dexFile.getVersion() + ", layouts = " + dexFile.size());
-        }
         SmaliWriterSetting setting = getSmaliWriterSetting(dexFile);
         File dir = new File(toSmaliRoot(mainDir), dexFile.buildSmaliDirectoryName());
         dexFile.writeSmali(setting, dir);
