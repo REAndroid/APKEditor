@@ -22,6 +22,8 @@ import com.reandroid.jcommand.annotations.OptionArg;
 import com.reandroid.utils.StringsUtil;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @CommandOptions(
         name = "d",
@@ -108,6 +110,9 @@ public class DecompileOptions extends OptionsWithFramework {
 
     @OptionArg(name = "-dex-profile", flag = true, description = "decode_dex_profile")
     public boolean dexProfile;
+
+    @OptionArg(name = "-remove-annotation", description = "remove_annotation")
+    public final List<String> removeAnnotations = new ArrayList<>();
 
     public DecompileOptions() {
     }
