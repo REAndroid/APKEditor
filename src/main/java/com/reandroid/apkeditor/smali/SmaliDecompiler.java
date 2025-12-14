@@ -119,9 +119,7 @@ public class SmaliDecompiler implements DexDecoder {
     }
 
     private DexDirectory loadMinimalDexForComment(ApkModule apkModule) throws IOException {
-        String commentLevel = decompileOptions.commentLevel;
-        if (!DecompileOptions.COMMENT_LEVEL_DETAIL.equals(commentLevel) &&
-                !DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
+        if (!decompileOptions.containsCommentLevel(DecompileOptions.COMMENT_LEVEL_DETAIL)) {
             return null;
         }
         logMessage("Loading basic structures of dex ...");
@@ -219,8 +217,7 @@ public class SmaliDecompiler implements DexDecoder {
         if (!mDexForCommentLoaded) {
             setting.clearClassComments();
             setting.clearMethodComments();
-            String commentLevel = decompileOptions.commentLevel;
-            if (DecompileOptions.COMMENT_LEVEL_DETAIL.equals(commentLevel) || DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
+            if (decompileOptions.containsCommentLevel(DecompileOptions.COMMENT_LEVEL_DETAIL)) {
                 setting.addClassComments(classRepository);
                 setting.addMethodComments(classRepository);
             }
@@ -241,20 +238,24 @@ public class SmaliDecompiler implements DexDecoder {
         setting.setLocalRegistersCount(!decompileOptions.smaliRegisters);
     }
     private void initializeSmaliComment(SmaliWriterSetting setting) {
-        String commentLevel = this.decompileOptions.commentLevel;
-        if (DecompileOptions.COMMENT_LEVEL_OFF.equals(commentLevel)) {
+        if (decompileOptions.containsCommentLevel(DecompileOptions.COMMENT_LEVEL_OFF)) {
             setting.setResourceIdComment((ResourceIdComment) null);
             setting.clearClassComments();
             setting.clearMethodComments();
             setting.setEnableComments(false);
             return;
         }
-        setting.setEnableComments(true);
-        if (tableBlock != null) {
-            setting.setResourceIdComment(ResourceIdComment.of(tableBlock.pickOne(), Locale.getDefault()));
+        if (decompileOptions.containsCommentLevel(DecompileOptions.COMMENT_LEVEL_DETAIL)) {
+            setting.setEnableComments(true);
+            if (tableBlock != null) {
+                setting.setResourceIdComment(ResourceIdComment.of(tableBlock.pickOne(), Locale.getDefault()));
+            }
         }
-        if (DecompileOptions.COMMENT_LEVEL_FULL.equals(commentLevel)) {
+        if (decompileOptions.containsCommentLevel(DecompileOptions.COMMENT_LEVEL_FULL)) {
             setting.setMaximumCommentLines(-1);
+            setting.setCommentUnicodeStrings(true);
+        }
+        if (decompileOptions.containsCommentLevel(DecompileOptions.COMMENT_LEVEL_DETAIL2)) {
             setting.setCommentUnicodeStrings(true);
         }
     }
