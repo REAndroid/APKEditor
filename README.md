@@ -81,6 +81,9 @@ Options:
                           *See<Notes> below.
   -o                    Output path. Optional, if not provided then a new file
                         will be generated on same directory as input
+  -remove-annotation    [Baksmali] Type name of annotation to remove from dex
+                          e.g: -remove-annotation Lkotlin/Metadata;
+                          *Can be multiple.
   -res-dir              Sets resource files root dir name. e.g. for obfuscation
                         to move files from 'res/*' to 'r/*' or vice versa.
   -sig                  Signatures directory path.
@@ -91,21 +94,34 @@ Options:
                         versions up to 042.
                          2) jf : Use library by JesusFreke/smali, supports dex
                         versions 035 and below.
-                          *Default = jf
-                          **WARN: The default value will be replaced by
-                        "internal" on coming versions.
+                          *Default = internal
                           *See <Notes> below.
                         [internal, jf]
+  -comment-level        [Baksmali] Sets the comment level.
+                         1) off : No comment will be printed.
+                         2) basic : Prints basic and resource id comments.
+                         3) detail : Including <basic>, Prints class & method
+                        relation comments.
+                         4) detail2 : Including <detail>, Prints encoded hex
+                        strings with literal as comment.
+                         5) full : Prints all comments.
+                         **Default = detail
+                        [off, basic, detail, detail2, full]
 Flags:
   -dex                  Copy raw dex files / skip smali.
   -dex-markers          Dumps dex markers (applies only when smali mode).
+  -dex-profile          Decodes dex profile binary files under assets/dexopt to
+                        readable json files.
   -f                    Force delete output path.
   -h | -help | --help   Displays this help and exit.
   -keep-res-path        Keeps original res/* file paths:
                           *Applies only when decoding to xml
                           *All res/* files will be placed on dir <res-files>
                           *The relative paths will be linked to values/*xml
+  -no-cache             Do not create dex .cache files.
   -no-dex-debug         Drops all debug info from smali/dex.
+  -smali-registers      [Baksmali] Use ".registers" directive instead of the
+                        default ".locals".
   -split-json           Splits resources.arsc into multiple parts as per type
                         entries (use this for large files)
   -vrd                  Validate resources dir name
@@ -130,7 +146,7 @@ Notes:
   * Builds with similar dex-section order as r8/dx.
   * Convenient dex markers editing, see file smali/classes/dex-file.json
   * Additional helpful smali comments: e.g class/method hierarchy.
-  * Supports whitespaces on class simple name as introduced on dex 041+
+  * Supports whitespaces on class simple name as introduced on dex 040+
   2)  [-load-dex] To print correct class/method hierarchy, it is necessary to
   load all dex files at once. This may result high memory consumption and
   could fail with "OutOfMemoryError" thus you are required to limit the
