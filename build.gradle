@@ -1,8 +1,10 @@
-
+apply plugin: 'application'
 apply plugin: 'java'
 
 group 'com.reandroid.apkeditor'
 version '1.4.7'
+
+mainClassName = 'com.reandroid.apkeditor.Main'
 
 java {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -16,19 +18,20 @@ if (JavaVersion.current().isJava8Compatible()) {
         }
     }
 }
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
     //implementation("io.github.reandroid:ARSCLib:+")
-    compile(files("$rootProject.projectDir/libs/ARSCLib.jar"))
+    implementation(files("$rootProject.projectDir/libs/ARSCLib.jar"))
 
     // built from: https://github.com/REAndroid/smali-lib
-    compile(files("$rootProject.projectDir/libs/smali.jar"))
+    implementation(files("$rootProject.projectDir/libs/smali.jar"))
 
     // built from: https://github.com/REAndroid/JCommand
-    compile(files("$rootProject.projectDir/libs/JCommand.jar"))
+    implementation(files("$rootProject.projectDir/libs/JCommand.jar"))
 }
 
 processResources {
@@ -40,19 +43,23 @@ processResources {
 javadoc {
     exclude('com/reandroid/test/**')
 }
+
 jar {
     exclude('com/reandroid/test/**')
     duplicatesStrategy = DuplicatesStrategy.FAIL
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
 }
 
 task fatJar(type: Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes(
-                'Main-Class': 'com.reandroid.apkeditor.Main'
+                'Main-Class': mainClassName 
         )
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
 
