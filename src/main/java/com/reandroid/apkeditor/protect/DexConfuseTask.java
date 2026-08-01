@@ -41,7 +41,7 @@ public abstract class DexConfuseTask implements APKLogger {
     public boolean apply(DexClass dexClass) {
         boolean result = false;
         dexClass.edit();
-        Iterator<DexMethod> iterator = dexClass.getDeclaredMethods();
+        Iterator<DexMethod> iterator = dexClass.declaredMethods();
         while (iterator.hasNext()) {
             if (apply(iterator.next())) {
                 addCount();

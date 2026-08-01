@@ -19,8 +19,11 @@ import com.reandroid.apkeditor.OptionsWithFramework;
 import com.reandroid.jcommand.annotations.ChoiceArg;
 import com.reandroid.jcommand.annotations.CommandOptions;
 import com.reandroid.jcommand.annotations.OptionArg;
+import com.reandroid.utils.StringsUtil;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @CommandOptions(
         name = "d",
@@ -95,17 +98,21 @@ public class DecompileOptions extends OptionsWithFramework {
                     COMMENT_LEVEL_OFF,
                     COMMENT_LEVEL_BASIC,
                     COMMENT_LEVEL_DETAIL,
+                    COMMENT_LEVEL_DETAIL2,
                     COMMENT_LEVEL_FULL
             },
             description = "comment_level"
     )
-    public String commentLevel = COMMENT_LEVEL_DETAIL;
+    public String commentLevel = COMMENT_LEVEL_BASIC;
 
     @OptionArg(name = "-sig", description = "signatures_path")
     public File signaturesDirectory;
 
     @OptionArg(name = "-dex-profile", flag = true, description = "decode_dex_profile")
     public boolean dexProfile;
+
+    @OptionArg(name = "-remove-annotation", description = "remove_annotation")
+    public final List<String> removeAnnotations = new ArrayList<>();
 
     public DecompileOptions() {
     }
@@ -123,6 +130,34 @@ public class DecompileOptions extends OptionsWithFramework {
     public void validateOutput(boolean isFile) {
         super.validateOutput(false);
     }
+    public boolean containsCommentLevel(String level) {
+        String commentLevel = this.commentLevel;
+        if (StringsUtil.isEmpty(level)) {
+            return COMMENT_LEVEL_OFF.equals(commentLevel);
+        }
+        if (COMMENT_LEVEL_OFF.equals(level)) {
+            return commentLevel.equals(level);
+        }
+        if (COMMENT_LEVEL_BASIC.equals(level)) {
+            return commentLevel.equals(level) ||
+                    COMMENT_LEVEL_DETAIL.equals(commentLevel) ||
+                    COMMENT_LEVEL_DETAIL2.equals(commentLevel) ||
+                    COMMENT_LEVEL_FULL.equals(commentLevel);
+        }
+        if (COMMENT_LEVEL_DETAIL.equals(level)) {
+            return commentLevel.equals(level) ||
+                    COMMENT_LEVEL_DETAIL2.equals(commentLevel) ||
+                    COMMENT_LEVEL_FULL.equals(commentLevel);
+        }
+        if (COMMENT_LEVEL_DETAIL2.equals(level)) {
+            return commentLevel.equals(level) ||
+                    COMMENT_LEVEL_FULL.equals(commentLevel);
+        }
+        if (COMMENT_LEVEL_FULL.equals(level)) {
+            return commentLevel.equals(level);
+        }
+        return false;
+    }
 
     @Override
     public File generateOutputFromInput(File input) {
@@ -132,5 +167,6 @@ public class DecompileOptions extends OptionsWithFramework {
     public static final String COMMENT_LEVEL_OFF = "off";
     public static final String COMMENT_LEVEL_BASIC = "basic";
     public static final String COMMENT_LEVEL_DETAIL = "detail";
+    public static final String COMMENT_LEVEL_DETAIL2 = "detail2";
     public static final String COMMENT_LEVEL_FULL = "full";
 }
