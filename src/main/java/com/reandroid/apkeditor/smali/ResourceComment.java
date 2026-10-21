@@ -20,7 +20,7 @@ import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResValue;
-import com.reandroid.arsc.value.ValueType;
+import com.reandroid.arsc.value.DataType;
 import org.jf.baksmali.CommentProvider;
 
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class ResourceComment extends CommentProvider {
         }
 
         String ref = resourceEntry
-                .buildReference(packageBlock, ValueType.REFERENCE);
+                .buildReference(packageBlock, DataType.REFERENCE);
 
         if (resourceEntry.getPackageBlock().getTableBlock() != tableBlock) {
             return ref;

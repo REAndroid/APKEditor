@@ -303,8 +303,8 @@ public class InfoWriterXml extends InfoWriter{
         mIndent = indent;
         writeIndent(serializer, indent);
         serializer.startTag(null, TAG_VALUE);
-        serializer.attribute(null, "type", resValue.getValueType().name());
-        serializer.text(getValueAsString(resValue));
+        serializer.attribute(null, "type", resValue.getDataType().name());
+        serializer.text(getDataAsString(resValue));
         serializer.endTag(null, TAG_VALUE);
         indent = indent - 2;
         mIndent = indent;
@@ -334,8 +334,8 @@ public class InfoWriterXml extends InfoWriter{
         serializer.startTag(null, TAG_VALUE);
         serializer.attribute(null, "name",
                 HexUtil.toHex8(resValueMap.getNameId()));
-        serializer.attribute(null, "type", resValueMap.getValueType().name());
-        serializer.text(getValueAsString(resValueMap));
+        serializer.attribute(null, "type", resValueMap.getDataType().name());
+        serializer.text(getDataAsString(resValueMap));
         serializer.endTag(null, TAG_VALUE);
         indent = indent - 2;
         mIndent = indent;

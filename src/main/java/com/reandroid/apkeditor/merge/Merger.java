@@ -33,7 +33,7 @@ import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
 import com.reandroid.arsc.value.Entry;
-import com.reandroid.arsc.value.ValueType;
+import com.reandroid.arsc.value.DataType;
 
 import java.io.File;
 import java.io.IOException;
@@ -177,7 +177,7 @@ public class Merger extends CommandExecutor<MergerOptions> {
         if(nameAttribute == null){
             return false;
         }
-        if(!"com.android.vending.splits".equals(nameAttribute.getValueAsString())){
+        if(!"com.android.vending.splits".equals(nameAttribute.getDataAsString())){
             return false;
         }
         ResXmlAttribute valueAttribute=metaElement.searchAttributeByResourceId(
@@ -187,7 +187,7 @@ public class Merger extends CommandExecutor<MergerOptions> {
                     AndroidManifest.ID_resource);
         }
         if(valueAttribute == null
-                || valueAttribute.getValueType() != ValueType.REFERENCE){
+                || valueAttribute.getDataType() != DataType.REFERENCE){
             return false;
         }
         if(!apkModule.hasTableBlock()){
@@ -207,7 +207,7 @@ public class Merger extends CommandExecutor<MergerOptions> {
             if(resValue == null){
                 continue;
             }
-            String path = resValue.getValueAsString();
+            String path = resValue.getDataAsString();
             logMessage("Removed-table-entry : " + path);
             //Remove file entry
             zipEntryMap.remove(path);

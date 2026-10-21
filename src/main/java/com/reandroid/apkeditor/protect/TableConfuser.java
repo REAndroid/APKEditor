@@ -21,6 +21,7 @@ import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.UnknownChunk;
+import com.reandroid.arsc.item.BlockItem;
 import com.reandroid.arsc.item.ByteArray;
 import com.reandroid.arsc.item.FixedLengthString;
 import com.reandroid.arsc.item.TypeString;
@@ -44,7 +45,8 @@ public class TableConfuser extends Confuser {
         UnknownChunk unknownChunk = new UnknownChunk();
         FixedLengthString fixedLengthString = new FixedLengthString(256);
         fixedLengthString.set(APKEditor.getRepo());
-        ByteArray extra = unknownChunk.getHeaderBlock().getExtraBytes();
+        /*
+        BlockItem extra = unknownChunk.getHeaderBlock().getExtraBytes();
         byte[] bytes = fixedLengthString.getBytes();
         extra.setSize(bytes.length);
         extra.putByteArray(0, bytes);
@@ -53,6 +55,8 @@ public class TableConfuser extends Confuser {
         bytes = fixedLengthString.getBytes();
         extra.setSize(bytes.length);
         extra.putByteArray(0, bytes);
+
+         */
         fixedLengthString.set(ARSCLib.getRepo());
         unknownChunk.refresh();
         tableBlock.getFirstPlaceHolder().setItem(unknownChunk);

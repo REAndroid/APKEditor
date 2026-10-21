@@ -23,16 +23,21 @@ import com.reandroid.arsc.coder.ValueCoder;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
 import com.reandroid.arsc.pool.StringPool;
+import com.reandroid.arsc.value.DataType;
+import com.reandroid.arsc.value.Entry;
+import com.reandroid.arsc.value.Value;
 import com.reandroid.dex.model.DexDirectory;
 import com.reandroid.dex.model.DexFile;
 import com.reandroid.utils.HexUtil;
-import com.reandroid.arsc.value.*;
 import com.reandroid.utils.collection.CollectionUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class InfoWriter implements Closeable {
     private final Writer writer;
@@ -90,19 +95,19 @@ public abstract class InfoWriter implements Closeable {
         }
         return null;
     }
-    static String getValueAsString(Value value){
-        ValueType valueType = value.getValueType();
-        if(valueType == ValueType.STRING){
-            return value.getValueAsString();
+    static String getDataAsString(Value value){
+        DataType dataType = value.getDataType();
+        if(dataType == DataType.STRING){
+            return value.getDataAsString();
         }
-        String decoded = ValueCoder.decode(valueType, value.getData());
+        String decoded = ValueCoder.decode(dataType, value.getData());
         if(decoded != null){
             return decoded;
         }
-        if(valueType == ValueType.ATTRIBUTE){
+        if(dataType == DataType.ATTRIBUTE){
             return HexUtil.toHex8("?0x", value.getData());
         }
-        if(valueType == ValueType.REFERENCE){
+        if(dataType == DataType.REFERENCE){
             return HexUtil.toHex8("@0x", value.getData());
         }
         return HexUtil.toHex8("0x", value.getData());

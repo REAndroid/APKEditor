@@ -164,7 +164,7 @@ public class InfoWriterJson extends InfoWriter{
         }
         mJsonWriter.object()
                 .key(NAME_QUALIFIERS).value(entry.getResConfig().getQualifiers())
-                .key("value").value(getValueAsString(resValue))
+                .key("value").value(getDataAsString(resValue))
                 .endObject();
     }
     private void writeBagEntry(Entry entry) {
@@ -184,7 +184,7 @@ public class InfoWriterJson extends InfoWriter{
         mJsonWriter.object()
                 .key("name").value(resValueMap.decodeName())
                 .key("id").value(resValueMap.getNameId())
-                .key("value").value(getValueAsString(resValueMap))
+                .key("value").value(getDataAsString(resValueMap))
                 .endObject();
     }
     @Override

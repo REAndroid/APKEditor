@@ -29,7 +29,7 @@ import com.reandroid.arsc.model.FrameworkTable;
 import com.reandroid.arsc.value.AttributeDataFormat;
 import com.reandroid.arsc.value.Entry;
 import com.reandroid.arsc.value.ResTableMapEntry;
-import com.reandroid.arsc.value.ValueType;
+import com.reandroid.arsc.value.DataType;
 import com.reandroid.arsc.value.array.ArrayBag;
 import com.reandroid.arsc.value.attribute.AttributeBag;
 import com.reandroid.arsc.value.plurals.PluralsBag;
@@ -38,7 +38,10 @@ import com.reandroid.xml.XMLDocument;
 import com.reandroid.xml.XMLElement;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class TypeNameRefactor {
     private final ApkModule apkModule;
@@ -412,7 +415,7 @@ public class TypeNameRefactor {
         if(nameId!=textColor){
             return false;
         }
-        if(attribute.getValueType() != ValueType.REFERENCE){
+        if(attribute.getDataType() != DataType.REFERENCE){
             return true;
         }
         rename(attribute.getData(), name);
@@ -436,7 +439,7 @@ public class TypeNameRefactor {
         if(nameId == 0){
             return false;
         }
-        if(attribute.getValueType() != ValueType.REFERENCE){
+        if(attribute.getDataType() != DataType.REFERENCE){
             return true;
         }
         if(!isEqualAndroidAttributeType(nameId, attributeValueType)){
@@ -456,7 +459,7 @@ public class TypeNameRefactor {
         if(nameId!=layout_width && nameId!=layout_height){
             return false;
         }
-        if(attribute.getValueType() != ValueType.REFERENCE){
+        if(attribute.getDataType() != DataType.REFERENCE){
             return true;
         }
         rename(attribute.getData(), name);
@@ -470,7 +473,7 @@ public class TypeNameRefactor {
         if(attribute.getNameId()!=AndroidManifest.ID_id){
             return false;
         }
-        if(attribute.getValueType() != ValueType.REFERENCE){
+        if(attribute.getDataType() != DataType.REFERENCE){
             return true;
         }
         rename(attribute.getData(), name);
@@ -484,7 +487,7 @@ public class TypeNameRefactor {
         if(attribute.getNameId() != AndroidManifest.ID_theme){
             return false;
         }
-        if(attribute.getValueType() != ValueType.REFERENCE){
+        if(attribute.getDataType() != DataType.REFERENCE){
             return true;
         }
         rename(attribute.getData(), name);
@@ -498,7 +501,7 @@ public class TypeNameRefactor {
         if(attribute.getNameId() != AndroidManifest.ID_label){
             return false;
         }
-        if(attribute.getValueType() != ValueType.REFERENCE){
+        if(attribute.getDataType() != DataType.REFERENCE){
             return true;
         }
         rename(attribute.getData(), name);
@@ -554,7 +557,7 @@ public class TypeNameRefactor {
         typeString.set(name);
         return true;
     }
-    private boolean isEqualAndroidAttributeType(int attributeResourceId, AttributeDataFormat attributeValueType){
+    private boolean isEqualAndroidAttributeType(int attributeResourceId, AttributeDataFormat attributeDataType){
         FrameworkApk frameworkApk = AndroidFrameworks.getCurrent();
         if(frameworkApk==null){
             return false;
@@ -580,7 +583,7 @@ public class TypeNameRefactor {
             return false;
         }
         return attributeBag.getFormat()
-                .isEqualType(attributeValueType);
+                .isEqualType(attributeDataType);
     }
     private void addRefactored(int id, String name){
         refactoredTypeMap.add(id, name);

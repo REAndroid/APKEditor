@@ -21,7 +21,7 @@ import com.reandroid.app.AndroidManifest;
 import com.reandroid.arsc.chunk.xml.AndroidManifestBlock;
 import com.reandroid.arsc.chunk.xml.ResXmlAttribute;
 import com.reandroid.arsc.chunk.xml.ResXmlElement;
-import com.reandroid.arsc.value.ValueType;
+import com.reandroid.arsc.value.DataType;
 import com.reandroid.utils.HexUtil;
 import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.EmptyList;
@@ -44,14 +44,14 @@ public class AndroidManifestHelper {
             if(nameAttribute == null){
                 return false;
             }
-            String value = nameAttribute.getValueAsString();
+            String value = nameAttribute.getDataAsString();
             if(value == null){
                 return false;
             }
             if (value.equals("com.android.dynamic.apk.fused.modules")){
                 ResXmlAttribute attribute = element.searchAttributeByResourceId(AndroidManifest.ID_value);
                     if (attribute != null){
-                        String attributeValue = attribute.getValueAsString();
+                        String attributeValue = attribute.getDataAsString();
                         if (attributeValue != null && attributeValue.equals(ApkUtil.DEF_MODULE_NAME)) {
                             return true;
                         }
@@ -130,6 +130,6 @@ public class AndroidManifestHelper {
             return false;
         }
         // TODO: could be in reference, use reference resolver
-        return attribute.getValueType() == ValueType.STRING;
+        return attribute.getDataType() == DataType.STRING;
     };
 }

@@ -4,9 +4,19 @@ import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.container.SpecTypePair;
 import com.reandroid.arsc.model.ResourceEntry;
-import com.reandroid.arsc.value.*;
+import com.reandroid.arsc.value.DataType;
+import com.reandroid.arsc.value.Entry;
+import com.reandroid.arsc.value.ResTableEntry;
+import com.reandroid.arsc.value.ResValue;
+import com.reandroid.arsc.value.TableEntry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +65,7 @@ public class StringValueNameGenerator {
                 continue;
             }
             ResValue resValue = ((ResTableEntry)entry.getTableEntry()).getValue();
-            String text = resValue.getValueAsString();
+            String text = resValue.getDataAsString();
             String name = generate(resourceId, text);
             if(name!=null){
                 results.put(resourceId, name);
@@ -75,7 +85,7 @@ public class StringValueNameGenerator {
                 continue;
             }
             ResValue resValue = ((ResTableEntry)tableEntry).getValue();
-            if(resValue.getValueType() != ValueType.STRING){
+            if(resValue.getDataType() != DataType.STRING){
                 continue;
             }
             if(entry.getResConfig().isDefault()){

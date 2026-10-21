@@ -172,7 +172,8 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(res.startsWith("@0x")){
             res = res.substring(1);
         }
-        EncodeResult encodeResult = ValueCoder.encode(res, AttributeDataFormat.INTEGER.valueTypes());
+        EncodeResult encodeResult = ValueCoder.encode(res,
+                AttributeDataFormat.INTEGER.dataTypes());
         if(encodeResult != null){
             printEntries(apkModule, "resource", encodeResult.value);
             return;
@@ -250,8 +251,8 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(attributeLabel == null){
             return;
         }
-        if(attributeLabel.getValueType() == ValueType.STRING){
-            getInfoWriter().writeNameValue("AppName", attributeLabel.getValueAsString());
+        if(attributeLabel.getDataType() == DataType.STRING){
+            getInfoWriter().writeNameValue("AppName", attributeLabel.getDataAsString());
             return;
         }
         int resourceId = attributeLabel.getData();
@@ -269,8 +270,8 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(attribute == null){
             return;
         }
-        if(attribute.getValueType() == ValueType.STRING){
-            getInfoWriter().writeNameValue("AppIcon", attribute.getValueAsString());
+        if(attribute.getDataType() == DataType.STRING){
+            getInfoWriter().writeNameValue("AppIcon", attribute.getDataAsString());
             return;
         }
         int resourceId = attribute.getData();
@@ -289,8 +290,8 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(attribute == null){
             return;
         }
-        if(attribute.getValueType() == ValueType.STRING){
-            getInfoWriter().writeNameValue("AppRoundIcon", attribute.getValueAsString());
+        if(attribute.getDataType() == DataType.STRING){
+            getInfoWriter().writeNameValue("AppRoundIcon", attribute.getDataAsString());
             return;
         }
         int resourceId = attribute.getData();
@@ -473,7 +474,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(attribute == null){
             return null;
         }
-        return attribute.getValueAsString();
+        return attribute.getDataAsString();
     }
     private void printEntries(ApkModule apkModule, String varName, int resourceId) throws IOException {
         TableBlock tableBlock = apkModule.getTableBlock();
@@ -501,9 +502,9 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(resValue == null){
             return "";
         }
-        ValueType valueType = resValue.getValueType();
-        if(valueType == ValueType.STRING){
-            return resValue.getValueAsString();
+        DataType valueType = resValue.getDataType();
+        if(valueType == DataType.STRING){
+            return resValue.getDataAsString();
         }
         String decoded = ValueCoder.decode(valueType, resValue.getData());
         if(decoded != null){

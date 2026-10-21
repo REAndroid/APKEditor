@@ -163,21 +163,21 @@ public class InfoWriterText extends InfoWriter {
             writer.append(')');
         }
         writer.append('=');
-        ValueType valueType = attribute.getValueType();
-        if (valueType == ValueType.STRING) {
+        DataType dataType = attribute.getDataType();
+        if (dataType == DataType.STRING) {
             writer.append('"');
             writer.write(attribute.getDataAsPoolString().getXml());
             writer.append('"');
             writer.write(" (Raw: \"");
             writer.write(attribute.getValueString());
             writer.write("\")");
-        } else if (valueType == ValueType.BOOLEAN) {
+        } else if (dataType == DataType.BOOLEAN) {
             writer.append('"');
-            writer.write(attribute.getValueAsBoolean() ? "true" : "false");
+            writer.write(attribute.getDataAsBoolean() ? "true" : "false");
             writer.append('"');
         } else {
             writer.write("(type ");
-            writer.write(HexUtil.toHex(valueType.getByte() & 0xff, 1));
+            writer.write(HexUtil.toHex(dataType.flag(), 1));
             writer.write(")");
             writer.write(HexUtil.toHex(attribute.getData(), 1));
         }
@@ -329,7 +329,7 @@ public class InfoWriterText extends InfoWriter {
             return;
         }
         Writer writer = getWriter();
-        writer.write(getValueAsString(resValue));
+        writer.write(getDataAsString(resValue));
         writer.write("\n");
     }
     private void writeBagEntry(Entry entry) throws IOException {
@@ -357,7 +357,7 @@ public class InfoWriterText extends InfoWriter {
             writer.write(")");
         }
         writer.write("=");
-        writer.write(getValueAsString(resValueMap));
+        writer.write(getDataAsString(resValueMap));
         writer.write("\n");
     }
     @Override

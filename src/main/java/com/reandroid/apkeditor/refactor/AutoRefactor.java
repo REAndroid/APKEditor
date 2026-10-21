@@ -43,7 +43,7 @@ public class AutoRefactor {
         int renameCount = 0;
         List<ResFile> resFileList = mApkModule.listResFiles();
         for(ResFile resFile:resFileList){
-            String path = resFile.buildPath(PackageBlock.RES_DIRECTORY_NAME);
+            String path = resFile.buildPath(PackageBlock.DIRECTORY_NAME_RES);
             if(path.equals(resFile.getFilePath())){
                 continue;
             }
