@@ -89,7 +89,7 @@ public class ManifestConfuser extends Confuser {
         }
         elementApi.getStartElement()
                 .getFirstPlaceHolder()
-                .setItem(byteArray);
+                .block(byteArray);
 
         element.refresh();
     }

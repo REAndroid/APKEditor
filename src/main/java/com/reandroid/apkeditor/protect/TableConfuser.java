@@ -21,8 +21,7 @@ import com.reandroid.arsc.ARSCLib;
 import com.reandroid.arsc.chunk.PackageBlock;
 import com.reandroid.arsc.chunk.TableBlock;
 import com.reandroid.arsc.chunk.UnknownChunk;
-import com.reandroid.arsc.item.BlockItem;
-import com.reandroid.arsc.item.ByteArray;
+import com.reandroid.arsc.item.CountedBlockItem;
 import com.reandroid.arsc.item.FixedLengthString;
 import com.reandroid.arsc.item.TypeString;
 import com.reandroid.arsc.pool.TypeStringPool;
@@ -45,21 +44,20 @@ public class TableConfuser extends Confuser {
         UnknownChunk unknownChunk = new UnknownChunk();
         FixedLengthString fixedLengthString = new FixedLengthString(256);
         fixedLengthString.set(APKEditor.getRepo());
-        /*
-        BlockItem extra = unknownChunk.getHeaderBlock().getExtraBytes();
+
+        CountedBlockItem extra = unknownChunk.getHeaderBlock().excessBytes();
         byte[] bytes = fixedLengthString.getBytes();
         extra.setSize(bytes.length);
-        extra.putByteArray(0, bytes);
+        extra.write(bytes);
         fixedLengthString.set(ARSCLib.getRepo());
         extra = unknownChunk.getBody();
         bytes = fixedLengthString.getBytes();
         extra.setSize(bytes.length);
-        extra.putByteArray(0, bytes);
+        extra.write(bytes);
 
-         */
         fixedLengthString.set(ARSCLib.getRepo());
         unknownChunk.refresh();
-        tableBlock.getFirstPlaceHolder().setItem(unknownChunk);
+        tableBlock.getFirstPlaceHolder().block(unknownChunk);
         tableBlock.refresh();
     }
     private void confuseTypeNames() {
@@ -70,7 +68,7 @@ public class TableConfuser extends Confuser {
         logMessage("Type names ...");
         ApkModule apkModule = getApkModule();
         TableBlock tableBlock = apkModule.getTableBlock();
-        for(PackageBlock packageBlock:tableBlock.listPackages()){
+        for(PackageBlock packageBlock:tableBlock){
             TypeStringPool pool = packageBlock.getTypeStringPool();
             for(TypeString typeString : pool) {
                 String type = typeString.get();
