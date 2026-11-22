@@ -445,12 +445,15 @@ public class InfoWriterXml extends InfoWriter{
         }
     }
     private void writeIndent(KXmlSerializer serializer, int level) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        builder.append('\n');
-        for(int i = 0; i < level; i++){
-            builder.append(' ');
+        serializer.text("\n");
+        writeSpacesToSerializer(serializer, level);
+    }
+    private void writeSpacesToSerializer(KXmlSerializer serializer, int amount) throws IOException {
+        while (amount > 0) {
+            int chunk = Math.min(amount, SPACE_BUFFER.length);
+            serializer.text(SPACE_BUFFER, 0, chunk);
+            amount -= chunk;
         }
-        serializer.text(builder.toString());
     }
     private KXmlSerializer getSerializer() throws IOException {
         KXmlSerializer serializer = this.mSerializer;

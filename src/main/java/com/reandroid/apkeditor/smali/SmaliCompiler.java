@@ -57,10 +57,10 @@ public class SmaliCompiler implements DexEncoder {
         if(minSdkVersion == null){
             minSdkVersion = 24;
         }
-        List<InputSource> results = new ArrayList<>();
         List<File> classesDirList = listClassesDirectories(smaliDir);
-        int i = 0;
         int size = classesDirList.size();
+        List<InputSource> results = new ArrayList<>(size);
+        int i = 0;
         for(File classesDir : classesDirList){
             i++;
             String progress = "(" + StringsUtil.formatNumber(i, size) + "/" + size + ") ";

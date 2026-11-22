@@ -40,6 +40,7 @@ import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.ComputeIterator;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Info extends CommandExecutor<InfoOptions> {
@@ -539,7 +540,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(dir != null && !dir.exists()){
             dir.mkdirs();
         }
-        return new OutputStreamWriter(new FileOutputStream(file));
+        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"), 65536);
     }
     private void flush() throws IOException {
         InfoWriter writer = this.mInfoWriter;

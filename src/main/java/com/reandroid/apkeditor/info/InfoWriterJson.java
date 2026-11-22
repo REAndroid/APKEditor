@@ -240,7 +240,6 @@ public class InfoWriterJson extends InfoWriter{
     @Override
     public void writeNameValue(String name, Object value) throws IOException {
         mJsonObject.put(name, value);
-        getWriter().flush();
     }
 
     @Override
