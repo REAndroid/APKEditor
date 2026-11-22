@@ -161,6 +161,7 @@ public class SmaliCompiler implements DexEncoder {
         if(files == null){
             return results;
         }
+        results = new ArrayList<>(files.length);
         for(File file : files){
             if(!SmaliUtil.isClassesDir(file)){
                 logMessage("WARN: Ignore: " + file);
