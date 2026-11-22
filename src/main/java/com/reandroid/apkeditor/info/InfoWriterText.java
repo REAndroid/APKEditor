@@ -404,7 +404,7 @@ public class InfoWriterText extends InfoWriter {
             writer.write(ARRAY_TAB);
             writeEntry(entry);
             writer.write("\n");
-            if((index % 3) == 0){
+            if((index % 64) == 0){
                 writer.flush();
             }
         }
@@ -453,7 +453,7 @@ public class InfoWriterText extends InfoWriter {
             }
             writer.write(text);
             writer.write("\n");
-            if((index % 3) == 0){
+            if((index % 64) == 0){
                 writer.flush();
             }
         }
@@ -470,7 +470,6 @@ public class InfoWriterText extends InfoWriter {
         writer.write(text);
         writer.write("\"");
         writer.write("\n");
-        writer.flush();
     }
 
     @Override
