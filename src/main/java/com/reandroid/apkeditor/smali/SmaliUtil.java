@@ -21,21 +21,23 @@ import java.util.List;
 
 public class SmaliUtil {
 
-    static void sortDexFiles(List<File> fileList){
-        fileList.sort(new Comparator<File>() {
-            @Override
-            public int compare(File file1, File file2) {
-                int i1 = getDexNumber(file1.getName());
-                int i2 = getDexNumber(file2.getName());
-                if(i1 == i2){
-                    return 0;
-                }
-                if(i1 < 0 || i1 < i2){
-                    return -1;
-                }
-                return 1;
+    private static final Comparator<File> DEX_FILE_COMPARATOR = new Comparator<File>() {
+        @Override
+        public int compare(File file1, File file2) {
+            int i1 = getDexNumber(file1.getName());
+            int i2 = getDexNumber(file2.getName());
+            if(i1 == i2){
+                return 0;
             }
-        });
+            if(i1 < 0 || i1 < i2){
+                return -1;
+            }
+            return 1;
+        }
+    };
+
+    static void sortDexFiles(List<File> fileList){
+        fileList.sort(DEX_FILE_COMPARATOR);
     }
     static String getDexFileName(int i){
         if(i==0){
