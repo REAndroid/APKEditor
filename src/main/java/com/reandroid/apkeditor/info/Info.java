@@ -556,6 +556,13 @@ public class Info extends CommandExecutor<InfoOptions> {
         }
     }
 
+    private static final Comparator<Entry> ENTRY_COMPARATOR = new Comparator<Entry>() {
+        @Override
+        public int compare(Entry entry1, Entry entry2) {
+            return entry1.getResConfig().compareTo(entry2.getResConfig());
+        }
+    };
+
     private static List<Entry> sortEntries(Collection<Entry> entryCollection) {
         ArrayList<Entry> results;
         if(entryCollection instanceof ArrayList){
@@ -563,13 +570,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         }else {
             results = new ArrayList<>(entryCollection);
         }
-        Comparator<Entry> cmp = new Comparator<Entry>() {
-            @Override
-            public int compare(Entry entry1, Entry entry2) {
-                return entry1.getResConfig().compareTo(entry2.getResConfig());
-            }
-        };
-        results.sort(cmp);
+        results.sort(ENTRY_COMPARATOR);
         return results;
     }
 }

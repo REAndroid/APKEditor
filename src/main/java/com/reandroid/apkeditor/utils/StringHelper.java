@@ -34,13 +34,7 @@ public class StringHelper {
         return "true";
     }
     public static List<String> sortAscending(List<String> nameList){
-        Comparator<String> cmp=new Comparator<String>() {
-            @Override
-            public int compare(String s1, String s2) {
-                return s1.compareTo(s2);
-            }
-        };
-        nameList.sort(cmp);
+        nameList.sort(Comparator.naturalOrder());
         return nameList;
     }
     public static void printNameAndValues(StringBuilder builder, String tab, int totalWidth, Object[][] objTable){
