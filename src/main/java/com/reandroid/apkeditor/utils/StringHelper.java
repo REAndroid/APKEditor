@@ -31,7 +31,7 @@ public class StringHelper {
         if(!value){
             return null;
         }
-        return String.valueOf(true);
+        return "true";
     }
     public static List<String> sortAscending(List<String> nameList){
         Comparator<String> cmp=new Comparator<String>() {
@@ -162,9 +162,18 @@ public class StringHelper {
             }
         }
     }
+    private static final char[] SPACE_BUFFER = new char[1024];
+    static {
+        for(int i=0;i<SPACE_BUFFER.length;i++){
+            SPACE_BUFFER[i]=' ';
+        }
+    }
     private static void fillSpace(StringBuilder builder, int count){
-        for(int i=0;i<count;i++){
-            builder.append(' ');
+        int remaining=count;
+        while(remaining>0){
+            int chunk=Math.min(remaining, SPACE_BUFFER.length);
+            builder.append(SPACE_BUFFER, 0, chunk);
+            remaining-=chunk;
         }
     }
 }
