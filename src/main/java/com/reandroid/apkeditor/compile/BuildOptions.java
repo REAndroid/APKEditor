@@ -75,7 +75,13 @@ public class BuildOptions extends OptionsWithFramework {
             },
             description = "dex_lib"
     )
-    public String dexLib = DEX_LIB_INTERNAL;
+    // DEX_LIB_JF (JesusFreke smali) is the default because the internal
+    // com.reandroid.dex assembler encodes invoke-polymorphic/range register
+    // count as E+1 instead of E-S+1, corrupting ranges that do not start at v0
+    // (e.g. Android 17 MessageQueue/LooperDoctor VarHandle) and causing
+    // VerifyError / zygote abort.  Use -dex-lib internal to opt into the
+    // legacy internal assembler if needed.
+    public String dexLib = DEX_LIB_JF;
 
     @OptionArg(name = "-sig", description = "signatures_path")
     public File signaturesDirectory;
