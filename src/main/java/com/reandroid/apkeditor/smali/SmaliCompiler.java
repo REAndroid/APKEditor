@@ -57,10 +57,10 @@ public class SmaliCompiler implements DexEncoder {
         if(minSdkVersion == null){
             minSdkVersion = 24;
         }
-        List<InputSource> results = new ArrayList<>();
         List<File> classesDirList = listClassesDirectories(smaliDir);
-        int i = 0;
         int size = classesDirList.size();
+        List<InputSource> results = new ArrayList<>(size);
+        int i = 0;
         for(File classesDir : classesDirList){
             i++;
             String progress = "(" + StringsUtil.formatNumber(i, size) + "/" + size + ") ";
@@ -82,7 +82,16 @@ public class SmaliCompiler implements DexEncoder {
         if(BuildOptions.DEX_LIB_INTERNAL.equals(buildOptions.dexLib)) {
             return buildWithInternalLib(progress, classesDir, dexCacheFile);
         }
-        return buildWithJesusFreke(progress, classesDir, dexCacheFile);
+        try {
+            return buildWithJesusFreke(progress, classesDir, dexCacheFile);
+        }catch (IOException e){
+            // JesusFreke assembler is stricter about smali syntax (e.g. field/method ordering)
+            // than the internal com.reandroid.dex assembler. Fall back to internal so the
+            // build still completes for non-standard smali; fix_dex_polymorphic.py runs
+            // post-build to repair any invoke-polymorphic/range register-count issues left behind.
+            logMessage(progress + "Smali<JF> failed, falling back to internal: " + e.getMessage());
+            return buildWithInternalLib(progress, classesDir, dexCacheFile);
+        }
     }
     private InputSource buildWithJesusFreke(String progress, File classesDir, File dexCacheFile) throws IOException {
         logMessage(progress + "Smali<JF>: " + dexCacheFile.getName());
@@ -161,6 +170,7 @@ public class SmaliCompiler implements DexEncoder {
         if(files == null){
             return results;
         }
+        results = new ArrayList<>(files.length);
         for(File file : files){
             if(!SmaliUtil.isClassesDir(file)){
                 logMessage("WARN: Ignore: " + file);

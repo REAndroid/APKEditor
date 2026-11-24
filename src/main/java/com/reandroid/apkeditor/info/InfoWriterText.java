@@ -404,7 +404,7 @@ public class InfoWriterText extends InfoWriter {
             writer.write(ARRAY_TAB);
             writeEntry(entry);
             writer.write("\n");
-            if((index % 3) == 0){
+            if((index % 64) == 0){
                 writer.flush();
             }
         }
@@ -421,19 +421,39 @@ public class InfoWriterText extends InfoWriter {
         writer.write(Integer.toString(values.length));
         writer.write("]");
         writer.write("\n");
-        String format = "%0" + getDecimalPlaces(values.length) + "d) ";
         int index = 0;
+        int maxLen = values.length;
+        int digits = 1;
+        while (maxLen >= 10) {
+            maxLen /= 10;
+            digits++;
+        }
         for(Object value : values){
             index ++;
             writer.write(ARRAY_TAB);
-            writer.write(String.format(format, index));
+            // Manual zero-padded integer formatting (faster than String.format)
+            int num = index;
+            int tempDigits = digits;
+            int temp = num;
+            while (temp >= 10) {
+                temp /= 10;
+                tempDigits--;
+            }
+            if (tempDigits < digits) {
+                int pad = digits - tempDigits;
+                while (pad-- > 0) {
+                    writer.write('0');
+                }
+            }
+            writer.write(Integer.toString(num));
+            writer.write(") ");
             String text = toString(value);
             if(text == null){
                 text = "null";
             }
             writer.write(text);
             writer.write("\n");
-            if((index % 3) == 0){
+            if((index % 64) == 0){
                 writer.flush();
             }
         }
@@ -450,7 +470,6 @@ public class InfoWriterText extends InfoWriter {
         writer.write(text);
         writer.write("\"");
         writer.write("\n");
-        writer.flush();
     }
 
     @Override
@@ -471,14 +490,5 @@ public class InfoWriterText extends InfoWriter {
             writer.write("\n");
         }
     }
-    private static int getDecimalPlaces(int max){
-        int i = 0;
-        while (max != 0){
-            i++;
-            max = max / 10;
-        }
-        return i;
-    }
-
     private static final String ARRAY_TAB = "     ";
 }

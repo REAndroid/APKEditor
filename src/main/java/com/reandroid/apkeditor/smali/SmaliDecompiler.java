@@ -213,7 +213,7 @@ public class SmaliDecompiler implements DexDecoder {
     }
 
     private DexBackedDexFile getInputDexFile(DexFileInputSource inputSource, BaksmaliOptions options) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(8192);
         inputSource.write(outputStream);
         outputStream.close();
         byte[] bytes = outputStream.toByteArray();

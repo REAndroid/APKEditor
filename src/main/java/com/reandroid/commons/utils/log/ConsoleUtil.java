@@ -107,7 +107,7 @@ public class ConsoleUtil {
     }
 
     public static String attemptCommand(String[] command) {
-        StringBuffer buffer = null;
+        StringBuilder buffer = null;
 
         try {
             Process p = Runtime.getRuntime().exec(command);
@@ -116,7 +116,7 @@ public class ConsoleUtil {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (buffer == null) {
-                    buffer = new StringBuffer();
+                    buffer = new StringBuilder();
                 }
 
                 buffer.append(line);

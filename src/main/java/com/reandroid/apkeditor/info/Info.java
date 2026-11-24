@@ -40,6 +40,7 @@ import com.reandroid.utils.collection.CollectionUtil;
 import com.reandroid.utils.collection.ComputeIterator;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Info extends CommandExecutor<InfoOptions> {
@@ -539,7 +540,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         if(dir != null && !dir.exists()){
             dir.mkdirs();
         }
-        return new OutputStreamWriter(new FileOutputStream(file));
+        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"), 65536);
     }
     private void flush() throws IOException {
         InfoWriter writer = this.mInfoWriter;
@@ -555,6 +556,13 @@ public class Info extends CommandExecutor<InfoOptions> {
         }
     }
 
+    private static final Comparator<Entry> ENTRY_COMPARATOR = new Comparator<Entry>() {
+        @Override
+        public int compare(Entry entry1, Entry entry2) {
+            return entry1.getResConfig().compareTo(entry2.getResConfig());
+        }
+    };
+
     private static List<Entry> sortEntries(Collection<Entry> entryCollection) {
         ArrayList<Entry> results;
         if(entryCollection instanceof ArrayList){
@@ -562,13 +570,7 @@ public class Info extends CommandExecutor<InfoOptions> {
         }else {
             results = new ArrayList<>(entryCollection);
         }
-        Comparator<Entry> cmp = new Comparator<Entry>() {
-            @Override
-            public int compare(Entry entry1, Entry entry2) {
-                return entry1.getResConfig().compareTo(entry2.getResConfig());
-            }
-        };
-        results.sort(cmp);
+        results.sort(ENTRY_COMPARATOR);
         return results;
     }
 }

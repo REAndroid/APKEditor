@@ -210,14 +210,22 @@ public class StringValueNameGenerator {
         }
         return builder.toString();
     }
+    private static final Pattern PATTERN_APOSTROPHE = Pattern.compile("'");
+    private static final Pattern PATTERN_FORMAT_S = Pattern.compile("%([0-9]+\\$)?s");
+    private static final Pattern PATTERN_FORMAT_D = Pattern.compile("%([0-9]+\\$)?d");
+    private static final Pattern PATTERN_AMP = Pattern.compile("&amp;");
+    private static final Pattern PATTERN_LT_GT = Pattern.compile("&(lt|gt);");
+    private static final Pattern PATTERN_NON_ALPHA = Pattern.compile("[^A-Za-z]+");
+    private static final Pattern PATTERN_SPLIT_SPACE = Pattern.compile("[\\s]+");
+
     private String getDefaultName(String str){
-        str=str.replaceAll("'", "");
-        str=str.replaceAll("%([0-9]+\\$)?s", " STR ");
-        str=str.replaceAll("%([0-9]+\\$)?d", " NUM ");
-        str=str.replaceAll("&amp;", " and ");
-        str=str.replaceAll("&(lt|gt);", " ");
+        str=PATTERN_APOSTROPHE.matcher(str).replaceAll("");
+        str=PATTERN_FORMAT_S.matcher(str).replaceAll(" STR ");
+        str=PATTERN_FORMAT_D.matcher(str).replaceAll(" NUM ");
+        str=PATTERN_AMP.matcher(str).replaceAll(" and ");
+        str=PATTERN_LT_GT.matcher(str).replaceAll(" ");
         str=replaceNonAZ(str);
-        String[] allWords=str.split("[\\s]+");
+        String[] allWords=PATTERN_SPLIT_SPACE.split(str);
         int len=0;
         boolean appendOnce=false;
         StringBuilder builder=new StringBuilder();
@@ -264,7 +272,7 @@ public class StringValueNameGenerator {
         }else {
             str=fullStr;
         }
-        str=str.replaceAll("[^A-Za-z]+", " ");
+        str=PATTERN_NON_ALPHA.matcher(str).replaceAll(" ");
         StringBuilder builder=new StringBuilder();
         builder.append(str);
         if(num!=null){

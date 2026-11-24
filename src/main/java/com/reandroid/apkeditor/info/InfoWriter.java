@@ -116,9 +116,17 @@ public abstract class InfoWriter implements Closeable {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
+    static final char[] SPACE_BUFFER = new char[1024];
+    static {
+        for (int i = 0; i < SPACE_BUFFER.length; i++) {
+            SPACE_BUFFER[i] = ' ';
+        }
+    }
     static void writeSpaces(Writer writer, int amount) throws IOException {
-        for (int i = 0; i < amount; i ++) {
-            writer.append(' ');
+        while (amount > 0) {
+            int chunk = Math.min(amount, SPACE_BUFFER.length);
+            writer.write(SPACE_BUFFER, 0, chunk);
+            amount -= chunk;
         }
     }
 
