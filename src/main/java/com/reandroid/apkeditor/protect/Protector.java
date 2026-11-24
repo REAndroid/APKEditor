@@ -18,6 +18,7 @@ package com.reandroid.apkeditor.protect;
 import com.reandroid.apkeditor.CommandExecutor;
 import com.reandroid.apkeditor.Util;
 import com.reandroid.apk.*;
+import com.reandroid.arsc.chunk.Chunk;
 
 import java.io.IOException;
 
@@ -46,12 +47,15 @@ public class Protector extends CommandExecutor<ProtectorOptions> {
     public void runCommand() throws IOException {
         ProtectorOptions options = getOptions();
         delete(options.outputFile);
+        Chunk.ENABLE_FIRST_PLACE_HOLDER = true;
         ApkModule module = ApkModule.loadApkFile(this, options.inputFile);
         module.setLoadDefaultFramework(false);
         String protect = Util.isProtected(module);
         if(protect != null){
             logMessage(options.inputFile.getAbsolutePath());
             logMessage(protect);
+            Chunk.ENABLE_FIRST_PLACE_HOLDER = false;
+            module.close();
             return;
         }
         setApkModule(module);
@@ -69,6 +73,7 @@ public class Protector extends CommandExecutor<ProtectorOptions> {
             module.writeApk(options.outputFile);
         }
         module.close();
+        Chunk.ENABLE_FIRST_PLACE_HOLDER = false;
         logMessage("Saved to: " + options.outputFile);
     }
 }
