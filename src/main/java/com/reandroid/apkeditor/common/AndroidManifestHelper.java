@@ -71,8 +71,9 @@ public class AndroidManifestHelper {
             }
             return;
         }
+        // Antes hera un valor entero  
         boolean removed = manifestElement.removeAttributesWithName(resourceName);
-        if (removed && logger != null) {
+        if (removed ) {
             logger.logMessage("Removed-attribute : " + resourceName);
         }
     }
@@ -86,7 +87,7 @@ public class AndroidManifestHelper {
             return;
         }
         boolean removed = manifestElement.removeAttributesWithId(resourceId);
-        if (removed && logger != null) {
+        if (removed ) {
             logger.logMessage("Removed-attribute : " + HexUtil.toHex8("@0x", resourceId));
         }
     }
@@ -108,7 +109,7 @@ public class AndroidManifestHelper {
         ResXmlElement applicationElement = manifestElement.getElement(
                 AndroidManifest.TAG_application);
 
-        if(removed && logger != null) {
+        if(removed ) {
             logger.logMessage("Attributes on <manifest> removed: "
                     + HexUtil.toHex8("0x", resourceId) + " (" + nameForLogging + ")");
         }
@@ -116,7 +117,7 @@ public class AndroidManifestHelper {
             return;
         }
         removed = applicationElement.removeAttributesWithId(resourceId);
-        if(removed && logger != null) {
+        if(removed ) {
             logger.logMessage("Attributes on <application> removed: "
                     + HexUtil.toHex8("0x", resourceId) + " (" + nameForLogging + ")");
         }
