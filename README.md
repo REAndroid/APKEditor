@@ -1,5 +1,101 @@
 <details><summary> 👈 <code><i> Click arrows to expand/collapse details on this page </i></code></summary></details>
 
+## Windows Batch Script Wrapper (`apkeditor.bat`)
+This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has six main features.
+*(Tool documentation remains the same as provided in the prompt - Decompile, Build, Merge, Refactor, Protect, Info sections)*
+
+To make using `APKEditor.jar` more convenient on Windows, you can use the following batch script wrapper. It allows you to call the tool using a simple `apkeditor` command from anywhere in your terminal, provided you set it up correctly.
+
+### Features:
+*   **Easy Access:** Run `APKEditor.jar` using the `apkeditor` command.
+*   **PATH Integration:** Add the script's location to your system PATH for global access.
+*   **Argument Forwarding:** Passes all arguments directly to `APKEditor.jar`.
+*   **Colorized Output:** Uses ANSI escape codes for clearer console feedback (requires a compatible terminal like Windows Terminal, PowerShell 7+, Git Bash).
+*   **Built-in Help:** Shows basic usage or forwards to `APKEditor.jar -h` when no command or a help flag is provided.
+
+### Steps to Set Up:
+1.  **Download `APKEditor.jar`**: Get the latest release from the [Releases Page](https://github.com/REAndroid/APKEditor/releases/latest) and place `APKEditor.jar` in a dedicated folder (e.g., `C:\APKEditor\`).
+2.  **Save the Script**: Copy the code below and save it as `apkeditor.bat` in the *same folder* as `APKEditor.jar` (e.g., `C:\APKEditor\apkeditor.bat`).
+3.  **Add Folder to System PATH**:
+    *   Search for "Environment Variables" in the Windows Start Menu and open "Edit the system environment variables".
+    *   Click the "Environment Variables..." button.
+    *   Under "System variables" (or "User variables" for just your user), find the `Path` variable, select it, and click "Edit...".
+    *   Click "New" and add the full path to the folder where you saved the script and JAR (e.g., `C:\APKEditor`).
+    *   Click "OK" on all open windows.
+    *   **Important**: You may need to **close and reopen** any open Command Prompt or PowerShell windows for the PATH change to take effect.
+
+### Batch Script Code (`apkeditor.bat`):
+
+```batch
+@echo off
+setlocal EnableDelayedExpansion
+
+::  colors
+set "red=[91m"
+set "green=[92m"
+set "yellow=[93m"
+set "cyan=[96m"
+set "reset=[0m"
+
+set "JAR_PATH=%~dp0APKEditor.jar"
+if not exist "%JAR_PATH%" (
+    echo %red%[ERROR] APKEditor.jar not found in %~dp0%reset%
+    exit /b 1
+)
+
+if "%~1"=="" (
+    echo %yellow%APKEditor%reset% 
+	
+    echo %cyan%Usage:%reset% apkeditor [command] [options]
+    echo %cyan%Commands:%reset% use %green% apkeditor -h %reset%- to see the available commands
+    echo %cyan%Example:%reset% apkeditor d -i app.apk
+    exit /b 0
+)
+
+echo %yellow%[INFO] Running command: java -jar APKEditor.jar %* %reset%
+java -jar "%JAR_PATH%" %*
+
+exit /b %ERRORLEVEL%
+
+```
+
+### Usage Examples (using the wrapper):
+
+Now you can open **Command Prompt**, **PowerShell**, or **Windows Terminal** and use the tool like this:
+
+*   **Get Help:**
+    ```sh
+    apkeditor -h
+    ```
+*   **Decompile an APK:**
+    ```sh
+    apkeditor d -i myapp.apk -o myapp_json
+    ```
+*   **Build APK from decompiled files:**
+    ```sh
+    apkeditor b -i myapp_json -o myapp_rebuilt.apk
+    ```
+*   **Merge multiple APK files:**
+    ```sh
+    apkeditor m -i apks-folder -o merged_app.apk
+    ```
+*   **Refactor obfuscated resources:**
+    ```sh
+    apkeditor x -i myapp.apk -o myapp_refactored.apk
+    ```
+*   **Protect APK resources:**
+    ```sh
+    apkeditor p -i myapp.apk -o myapp_protected.apk
+    ```
+*   **Get detailed APK information:**
+    ```sh
+    apkeditor info -v -resources -i myapp.apk
+    ```
+
+### Notes:
+*   **Color Support:** ANSI color codes work best in modern terminals like **Windows Terminal**, **PowerShell 7+**, or **Git Bash**. They might appear as garbled text in older `cmd.exe` windows on older Windows versions.
+*   **Java Requirement:** Ensure you have a compatible Java Runtime Environment (JRE) installed and available in your system's PATH for the `java` command to work.
+
 # APKEditor
 ### Powerful android apk resources editor
 This tool uses [ARSCLib](https://github.com/REAndroid/ARSCLib) to edit any apk resources and has six main features
