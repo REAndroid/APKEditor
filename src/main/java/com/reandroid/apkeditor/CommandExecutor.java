@@ -15,6 +15,8 @@
  */
 package com.reandroid.apkeditor;
 
+import com.reandroid.apkeditor.core.ExecutionContext;
+
 import com.reandroid.apk.APKLogger;
 import com.reandroid.archive.ZipEntryMap;
 import com.reandroid.apk.ApkModule;
@@ -97,6 +99,7 @@ public class CommandExecutor<T extends Options> implements APKLogger, XmlCoderLo
         if(!mEnableLog){
             return;
         }
+        ExecutionContext.message(mLogTag + msg);
         Logger.i(mLogTag + msg);
     }
     @Override
@@ -104,6 +107,7 @@ public class CommandExecutor<T extends Options> implements APKLogger, XmlCoderLo
         if(!mEnableLog){
             return;
         }
+        ExecutionContext.error(mLogTag + msg, tr);
         Logger.e(mLogTag + msg, tr);
     }
     @Override
@@ -111,6 +115,7 @@ public class CommandExecutor<T extends Options> implements APKLogger, XmlCoderLo
         if(!mEnableLog){
             return;
         }
+        ExecutionContext.message(mLogTag + msg);
         Logger.sameLine(mLogTag + msg);
     }
     @Override
@@ -146,4 +151,3 @@ public class CommandExecutor<T extends Options> implements APKLogger, XmlCoderLo
         archive.remove("stamp-cert-sha256");
     }
 }
-

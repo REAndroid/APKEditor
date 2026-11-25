@@ -1,30 +1,52 @@
-name: Build Jar
+name: Build JavaFX GUI Jar
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "UI" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "UI" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 8
+
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
+          java-version: '21'
           distribution: 'temurin'
+
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build with Gradle
-        run: ./gradlew fatJar
-      - uses: actions/upload-artifact@v4
+
+      - name: Build JavaFX GUI jar
+        run: |
+          chmod +x gradlew
+          ./gradlew clean guiFatJar --no-daemon
+          ls -lh build/libs build/javafx
+
+      - name: Install Xvfb
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: JavaFX smoke test
+        run: xvfb-run -a ./gradlew javafxSmoke --no-daemon
+
+      - name: Package GUI artifact
+        run: |
+          mkdir -p dist/gui/javafx
+          cp build/libs/*-gui.jar dist/gui/
+          cp build/javafx/*.jar dist/gui/javafx/
+          ls -lh dist/gui dist/gui/javafx
+
+      - name: Upload GUI artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: APKEditor
-          path: build/libs
+          name: APKEDITOR-GUI
+          path: dist/gui
+          if-no-files-found: error
